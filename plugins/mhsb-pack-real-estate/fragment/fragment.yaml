@@ -1,0 +1,86 @@
+# Fragment for real estate. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: real-estate
+practice: real estate
+release_tier: pilot
+status: pilot draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: role
+  prompt: Role in the transaction
+  type: choice
+- id: property
+  prompt: Property
+  type: text
+- id: contract_status
+  prompt: Contract status and dates
+  type: text
+- id: lender_title
+  prompt: Lender and title company
+  type: text
+- id: other_party
+  prompt: Other party and counsel
+  type: text
+- id: closing_date
+  prompt: Closing date
+  type: date
+attorney_review_flags:
+- adverse_parties_unsettled_terms
+- conflict_match
+- outside_jurisdiction
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- purchase agreement and addenda
+- disclosures
+- pre-approval
+- title commitment
+- survey
+- deed
+- note and mortgage
+- closing disclosure
+- inspections
+- leases (commercial)
+- estoppels (commercial)
+- environmental (commercial)
+stage_map:
+- contract review
+- title and survey review
+- contingency tracking
+- closing prep
+- closing
+- recording and post-closing
+fee_model:
+  model: hybrid
+  notes: Flat per closing; hourly for disputes.
+deadline_categories:
+- id: contract_dates
+  label: Contingency, title objection, closing and recording dates (entered from the contract; govern)
+  kind: entered
+communication_templates:
+- milestone-update
+- closing-document-request
+- closing-confirmation
+- file-closing-letter
+consent_flags:
+- id: multi_party_representation
+  label: Multi-party representation rules per the firm's state
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags: []
+sensitive_field_semantics: excluded from any scoring
+brief_views:
+- contingency_dates
+- closing_checklist
+- title_items
+reports: []

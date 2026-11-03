@@ -1,0 +1,18 @@
+{
+  "name": "mhsb-pack-business-transactional",
+  "version": "0.1.0",
+  "description": "Business and transactional practice fragment: intake questions, attorney-review flags, document list, stage map, deadline categories, template references and report entries. Data only; adds no commands.",
+  "author": {
+    "name": "MHSB Solutions",
+    "url": "https://mhsbsolutions.com"
+  },
+  "homepage": "https://github.com/MHSBai/platform-plugins",
+  "repository": "https://github.com/MHSBai/platform-plugins",
+  "license": "LicenseRef-MHSB-Source-Available",
+  "keywords": [
+    "legal",
+    "law-firm",
+    "practice",
+    "practice-area"
+  ]
+}

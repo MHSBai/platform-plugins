@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mhsb-lawmatics": {
+      "type": "http",
+      "url": "https://mcp.mhsbsolutions.com/lawmatics"
+    }
+  }
+}

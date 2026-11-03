@@ -1,0 +1,90 @@
+# Fragment for family law. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: family-law
+practice: family law
+release_tier: hidden
+status: hidden draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: parties_children
+  prompt: Parties and children
+  type: text
+- id: dates
+  prompt: Key dates
+  type: text
+- id: prior_pending_cases
+  prompt: Prior or pending cases and orders, including protective orders
+  type: text
+- id: income
+  prompt: Income
+  type: text
+- id: assets_debts
+  prompt: Assets and debts
+  type: text
+- id: goals
+  prompt: Goals
+  type: text
+- id: opposing_party
+  prompt: Opposing party and counsel
+  type: text
+- id: safety_protocol_followed
+  prompt: The firm's safety protocol was followed, and the resulting contact rules
+  type: text
+attorney_review_flags:
+- possible_conflict_other_spouse_prior_contact
+- outside_matter_types_or_jurisdiction
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- collected after engagement
+stage_map:
+- inquiry
+- conflict check
+- consult
+- retainer
+- pleadings and temporary orders
+- disclosure
+- mediation or settlement
+- trial
+- judgment
+- post-judgment
+fee_model:
+  model: hourly
+  notes: Hourly retainer; flat for uncontested matters; contingency prohibited.
+deadline_categories:
+- id: response_disclosure
+  label: Response to petition and disclosure deadlines, by state
+  kind: statutory
+  citation: null
+  adopter: null
+- id: hearings
+  label: Hearings (entered)
+  kind: entered
+communication_templates:
+- urgent-routing
+- consult-prep
+- hearing-reminder
+- final-letter
+consent_flags:
+- id: verified_contact_rule
+  label: Verified contact rule; outreach drafts are refused unless the record carries it with verifier
+    and date
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags:
+- safety_screen
+- health
+- children
+sensitive_field_semantics: excluded from any scoring
+brief_views: []
+reports: []

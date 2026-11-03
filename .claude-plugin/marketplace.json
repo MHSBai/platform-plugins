@@ -1,0 +1,53 @@
+{
+  "name": "mhsb-platform-plugins",
+  "description": "Claude plugins for solo and small United States law firms on Lawmatics, Clio or MyCase, maintained by MHSB Solutions. Read-only in version 1.",
+  "version": "0.1.0",
+  "owner": {
+    "name": "MHSB Solutions",
+    "url": "https://mhsbsolutions.com"
+  },
+  "plugins": [
+    {
+      "name": "mhsb-firm-core",
+      "source": "./plugins/mhsb-firm-core",
+      "description": "Free core plugin for law firm staff: orientation, a pre-paste confidentiality check, plain-language explanation, follow-up drafting, meeting notes, an AI policy draft for attorney adoption, role-based training and a support request. Operates without a connector.",
+      "category": "governance"
+    },
+    {
+      "name": "mhsb-operations",
+      "source": "./plugins/mhsb-operations",
+      "description": "Read-only operations commands for subscribing firms: briefs, consultation preparation, matter status, intake triage, adopted letters, dates, document checklists, data hygiene, reports, register checks and setup verification. Bundles the MHSB firm connector.",
+      "category": "operations"
+    },
+    {
+      "name": "mhsb-lawmatics",
+      "source": "./plugins/mhsb-lawmatics",
+      "description": "Lawmatics platform commands: public form protection review and pipeline health. Bundles the MHSB Lawmatics connector. Read-only.",
+      "category": "platform"
+    },
+    {
+      "name": "mhsb-clio",
+      "source": "./plugins/mhsb-clio",
+      "description": "Clio platform commands: timekeeper hours, production by billing method and flat-fee budget versus actual. Bundles the MHSB Clio connector. Read-only.",
+      "category": "platform"
+    },
+    {
+      "name": "mhsb-mycase",
+      "source": "./plugins/mhsb-mycase",
+      "description": "MyCase vocabulary and field mapping for use over the vendor's own connector. Adds no commands. MHSB service-side controls do not apply to records retrieved through the vendor connector.",
+      "category": "platform"
+    },
+    {
+      "name": "mhsb-pack-personal-injury",
+      "source": "./plugins/mhsb-pack-personal-injury",
+      "description": "Personal injury practice fragment: intake questions, attorney-review flags, document list, stage map, deadline categories, template references and report entries. Data only; adds no commands.",
+      "category": "practice-area"
+    },
+    {
+      "name": "mhsb-pack-business-transactional",
+      "source": "./plugins/mhsb-pack-business-transactional",
+      "description": "Business and transactional practice fragment: intake questions, attorney-review flags, document list, stage map, deadline categories, template references and report entries. Data only; adds no commands.",
+      "category": "practice-area"
+    }
+  ]
+}
