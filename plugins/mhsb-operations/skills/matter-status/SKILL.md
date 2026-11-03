@@ -69,3 +69,9 @@ This command does not do the following. It says so and stops.
 - Deleting, bulk edits or any write to the platform.
 - A client-facing status without an adopted template.
 - Any field outside the client_visible allowlist in client copy.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/status-variants.md`: Status variants.

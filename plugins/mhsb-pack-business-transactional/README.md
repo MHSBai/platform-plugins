@@ -15,3 +15,7 @@ From a shell, after `claude plugin marketplace add MHSBai/platform-plugins#<tag>
 ## Scope
 
 The plugin does no legal research, drafts no filings, produces no citations, takes no trust account action, sends nothing, deletes nothing and, in version 1, writes nothing to the firm's platform. Outputs require review by a licensed attorney.
+
+## Adapted fragment sources
+
+The fragment is accompanied by `fragment/intake-blocks.yaml`. Each file names its source, commit and license in its header and has a row in the repository's `PROVENANCE.md`.

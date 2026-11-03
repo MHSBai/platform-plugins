@@ -56,3 +56,9 @@ This command does not do the following. It says so and stops.
 - Sending anything. A person reviews and sends every draft.
 - Deleting, bulk edits or any write to the platform.
 - Matter content of any kind, including client names, facts or documents. The user is asked to remove it.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/request-triage.md`: Request triage: packaging a support request for MHSB.

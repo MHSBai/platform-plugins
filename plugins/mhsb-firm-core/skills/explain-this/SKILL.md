@@ -54,3 +54,9 @@ This command does not do the following. It says so and stops.
 - Sending anything. A person reviews and sends every draft.
 - Deleting, bulk edits or any write to the platform.
 - A legal conclusion, a prediction of outcome, or advice on what to do.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/plain-response.md`: Plain response: structure for an explanation a client or staff member can read.

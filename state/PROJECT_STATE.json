@@ -1,51 +1,67 @@
 {
   "project": "MHSB Platform Plugins: platform-plugins repository",
-  "stage": "PP-1, Stage 1: repository, marketplace, manifest and lint",
-  "branch": "cloud/pp1-repository-marketplace",
+  "stage": "PP-2, Stage 2: harvest, provenance and adapted sources",
+  "branch": "cloud/pp2-harvest",
+  "base": "cloud/pp1-repository-marketplace (pull request open, not merged)",
   "checkpoints": [
     {
       "id": "C1",
-      "name": "manifest generates the counts table, at most 22 commands in any combination",
-      "command": "python tools/gen_manifest.py --counts && python tools/gen_manifest.py --check",
+      "name": "ledger complete",
+      "command": "python -c (see state/EXECUTION-LOG.md, PP-2 Step 5)",
       "status": "pass",
-      "evidence": "895 combinations; maximum 22 commands"
+      "evidence": "17 entries, 0 incomplete; 16 ALLOWED, 1 ABSENT (anthropics/skills, BENCHMARK)"
     },
     {
       "id": "C2",
-      "name": "lint and tests green",
-      "command": "python tools/lint.py && python -m pytest -q",
+      "name": "license gate green",
+      "command": "python tools/license_gate.py --clones",
       "status": "pass",
-      "evidence": "lint 0 errors, 12 warnings (synthetic adoption, decision 0002); 56 tests passed"
+      "evidence": "17 ledger entries, 32 PROVENANCE rows, 0 failures"
     },
     {
       "id": "C3",
-      "name": "marketplace validated",
-      "command": "tools/verify_marketplace.sh",
+      "name": "adapted files carry headers",
+      "command": "grep -rlF 'MHSB modification notice' plugins | wc -l",
       "status": "pass",
-      "evidence": "claude plugin validate . --strict passed; seven listed plugins installed; hidden pack not installable"
+      "evidence": "32 files; gate rule G3 and lint rule L12 pass"
     },
     {
       "id": "C4",
-      "name": "CI present",
-      "command": "python -c \"import yaml; print(sorted(yaml.safe_load(open('.github/workflows/ci.yml'))['jobs']))\"",
+      "name": "element checklists for every restricted form",
+      "command": "ls catalog/element-checklists",
       "status": "pass",
-      "evidence": "jobs: agent-scan, lint, tests; first GitHub run pending on the pull request"
+      "evidence": "7 of 7 (OSB PLF, SC Bar PMAP, WSBA, ACTEC, NACDL, IDP, ABA DV)"
     },
     {
       "id": "C5",
-      "name": "no pilot firm identifier from the specification in the repository",
-      "command": "grep -rnwF -f <private denylist> --exclude-dir=.git .",
+      "name": "lint and tests green",
+      "command": "python tools/gen_manifest.py --check && python tools/lint.py && python -m pytest -q",
       "status": "pass",
-      "evidence": "10 identifiers, 0 hits"
+      "evidence": "lint 0 errors, 12 warnings (synthetic adoption, decision 0002); 70 tests passed"
+    },
+    {
+      "id": "C6",
+      "name": "no firm name from the specification",
+      "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
+      "status": "pass",
+      "evidence": "15 identifiers, 0 hits"
     }
+  ],
+  "provenance_rows_by_license": {
+    "Apache-2.0": 27,
+    "MIT": 3,
+    "CC0-1.0": 2
+  },
+  "incidents": [
+    "pytest collection imported clone test modules once before pytest.ini pinned discovery; see EXECUTION-LOG PP-2 Step 2"
   ],
   "gates": [
     {
       "id": "G1",
-      "name": "documentation fetch failed for all URLs",
-      "action": "stop",
+      "name": "required repository unreachable",
+      "action": "record and continue",
       "status": "not triggered",
-      "evidence": "five URLs returned HTTP 200 on 2026-11-03"
+      "evidence": "17 of 17 cloned"
     }
   ],
   "last_verified": "2026-11-03"

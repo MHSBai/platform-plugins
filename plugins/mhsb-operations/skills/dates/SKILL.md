@@ -69,3 +69,9 @@ This command does not do the following. It says so and stops.
 - Deleting, bulk edits or any write to the platform.
 - Deriving a governing deadline from a generic period.
 - Choosing between two dates that disagree.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/deadline-rules.md`: Deadline rules.

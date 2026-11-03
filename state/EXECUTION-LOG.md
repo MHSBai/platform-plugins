@@ -162,3 +162,64 @@ Command: `git push -u origin cloud/pp1-repository-marketplace`
 ```
 
 Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/1 ("Stage 1: repository, marketplace, manifest and lint"). Not merged. Outcome: DONE PP-1.
+
+## PP-2, Stage 2: harvest, provenance and adapted sources
+
+### Step 0. Resume check and stacking (2026-11-03)
+
+Command: `git ls-remote --heads origin; git log --oneline origin/main`
+
+Output: `main` holds only `080d165 docs: repository purpose`; the Stage 1 branch `cloud/pp1-repository-marketplace` (head 48bc51a) holds the skeleton and its pull request is open, not merged. No PP-2 entry existed in this log. Branch `cloud/pp2-harvest` was created from `cloud/pp1-repository-marketplace`. The session harness named a different branch (`roo/wizardly-mendel-c744jl`); the task's branch name was used, as in Stage 1 and Stage 3.
+
+### Step 1. Clone the seventeen repositories
+
+Command: `git -c core.hooksPath=/dev/null clone --no-checkout https://github.com/OWNER/REPO harvest/OWNER_REPO/repo`, then `checkout` with hooks disabled; one empty directory per repository.
+
+Output: all seventeen cloned; none unreachable. Heads recorded in `harvest/LEDGER.yaml`. No build tool, install script or package manager was run in any clone; license files were hashed and classified with a scratchpad script run under `python3 -I`.
+
+### Step 2. Incident: pytest collection imported clone modules
+
+The first `python -m pytest -q` after the clones existed had no `testpaths` setting, so pytest discovery walked into `harvest/` and imported test modules and three `conftest.py` files from the clones (RosenAdvertising clio-mcp and lawmatics-mcp, snyk agent-scan) before stopping with 34 collection errors. Module-level code of those files and of the packages they import therefore ran once inside this container's pytest process. No fixture or test body ran (collection was interrupted); the module-level code inspected sets environment variables for its own process and defines fixtures; the process exited. No secret is held in the repository or was set for the session. Remedy: `pytest.ini` pins discovery to `tests/` with `norecursedirs = harvest`; the `__pycache__` directories produced in the clones were deleted; `git status --ignored` in each clone is clean. This breached the instruction never to run code from a clone and is recorded here for that reason.
+
+### Step 3. Ledger, license gate, adapted files (checkpoints: ledger complete, license gate green, headers)
+
+Commit 6735a61. 32 adapted files (14 from claude-for-legal, 13 from knowledge-work-plugins, 2 from frblaw/ai-policy-templates, 3 from AssemblyLine), each with the modification notice and a PROVENANCE row. `tools/license_gate.py` (G1 to G6) with negative tests in `tests/test_license_gate.py`; CI step added to the lint job. The dash rule now skips the git-ignored clones and still lints `harvest/LEDGER.yaml`.
+
+### Step 4. Element checklists (checkpoint: one per restricted form)
+
+Commit 6ac3d62. Seven checklists in `catalog/element-checklists/`, written without any form open; comparison against each current edition and the similarity review are pending. Consent request drafts and the terms record are in the private repository (mhsb-firm-service `docs/consents/`), not sent.
+
+### Step 5. Checkpoint run
+
+```
+$ ledger completeness
+entries: 17 incomplete: []
+status: {'ADAPT': 4, 'BENCHMARK': 6, 'VENDOR': 5, 'EVALUATED': 1, 'TOOL': 1}
+license_status: {'ALLOWED': 16, 'ABSENT': 1}
+$ python tools/license_gate.py --clones
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ python tools/license_gate.py
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ adapted files with notice
+32
+$ PROVENANCE rows by license
+Apache-2.0: 27
+CC0-1.0: 2
+MIT: 3
+$ element checklists
+7
+$ python tools/gen_manifest.py --check
+generated files current
+exit 0
+$ python tools/lint.py
+lint: 14 rules, 0 error(s), 12 warning(s)
+$ python -m pytest -q
+70 passed in 44.85s
+$ denylist grep
+identifiers: 15
+hits: 0
+$ tracked files under harvest
+harvest/LEDGER.yaml
+```
+
+agent-scan: wired by Stage 1 in `.github/workflows/ci.yml` (job `agent-scan`, public repository only, SNYK_TOKEN reported as SET or EMPTY); unchanged in this stage. Its first GitHub run is on the pull request.

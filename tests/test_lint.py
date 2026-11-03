@@ -25,10 +25,21 @@ from manifest_lib import load_manifest  # noqa: E402
 EM, EN, FIG = "\u2014", "\u2013", "\u2012"
 
 
+_BASE_IGNORE = shutil.ignore_patterns(".git", ".venv", "__pycache__", ".pytest_cache")
+
+
+def copy_ignore(directory: str, names: list[str]) -> set[str]:
+    """Skip caches, and the git-ignored harvest clones; keep harvest/LEDGER.yaml."""
+    ignored = set(_BASE_IGNORE(directory, names))
+    if Path(directory).resolve() == (ROOT / "harvest").resolve():
+        ignored |= {n for n in names if n != "LEDGER.yaml"}
+    return ignored
+
+
 @pytest.fixture()
 def repo(tmp_path: Path) -> Path:
     target = tmp_path / "repo"
-    shutil.copytree(ROOT, target, ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache"))
+    shutil.copytree(ROOT, target, ignore=copy_ignore)
     return target
 
 
@@ -402,3 +413,13 @@ def test_cli_exit_codes(repo: Path) -> None:
     assert lint.main(["--root", str(repo)]) == 0
     assert lint.main(["--root", str(repo), "--release"]) == 1
     assert gen_manifest.main(["--root", str(repo), "--check"]) == 0
+
+
+def test_l04_skips_harvest_clones_but_lints_ledger(repo: Path) -> None:
+    clone = repo / "harvest" / "owner_repo" / "repo"
+    clone.mkdir(parents=True)
+    (clone / "README.md").write_text(f"third-party text {EM} untouched\n", encoding="utf-8")
+    assert "L04" not in rules_failed(repo)
+    ledger = repo / "harvest" / "LEDGER.yaml"
+    ledger.write_text(ledger.read_text(encoding="utf-8") + f"# note {EN}\n", encoding="utf-8")
+    assert "L04" in rules_failed(repo)

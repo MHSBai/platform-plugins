@@ -95,3 +95,11 @@ The PP-1 prompt names `cloud/pp1-repository-marketplace`; the session environmen
 ## 7. Later stages
 
 Stage 2 adds harvested files with ledger rows in PROVENANCE.md and the 4(b) notice. Stage 3 defines the authoritative fragment schema, replaces the placeholder `schema_status` in each `fragment.yaml`, and adds the MyCase vocabulary. Stage 8 replaces the Stage 1 skill bodies with the full procedures, examples and the sixty-phrase routing suite. Stage 14 adds the directory listing fields (privacy policy, terms, support URL) to `mhsb-firm-core`.
+
+## PP-2 (Stage 2) items
+
+1. Element checklists: compare each checklist in `catalog/element-checklists/` against the current edition of its form under the publisher's terms, and run the similarity review; confirm the five terms statuses marked "restricted or unstated".
+2. Consent requests: drafts are in mhsb-firm-service `docs/consents/consent-requests.md`; decide per form whether any wording is wanted, and send only those. Not sent from the cloud session.
+3. Adoption: the 32 adapted references and fragment sources are drafts in the repository's register; the skills point to them, but they carry no attorney adoption, and none is a template.
+4. MHSB hygiene items and the appointment-comms v3 gate on Stage 10 are recorded in mhsb-firm-service `HANDOFF.md`; they need pop-os and the vault.
+5. Stacking: `cloud/pp2-harvest` is based on `cloud/pp1-repository-marketplace`; merge that pull request first, then rebase this branch onto `main`.

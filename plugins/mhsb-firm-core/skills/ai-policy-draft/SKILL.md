@@ -59,3 +59,10 @@ This command does not do the following. It says so and stops.
 - Deleting, bulk edits or any write to the platform.
 - Writing policy wording that is not in the counsel-reviewed template.
 - Marking the policy adopted. Only the attorney adopts it.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/policy-base.md`: AI policy base.
+- `references/policy-gap-interview.md`: AI policy interview and gap analysis.

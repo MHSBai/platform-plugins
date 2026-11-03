@@ -69,3 +69,10 @@ This command does not do the following. It says so and stops.
 - Sending anything. A person reviews and sends every draft.
 - Deleting, bulk edits or any write to the platform.
 - Sending the message. The draft goes to a person.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/call-list.md`: Call list: who to contact today.
+- `references/speed-to-lead.md`: Speed to lead: first reply to an inbound inquiry.

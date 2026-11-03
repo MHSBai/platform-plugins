@@ -1,0 +1,264 @@
+# MHSB modification notice (Apache License, Version 2.0, Section 4(b)).
+# Modified by MHSB Solutions on 2026-11-03.
+# Original: SuffolkLITLab/docassemble-AssemblyLine, docassemble/AssemblyLine/data/questions/ql_baseline.yml, commit 66fbabe7ea68876c4e0c77c2ad5021626bcc0a68.
+# Original license: MIT. The original copyright and license notices are retained.
+# Change note: Name, contact, address, party, date and document question blocks rewritten as plain YAML intake data mapped to this pack's fragment question ids.
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2025 Suffolk Legal Innovation and Technology Lab
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# Intake blocks for this pack. Data only: no docassemble syntax, no code, no
+# computed values. The pack's fragment/fragment.yaml remains the authoritative
+# list of intake_questions; this file supplies reusable identity, contact,
+# address, party, date and document blocks and maps them onto those question ids.
+# Every block is a draft until the firm's attorney adopts the fragment.
+schema_version: 0.1.0
+schema_status: placeholder; validated against the fragment schema in the service repository
+source_pattern: reusable question blocks (identity, contact, address, parties, dates, documents)
+semantics:
+  unknown_is_not_permitted: true
+  dates_as_entered: the entered date and its stated source are recorded; no date is computed here
+  sensitive_fields: excluded from any scoring or ranking; masked in reports
+  contact_rule: no outreach draft is offered unless safe_to_contact is yes and verified
+blocks:
+  party_identity:
+    description: Name of a person in the parts the record needs, with the name the person uses.
+    fields:
+    - id: name_first
+      prompt: First name
+      type: text
+      required: true
+      sensitive: false
+    - id: name_middle
+      prompt: Middle name or initial
+      type: text
+      required: false
+      sensitive: false
+    - id: name_last
+      prompt: Last name
+      type: text
+      required: true
+      sensitive: false
+    - id: name_suffix
+      prompt: Suffix, if any
+      type: text
+      required: false
+      sensitive: false
+    - id: preferred_name
+      prompt: Name the person prefers to be called
+      type: text
+      required: false
+      sensitive: false
+    - id: other_names
+      prompt: Other names or prior names used, if relevant to the matter
+      type: list
+      required: false
+      sensitive: true
+    - id: birthdate
+      prompt: Date of birth
+      type: date
+      required: false
+      sensitive: true
+    - id: interpreter_needed
+      prompt: Whether an interpreter is needed, and the preferred language
+      type: choice
+      choices: ['yes', 'no', 'unknown']
+      default: unknown
+      required: false
+      sensitive: false
+  contact:
+    description: At least one way to reach the person other than postal mail, and the rules for using it.
+    fields:
+    - id: mobile_number
+      prompt: Mobile number
+      type: phone
+      required: false
+      sensitive: false
+    - id: other_phone
+      prompt: Other phone number
+      type: phone
+      required: false
+      sensitive: false
+    - id: email
+      prompt: Email address
+      type: email
+      required: false
+      sensitive: false
+    - id: other_contact_method
+      prompt: Other way to reach the person, for example a relied-upon third party
+      type: text
+      required: false
+      sensitive: true
+    - id: preferred_method
+      prompt: Preferred method of contact
+      type: choice
+      choices: [mobile_call, text, other_phone, email, mail, other, unknown]
+      default: unknown
+      required: true
+      sensitive: false
+    - id: safe_to_contact
+      prompt: Whether contact by the preferred method is safe, as stated by the person
+      type: choice
+      choices: ['yes', 'no', 'unknown']
+      default: unknown
+      required: true
+      sensitive: true
+    - id: safe_to_contact_verifier
+      prompt: Person who verified the contact rule, and the date
+      type: text
+      required: false
+      sensitive: false
+    validation:
+      at_least_one_of: [mobile_number, other_phone, email, other_contact_method]
+  address:
+    description: Current address, with a mailing address only where it differs.
+    fields:
+    - id: street
+      prompt: Street address
+      type: text
+      required: false
+      sensitive: true
+    - id: unit
+      prompt: Unit or apartment
+      type: text
+      required: false
+      sensitive: true
+    - id: city
+      prompt: City
+      type: text
+      required: false
+      sensitive: false
+    - id: state
+      prompt: State
+      type: text
+      required: false
+      sensitive: false
+    - id: postal_code
+      prompt: Postal code
+      type: text
+      required: false
+      sensitive: false
+    - id: country
+      prompt: Country
+      type: text
+      required: false
+      sensitive: false
+    - id: mailing_differs
+      prompt: Whether mail should go to a different address
+      type: choice
+      choices: ['yes', 'no', 'unknown']
+      default: unknown
+      required: false
+      sensitive: false
+  other_parties:
+    description: Opposing and other parties, each with counsel where known; used for the conflict name-match.
+    repeat: true
+    fields:
+    - id: party_name
+      prompt: Name of the party, person or entity
+      type: text
+      required: true
+      sensitive: false
+    - id: party_role
+      prompt: Role in the matter
+      type: choice
+      choices: [opposing_party, co_party, witness, insurer, other, unknown]
+      default: unknown
+      required: true
+      sensitive: false
+    - id: party_counsel
+      prompt: Counsel for the party, if known
+      type: text
+      required: false
+      sensitive: false
+    - id: party_relationship
+      prompt: Relationship to the prospective client, as stated
+      type: text
+      required: false
+      sensitive: false
+  key_dates:
+    description: Dates as the person or a document states them, each with its source; none is computed.
+    repeat: true
+    fields:
+    - id: date_label
+      prompt: What the date is
+      type: text
+      required: true
+      sensitive: false
+    - id: date_value
+      prompt: The date as entered
+      type: date
+      required: false
+      sensitive: false
+    - id: date_source
+      prompt: Source of the date (person, document, docket)
+      type: text
+      required: true
+      sensitive: false
+    - id: date_status
+      prompt: Whether the date is established
+      type: choice
+      choices: [established, not_established]
+      default: not_established
+      required: true
+      sensitive: false
+  documents_held:
+    description: Documents the person already holds, recorded as a list; nothing is uploaded at intake.
+    repeat: true
+    fields:
+    - id: document_type
+      prompt: Type of document
+      type: text
+      required: true
+      sensitive: false
+    - id: document_held_by
+      prompt: Who holds the document now
+      type: text
+      required: false
+      sensitive: false
+    - id: document_date
+      prompt: Date on the document, as entered
+      type: date
+      required: false
+      sensitive: false
+pack:
+  fragment_id: personal-injury
+  block_use:
+    prospective_client: [party_identity, contact, address]
+    parties: other_parties
+    dates: key_dates
+    documents: documents_held
+  question_map:
+    loss_date: {block: key_dates, date_label: date of the loss}
+    loss_location: {block: address, note: location of the loss, recorded as a place, not a residence}
+    loss_type: {block: none, note: pack question kept as written in fragment.yaml}
+    injuries_treatment: {block: none, sensitive: true, note: health data; excluded from scoring}
+    insurance_both_parties: {block: other_parties, party_role: insurer, sensitive: true}
+    witnesses: {block: other_parties, party_role: witness}
+    employment_wage_loss: {block: none, sensitive: true}
+    prior_claims: {block: key_dates, date_label: prior claim or suit, note: attorney-review flag on any entry}
+    impact_statement: {block: none, note: recorded in the person's words}
+    source: {block: none}
+  flags_fed:
+    conflict_match: other_parties.party_name
+    prior_counsel_of_record: other_parties.party_counsel
+    possible_limitation_issue: key_dates (date_status not_established is itself a flag)
