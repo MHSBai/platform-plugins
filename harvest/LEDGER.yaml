@@ -1,0 +1,213 @@
+# Harvest ledger, PP-2 (Stage 2). One entry per cloned repository.
+# Generated from the clones under harvest/<owner>_<repo>/repo, which are not committed.
+# license_status: ALLOWED when the root LICENSE is present and its SPDX identifier is in the
+# allowed set; otherwise ABSENT or EXCLUDED, and the repository is BENCHMARK only.
+# status: ADAPT (text rewritten with per-file notices), VENDOR (code ported with notices),
+# EVALUATED (compared, decision recorded, nothing copied), BENCHMARK (coverage compared,
+# nothing copied), TOOL (run in CI, not redistributed).
+schema_version: 1
+harvested: '2026-11-03'
+allowed_licenses: [Apache-2.0, BSD-2-Clause, BSD-3-Clause, CC0-1.0, ISC, MIT]
+repositories:
+- repository: anthropics/claude-for-legal
+  url: https://github.com/anthropics/claude-for-legal
+  commit: 4a6c651889c97cc9140580363c73e0eb17379c2b
+  commit_date: '2026-07-23'
+  license_file: LICENSE
+  license_sha256: cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
+  spdx: Apache-2.0
+  license_status: ALLOWED
+  status: ADAPT
+  used_in: platform-plugins
+  use: "legal-clinic and litigation-legal skills adapted into operations and core references and the PI and civil litigation fragments"
+- repository: anthropics/knowledge-work-plugins
+  url: https://github.com/anthropics/knowledge-work-plugins
+  commit: 2574e29377c7173d0cecffef29a6ecbd7f8ccb5d
+  commit_date: '2026-10-27'
+  license_file: LICENSE
+  license_sha256: a6946284993aeec75c7d75906064b66210c46051e562077efb30eb6dcfe72e26
+  spdx: Apache-2.0
+  license_status: ALLOWED
+  status: ADAPT
+  used_in: platform-plugins
+  use: "small-business, legal, customer-support and operations skills adapted into core and operations references"
+- repository: anthropics/skills
+  url: https://github.com/anthropics/skills
+  commit: ca45fc496a3436251f191354091d557da31c15b5
+  commit_date: '2026-10-28'
+  license_file: null
+  license_sha256: null
+  spdx: null
+  license_status: ABSENT
+  status: BENCHMARK
+  used_in: none
+  use: "no root LICENSE; per-folder Apache-2.0 for skill-creator, mcp-builder and brand-guidelines (build tooling, nothing copied); docx, pdf, pptx and xlsx are source-available and excluded"
+  folder_licenses:
+  - folder: skills/skill-creator
+    license_sha256: bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362
+    spdx: Apache-2.0
+  - folder: skills/mcp-builder
+    license_sha256: bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362
+    spdx: Apache-2.0
+  - folder: skills/brand-guidelines
+    license_sha256: bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362
+    spdx: Apache-2.0
+  - folder: skills/docx
+    license_sha256: 79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa
+    spdx: LicenseRef-proprietary-source-available
+- repository: frblaw/ai-policy-templates
+  url: https://github.com/frblaw/ai-policy-templates
+  commit: 080ccd9946bcb676104c036eda7da89bc14aaf5f
+  commit_date: '2026-06-24'
+  license_file: LICENSE
+  license_sha256: a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499
+  spdx: CC0-1.0
+  license_status: ALLOWED
+  status: ADAPT
+  used_in: platform-plugins
+  use: "policy base and gap interview for /ai-policy-draft"
+- repository: dschnurbusch/mattergate
+  url: https://github.com/dschnurbusch/mattergate
+  commit: 98a8f1c81976a13c8de33054140e75d8d3ce8dd4
+  commit_date: '2026-07-07'
+  license_file: LICENSE
+  license_sha256: 62fe825161880756ba83300e3243486bc39445849350bd9122c1ccb7bd0b725f
+  spdx: MIT
+  license_status: ALLOWED
+  status: VENDOR
+  used_in: mhsb-firm-service
+  use: "policy evaluator ported to Python with platform-default and restricted presets"
+- repository: LegalMate/hyacinth
+  url: https://github.com/LegalMate/hyacinth
+  commit: 59c2e2a5aec88a9f8ee47a4a5b0ab32a2596323d
+  commit_date: '2026-10-20'
+  license_file: LICENSE
+  license_sha256: 3430e8b5547ad5ebfc61c50b6bc69a9a74cb308b8fed7f5804f87d7d5787aaee
+  spdx: MIT
+  license_status: ALLOWED
+  status: EVALUATED
+  used_in: mhsb-firm-service
+  use: "evaluated against the existing read-only Clio client; decision PARTIAL (docs/decisions/0004-clio-client.md); no code copied"
+- repository: RosenAdvertising/clio-mcp
+  url: https://github.com/RosenAdvertising/clio-mcp
+  commit: 4ee75fee321cbc184555f946d855125c7df7ed2c
+  commit_date: '2026-11-02'
+  license_file: LICENSE
+  license_sha256: a7114d9615a54219da6fc4796f17e8799827a3b657de61397cf0cc18d2e7bda9
+  spdx: MIT
+  license_status: ALLOWED
+  status: VENDOR
+  used_in: mhsb-firm-service
+  use: "PII logging scan ported (firm_service/log_scan.py)"
+- repository: RosenAdvertising/lawmatics-mcp
+  url: https://github.com/RosenAdvertising/lawmatics-mcp
+  commit: 7255623abebed255881540416f3a4393247e8908
+  commit_date: '2026-10-11'
+  license_file: LICENSE
+  license_sha256: a7114d9615a54219da6fc4796f17e8799827a3b657de61397cf0cc18d2e7bda9
+  spdx: MIT
+  license_status: ALLOWED
+  status: BENCHMARK
+  used_in: none
+  use: "Retry-After and offline mock patterns reviewed; nothing copied in Stage 2"
+- repository: RosenAdvertising/mycase-mcp
+  url: https://github.com/RosenAdvertising/mycase-mcp
+  commit: e4d24923625305b98fe8938912ae4f56eec4635b
+  commit_date: '2026-11-02'
+  license_file: LICENSE
+  license_sha256: a7114d9615a54219da6fc4796f17e8799827a3b657de61397cf0cc18d2e7bda9
+  spdx: MIT
+  license_status: ALLOWED
+  status: BENCHMARK
+  used_in: none
+  use: "MyCase tool catalog used as a coverage benchmark; nothing copied"
+- repository: oktopeak/clio-mcp
+  url: https://github.com/oktopeak/clio-mcp
+  commit: 753da45677d0fc3c9e35c2f7c938d05a565a4795
+  commit_date: '2026-11-03'
+  license_file: LICENSE
+  license_sha256: 8dc664effcdf0b755c672a978e2d3457c5d3053bb9abf30887fb9ac8d54ce4e5
+  spdx: MIT
+  license_status: ALLOWED
+  status: VENDOR
+  used_in: mhsb-firm-service
+  use: "audit redaction canary sweep and verify-no-secrets ported"
+- repository: oktopeak/lawmatics-mcp
+  url: https://github.com/oktopeak/lawmatics-mcp
+  commit: c3de09376f1cf8c3d0a8b5b2f843295f4bf37df0
+  commit_date: '2026-10-15'
+  license_file: LICENSE
+  license_sha256: 8dc664effcdf0b755c672a978e2d3457c5d3053bb9abf30887fb9ac8d54ce4e5
+  spdx: MIT
+  license_status: ALLOWED
+  status: BENCHMARK
+  used_in: none
+  use: "read-only registration gating and truncation flag reviewed for Stage 4; nothing copied in Stage 2"
+- repository: marshall1727/clio-mcp
+  url: https://github.com/marshall1727/clio-mcp
+  commit: adc3aafa509755fdef7f5cd174e23a0e4b1ad65b
+  commit_date: '2026-10-04'
+  license_file: LICENSE
+  license_sha256: 4a24df0138499d93cd1579b04beb5dbfb0d513a86bc2104036eeeb805166bc9a
+  spdx: Apache-2.0
+  license_status: ALLOWED
+  status: VENDOR
+  used_in: mhsb-firm-service
+  use: "OpenAPI catalog generator ported (firm_service/clio/catalog_gen.py); upstream NOTICE reproduced"
+  notice_file: NOTICE
+  notice_sha256: 2568ffa1d7a4cfce4c2de5d96caa38423dfdc44c0d5449828680d2691c180c14
+- repository: WYRE-AI/node-clio
+  url: https://github.com/WYRE-AI/node-clio
+  commit: e1a6358b927ec27c9a5c9862d1a52aff478ab811
+  commit_date: '2026-10-07'
+  license_file: LICENSE
+  license_sha256: 111d8c233944a9869bfd90afc2532d0b36f9e900be39951b1a7b992a1f8957cc
+  spdx: Apache-2.0
+  license_status: ALLOWED
+  status: VENDOR
+  used_in: mhsb-firm-service
+  use: "typed errors and fixture pattern ported"
+- repository: WYRE-AI/clio-mcp
+  url: https://github.com/WYRE-AI/clio-mcp
+  commit: c5d6621cca685e56959f1bf2820c5e5d21b5a6f1
+  commit_date: '2026-10-14'
+  license_file: LICENSE
+  license_sha256: 7aa52fdd08c1063e02aab8e6e0dd4792a16980ac57eee6c35a1ebd4f96b87491
+  spdx: Apache-2.0
+  license_status: ALLOWED
+  status: BENCHMARK
+  used_in: none
+  use: "elicitation before unfiltered lists noted for Stage 4; nothing copied"
+- repository: snyk/agent-scan
+  url: https://github.com/snyk/agent-scan
+  commit: 5476dcec43f3ae2d538919de7c034a698eb0223c
+  commit_date: '2026-11-03'
+  license_file: LICENSE
+  license_sha256: 90154031b70befefac025106f493124530e13c608b876cc1418b5f65ba945f14
+  spdx: Apache-2.0
+  license_status: ALLOWED
+  status: TOOL
+  used_in: platform-plugins CI
+  use: "run as a pinned CLI in the public repository's CI only; not redistributed"
+- repository: lasso-security/mcp-gateway
+  url: https://github.com/lasso-security/mcp-gateway
+  commit: 7e7f1f6e5314819b3d0928128bb88eaea874b600
+  commit_date: '2026-01-22'
+  license_file: LICENSE
+  license_sha256: 380b2f7d335830301e588ffe4ebc7b129ca3ab03ae6f4bebf8ee23c97faa8993
+  spdx: MIT
+  license_status: ALLOWED
+  status: BENCHMARK
+  used_in: none
+  use: "presidio masking plugin read as a pattern reference; regex masking first; nothing copied"
+- repository: SuffolkLITLab/docassemble-AssemblyLine
+  url: https://github.com/SuffolkLITLab/docassemble-AssemblyLine
+  commit: 66fbabe7ea68876c4e0c77c2ad5021626bcc0a68
+  commit_date: '2026-11-02'
+  license_file: LICENSE
+  license_sha256: 76733a421de50ded82898c411eabfe54c444d839217e539c2a26c3fd028a05c9
+  spdx: MIT
+  license_status: ALLOWED
+  status: ADAPT
+  used_in: platform-plugins
+  use: "question blocks restated as fragment intake blocks for PI, civil litigation and business"

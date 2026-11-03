@@ -67,3 +67,10 @@ This command does not do the following. It says so and stops.
 - Deleting, bulk edits or any write to the platform.
 - Adding or changing a recipient. That needs an approver-confirmed change request.
 - Copying report rows into an email.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/report-pack.md`: Report pack: the firm's recurring reports as one briefing.
+- `references/status-report.md`: Status report cover for the firm's periodic reports.

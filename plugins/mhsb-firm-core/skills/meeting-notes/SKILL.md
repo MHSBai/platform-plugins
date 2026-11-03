@@ -67,3 +67,9 @@ This command does not do the following. It says so and stops.
 - Sending anything. A person reviews and sends every draft.
 - Deleting, bulk edits or any write to the platform.
 - Using a transcript when consent to record is not confirmed.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/contact-log.md`: Contact log entry.

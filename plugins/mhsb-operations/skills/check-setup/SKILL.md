@@ -63,3 +63,9 @@ This command does not do the following. It says so and stops.
 - Trust account actions.
 - Sending anything. A person reviews and sends every draft.
 - Deleting, bulk edits or any write to the platform.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/runbook.md`: Runbook shape for setup checks.

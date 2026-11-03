@@ -75,7 +75,8 @@ VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 PROVENANCE_MARKERS = ("MHSB modification notice", "Modified by MHSB Solutions", "Original license:")
 
 TEXT_SUFFIXES = {".md", ".json", ".yaml", ".yml", ".py", ".txt", ".toml", ".cfg", ".ini", ""}
-SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules"}
+HARVEST_DIR = "harvest"
+SKIP_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules"}
 
 
 @dataclass(frozen=True)
@@ -112,7 +113,11 @@ class Context:
 
 def iter_text_files(root: Path) -> Iterable[Path]:
     for path in sorted(root.rglob("*")):
-        if any(part in SKIP_DIRS for part in path.relative_to(root).parts):
+        parts = path.relative_to(root).parts
+        if any(part in SKIP_DIRS for part in parts):
+            continue
+        # Harvest clones are untrusted third-party data (git-ignored); only the ledger is linted.
+        if parts[0] == HARVEST_DIR and len(parts) > 2:
             continue
         if path.is_file() and (path.suffix in TEXT_SUFFIXES or path.name in {"LICENSE", "NOTICE"}):
             yield path

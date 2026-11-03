@@ -68,3 +68,10 @@ This command does not do the following. It says so and stops.
 - Deleting, bulk edits or any write to the platform.
 - Declining a lead. A flag goes to the attorney, who decides.
 - Scoring on a field tagged sensitive.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/client-intake-screen.md`: Client intake screen.
+- `references/lead-triage.md`: Lead triage: ordering inbound leads for review.
