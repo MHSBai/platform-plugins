@@ -152,3 +152,13 @@ hits: 0
 ```
 
 A case-sensitive substring search without word boundaries, excluding the two-letter and three-letter common-word codes, also returned 0. Result: pass.
+
+### Step 10. Push and pull request
+
+Command: `git push -u origin cloud/pp1-repository-marketplace`
+
+```
+ * [new branch]      cloud/pp1-repository-marketplace -> cloud/pp1-repository-marketplace
+```
+
+Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/1 ("Stage 1: repository, marketplace, manifest and lint"). Not merged. Outcome: DONE PP-1.
