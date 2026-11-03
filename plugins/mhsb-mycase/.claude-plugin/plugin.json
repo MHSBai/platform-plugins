@@ -1,0 +1,18 @@
+{
+  "name": "mhsb-mycase",
+  "version": "0.1.0",
+  "description": "MyCase vocabulary and field mapping for use over the vendor's own connector. Adds no commands. MHSB service-side controls do not apply to records retrieved through the vendor connector.",
+  "author": {
+    "name": "MHSB Solutions",
+    "url": "https://mhsbsolutions.com"
+  },
+  "homepage": "https://github.com/MHSBai/platform-plugins",
+  "repository": "https://github.com/MHSBai/platform-plugins",
+  "license": "LicenseRef-MHSB-Source-Available",
+  "keywords": [
+    "legal",
+    "law-firm",
+    "platform",
+    "platform"
+  ]
+}

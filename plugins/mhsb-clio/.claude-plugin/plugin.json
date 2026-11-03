@@ -1,0 +1,18 @@
+{
+  "name": "mhsb-clio",
+  "version": "0.1.0",
+  "description": "Clio platform commands: timekeeper hours, production by billing method and flat-fee budget versus actual. Bundles the MHSB Clio connector. Read-only.",
+  "author": {
+    "name": "MHSB Solutions",
+    "url": "https://mhsbsolutions.com"
+  },
+  "homepage": "https://github.com/MHSBai/platform-plugins",
+  "repository": "https://github.com/MHSBai/platform-plugins",
+  "license": "LicenseRef-MHSB-Source-Available",
+  "keywords": [
+    "legal",
+    "law-firm",
+    "platform",
+    "platform"
+  ]
+}

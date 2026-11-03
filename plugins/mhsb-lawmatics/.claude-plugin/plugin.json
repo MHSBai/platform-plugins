@@ -1,0 +1,18 @@
+{
+  "name": "mhsb-lawmatics",
+  "version": "0.1.0",
+  "description": "Lawmatics platform commands: public form protection review and pipeline health. Bundles the MHSB Lawmatics connector. Read-only.",
+  "author": {
+    "name": "MHSB Solutions",
+    "url": "https://mhsbsolutions.com"
+  },
+  "homepage": "https://github.com/MHSBai/platform-plugins",
+  "repository": "https://github.com/MHSBai/platform-plugins",
+  "license": "LicenseRef-MHSB-Source-Available",
+  "keywords": [
+    "legal",
+    "law-firm",
+    "platform",
+    "platform"
+  ]
+}

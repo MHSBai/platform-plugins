@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mhsb-clio": {
+      "type": "http",
+      "url": "https://mcp.mhsbsolutions.com/clio"
+    }
+  }
+}

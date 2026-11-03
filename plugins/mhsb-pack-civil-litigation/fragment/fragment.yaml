@@ -1,0 +1,108 @@
+# Fragment for civil litigation, general. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: civil-litigation
+practice: civil litigation, general
+release_tier: pilot
+status: pilot draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: parties_counsel
+  prompt: Parties and counsel
+  type: text
+- id: claim_type
+  prompt: Claim type
+  type: choice
+- id: key_dates
+  prompt: Key dates
+  type: text
+- id: writing_or_contract
+  prompt: Writing or contract
+  type: text
+- id: damages
+  prompt: Damages
+  type: text
+- id: prior_suits
+  prompt: Prior suits
+  type: text
+- id: insurance
+  prompt: Insurance
+  type: text
+- id: goals_budget
+  prompt: Goals and budget
+  type: text
+attorney_review_flags:
+- possible_limitation_issue
+- collectability_question
+- conflict_match
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- contracts
+- correspondence
+- invoices
+- photos
+- prior pleadings
+- policies
+- preservation of electronic records
+stage_map:
+- screen
+- conflict check
+- consult
+- retainer
+- demand
+- pleadings
+- discovery
+- motions
+- mediation
+- trial
+- judgment and collection
+fee_model:
+  model: hybrid
+  notes: Hourly with advance retainer; flat for defined steps; contingency on collections.
+deadline_categories:
+- id: limitation_by_claim_type
+  label: Limitation periods by claim type; the firm records the statute
+  kind: firm_set
+- id: docket_deadlines
+  label: Answer deadlines, discovery cutoffs and appeal windows (entered from the docket; govern)
+  kind: entered
+communication_templates:
+- scope-letter
+- litigation-hold-notice
+- monthly-statement-cover
+- event-update
+- closing-letter
+consent_flags:
+- id: preservation_duties
+  label: Preservation duties
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+- id: limited_scope
+  label: Limited scope with informed consent
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+- id: recording_consent
+  label: Recording consent
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags: []
+sensitive_field_semantics: excluded from any scoring
+brief_views:
+- event_updates_due
+reports: []

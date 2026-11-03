@@ -1,0 +1,99 @@
+# Fragment for business and transactional. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: business-transactional
+practice: business and transactional
+release_tier: ga
+status: complete
+adoption:
+  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
+  date: '2026-11-03'
+  version: 0.1.0
+  synthetic: true
+intake_questions:
+- id: owners_percentages
+  prompt: Owners and ownership percentages
+  type: text
+- id: goals
+  prompt: Goals
+  type: text
+- id: state
+  prompt: State of formation or operation
+  type: choice
+- id: capital_debt
+  prompt: Capital and debt
+  type: text
+- id: regulated_profession
+  prompt: Regulated profession
+  type: boolean
+- id: client_identity
+  prompt: Who is the client
+  type: text
+attorney_review_flags:
+- possible_conflict_across_founders
+- outside_jurisdiction
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- formation filings
+- EIN
+- operating or shareholder agreements
+- prior minutes
+- contracts
+stage_map:
+- inquiry
+- conflict check
+- engagement naming the entity
+- formation
+- governance documents
+- annual compliance
+fee_model:
+  model: hybrid
+  notes: Flat for formation and standard documents; hourly, subscription or fractional-counsel retainers;
+    flat-fee items with budgeted hours.
+deadline_categories:
+- id: tax_elections
+  label: Tax elections
+  kind: statutory
+  citation: null
+  adopter: null
+- id: annual_reports_franchise_tax
+  label: Annual reports and franchise tax, by state
+  kind: statutory
+  citation: null
+  adopter: null
+- id: annual_meetings
+  label: Annual meetings
+  kind: firm_set
+- id: assumed_name_filings
+  label: Assumed-name filings
+  kind: firm_set
+- id: beneficial_ownership
+  label: Beneficial-ownership reporting where it applies
+  kind: statutory
+  citation: null
+  adopter: null
+communication_templates:
+- engagement-letter
+- compliance-reminder
+- document-request
+consent_flags:
+- id: entity_as_client
+  label: Entity as client, explained to constituents
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags: []
+sensitive_field_semantics: excluded from any scoring
+brief_views:
+- entity_roster_next_compliance
+- budget_vs_actual
+reports:
+- timekeeper_hours
+- production
+- flat_fee_budget_vs_actual

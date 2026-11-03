@@ -1,0 +1,80 @@
+# Fragment for bankruptcy, consumer. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: bankruptcy-consumer
+practice: bankruptcy, consumer
+release_tier: hidden
+status: hidden draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: income_six_months
+  prompt: Six months' income
+  type: text
+- id: household_size
+  prompt: Household size
+  type: number
+- id: debts_by_type
+  prompt: Debts by type
+  type: text
+- id: assets
+  prompt: Assets
+  type: text
+- id: prior_filings
+  prompt: Prior filings
+  type: text
+- id: suits_garnishments
+  prompt: Suits, garnishments, foreclosure
+  type: text
+- id: transfers
+  prompt: Transfers
+  type: text
+- id: business_ownership
+  prompt: Business ownership
+  type: text
+attorney_review_flags:
+- prior_filing_question
+- conflict_match
+- outside_district
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- pay stubs
+- latest return
+- statements
+- identification
+- counseling certificate
+stage_map:
+- intake pipeline
+- petition
+- 341 meeting
+- debtor education
+- discharge
+fee_model:
+  model: flat
+  notes: Flat for Chapter 7; Chapter 13 court-reviewed.
+deadline_categories:
+- id: code_and_rules_periods
+  label: All Code and Rules periods
+  kind: statutory
+  citation: null
+  adopter: null
+communication_templates:
+- document-checklist
+- meeting-341-prep
+- course-deadlines
+- discharge-notice
+consent_flags: []
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags:
+- income
+- debts
+sensitive_field_semantics: excluded from any scoring
+brief_views:
+- readiness_341
+reports:
+- document_readiness_rate

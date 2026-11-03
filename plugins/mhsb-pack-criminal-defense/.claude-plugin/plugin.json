@@ -1,0 +1,18 @@
+{
+  "name": "mhsb-pack-criminal-defense",
+  "version": "0.1.0",
+  "description": "Criminal defense practice fragment. Pilot only; installed by MHSB for a named firm. Data only; adds no commands.",
+  "author": {
+    "name": "MHSB Solutions",
+    "url": "https://mhsbsolutions.com"
+  },
+  "homepage": "https://github.com/MHSBai/platform-plugins",
+  "repository": "https://github.com/MHSBai/platform-plugins",
+  "license": "LicenseRef-MHSB-Source-Available",
+  "keywords": [
+    "legal",
+    "law-firm",
+    "practice",
+    "practice-area"
+  ]
+}

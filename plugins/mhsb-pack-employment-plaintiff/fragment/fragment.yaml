@@ -1,0 +1,110 @@
+# Fragment for employment, plaintiff side. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: employment-plaintiff
+practice: employment, plaintiff side
+release_tier: hidden
+status: hidden draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: employment_status
+  prompt: Employment status
+  type: choice
+- id: employer_size
+  prompt: Employer size
+  type: text
+- id: adverse_action
+  prompt: Adverse action and dates
+  type: text
+- id: stated_reason
+  prompt: Employer's stated reason
+  type: text
+- id: witnesses
+  prompt: Witnesses
+  type: text
+- id: notice_given
+  prompt: Notice given
+  type: text
+- id: pay_hours
+  prompt: Pay and hours
+  type: text
+- id: right_to_sue
+  prompt: Existing right-to-sue notice
+  type: boolean
+- id: prior_counsel
+  prompt: Prior counsel
+  type: text
+- id: protected_activity
+  prompt: Protected activity or class, recorded as stated and never scored
+  type: text
+attorney_review_flags:
+- possible_agency_deadline_issue
+- employer_threshold_question
+- conflict_match
+- prior_counsel_of_record
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- pay stubs
+- timeline
+- HR correspondence
+- original recordings kept on the original device
+- social media archive
+stage_map:
+- screen
+- questionnaire
+- consult
+- agreement
+- preservation instructions
+- agency charge
+- right-to-sue
+- suit or settlement
+fee_model:
+  model: contingency
+  notes: With fee-shifting language.
+deadline_categories:
+- id: agency_charge_windows
+  label: Agency charge windows
+  kind: statutory
+  citation: null
+  adopter: null
+- id: post_right_to_sue_window
+  label: Window after a right-to-sue notice
+  kind: statutory
+  citation: null
+  adopter: null
+- id: wage_claims
+  label: Wage claims
+  kind: statutory
+  citation: null
+  adopter: null
+communication_templates:
+- preservation-instructions
+- agency-step-update
+consent_flags:
+- id: recording_states
+  label: Recording consent by state
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+- id: client_taken_documents
+  label: Client-taken documents and discoverability
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags:
+- protected_class
+- health
+sensitive_field_semantics: excluded from any scoring
+brief_views: []
+reports: []
