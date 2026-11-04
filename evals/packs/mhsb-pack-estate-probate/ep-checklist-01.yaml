@@ -1,0 +1,21 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: ep-checklist-01
+pack: mhsb-pack-estate-probate
+skill: checklist
+description: Planning matter with statements present; probate items are optional in the list and are reported
+  as missing optional.
+input:
+  documents_present:
+  - account_statements
+  - prior_wills_poa
+expect:
+  missing_required: []
+  ready: true
+  missing_optional:
+  - beneficiary_forms
+  - death_certificates
+  - decedent_return
+  - original_will
+  - out_of_state_deeds
+  - trust_entity_documents

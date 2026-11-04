@@ -1,0 +1,44 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: ep-dates-01
+pack: mhsb-pack-estate-probate
+skill: dates
+description: One statutory category (citation placeholder, counsel review) and one firm-set category;
+  the entered date governs and a disagreeing cross-check is listed, not resolved; an unmapped category
+  derives nothing.
+input:
+  as_of: '2026-11-03'
+  firm_tz: America/New_York
+  mapping:
+    creditor_claim_period: Creditor Claim Deadline
+    annual_review: Annual Review Date
+  record:
+    Creditor Claim Deadline:
+      value: '2027-02-20'
+      source: entered by staff from the notice
+      owner: paralegal
+    Annual Review Date:
+      value: '2027-11-03'
+      source: entered by the responsible attorney
+      owner: attorney
+  computed: {}
+expect:
+  rows:
+    creditor_claim_period:
+      kind: statutory
+      citation_status: pending adopter confirmation
+      counsel_review: true
+      status: established
+      governing_date: '2027-02-20'
+      disagreement: false
+    annual_review:
+      kind: firm_set
+      citation_status: not applicable
+      counsel_review: false
+      status: established
+      governing_date: '2027-11-03'
+      cross_check: null
+      disagreement: false
+    estate_tax_return:
+      status: unmapped
+      governing_date: null

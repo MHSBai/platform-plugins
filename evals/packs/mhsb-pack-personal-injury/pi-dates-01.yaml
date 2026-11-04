@@ -1,0 +1,45 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: pi-dates-01
+pack: mhsb-pack-personal-injury
+skill: dates
+description: One statutory category (citation placeholder, counsel review) and one firm-set category;
+  the entered date governs and a disagreeing cross-check is listed, not resolved; an unmapped category
+  derives nothing.
+input:
+  as_of: '2026-11-03'
+  firm_tz: America/New_York
+  mapping:
+    government_notice_of_claim: Notice of Claim Deadline
+    limitation_period: Statute of Limitations
+  record:
+    Notice of Claim Deadline:
+      value: '2027-01-15'
+      source: entered by staff from the notice
+      owner: paralegal
+    Statute of Limitations:
+      value: '2028-03-01'
+      source: entered by the responsible attorney
+      owner: attorney
+  computed:
+    limitation_period: '2028-02-28'
+expect:
+  rows:
+    government_notice_of_claim:
+      kind: statutory
+      citation_status: pending adopter confirmation
+      counsel_review: true
+      status: established
+      governing_date: '2027-01-15'
+      disagreement: false
+    limitation_period:
+      kind: firm_set
+      citation_status: not applicable
+      counsel_review: false
+      status: established
+      governing_date: '2028-03-01'
+      cross_check: '2028-02-28'
+      disagreement: true
+    records_turnaround:
+      status: unmapped
+      governing_date: null

@@ -1,0 +1,18 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: bt-checklist-01
+pack: mhsb-pack-business-transactional
+skill: checklist
+description: Formation filings and governing agreements are required; with both present the matter is
+  ready.
+input:
+  documents_present:
+  - formation_filings
+  - governing_agreements
+  - ein_letter
+expect:
+  missing_required: []
+  missing_optional:
+  - material_contracts
+  - prior_minutes
+  ready: true

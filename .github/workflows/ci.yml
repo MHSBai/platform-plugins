@@ -22,6 +22,8 @@ jobs:
         run: python tools/gen_manifest.py --check
       - name: Lint
         run: python tools/lint.py
+      - name: Pack evals
+        run: python tools/pack_evals.py
       - name: License gate (LEDGER.yaml and PROVENANCE.md)
         run: python tools/license_gate.py
       - name: Release gate (tags only)

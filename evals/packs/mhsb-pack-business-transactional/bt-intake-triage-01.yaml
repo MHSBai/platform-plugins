@@ -1,0 +1,30 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: bt-intake-triage-01
+pack: mhsb-pack-business-transactional
+skill: intake-triage
+description: Capital and debt are excluded from scoring; a name-match across founders raises possible_conflict
+  and an out-of-state formation raises outside_jurisdiction; the lead is not declined.
+input:
+  answers:
+    client_identity: entity
+    owners_percentages: two founders, 60 and 40
+    goals: form an LLC
+    state: a state where the firm is not admitted
+    capital_debt: 50,000 contributed; 200,000 loan
+    regulated_profession: 'no'
+  signals:
+    conflict_name_matches: 2
+    out_of_area: true
+expect:
+  score: 1.0
+  excluded_sensitive:
+  - capital_debt
+  flags:
+  - possible_conflict
+  - outside_jurisdiction
+  action: attorney_review
+  decline: false
+sensitive_variants:
+- capital_debt: ''
+- capital_debt: no debt

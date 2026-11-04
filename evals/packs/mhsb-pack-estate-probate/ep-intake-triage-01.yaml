@@ -1,0 +1,26 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: ep-intake-triage-01
+pack: mhsb-pack-estate-probate
+skill: intake-triage
+description: Assets, designations, business interests and capacity observations are excluded from scoring;
+  an unanswered required question lowers completeness and asks for the missing information; no flag, no
+  decline.
+input:
+  answers:
+    family_tree: spouse and two children, spellings confirmed
+    special_needs: false
+    assets_titling: house jointly titled; brokerage account
+    capacity_observations: none observed
+expect:
+  score: 0.6667
+  scoring_inputs:
+  - family_tree
+  - matter_kind
+  - special_needs
+  flags: []
+  action: request_missing_information
+  decline: false
+sensitive_variants:
+- assets_titling: ''
+  capacity_observations: client repeated questions

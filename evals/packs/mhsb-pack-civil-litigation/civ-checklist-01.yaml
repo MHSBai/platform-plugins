@@ -1,0 +1,15 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: civ-checklist-01
+pack: mhsb-pack-civil-litigation
+skill: checklist
+description: Preservation confirmation is a required document; its absence blocks readiness.
+input:
+  documents_present:
+  - contracts
+  - correspondence
+  - invoices
+expect:
+  missing_required:
+  - electronic_records_preservation
+  ready: false

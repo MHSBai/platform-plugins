@@ -1,0 +1,34 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: pi-brief-01
+pack: mhsb-pack-personal-injury
+skill: brief
+description: 'Incident aging pack view: days since the mapped incident date; a matter without the date
+  goes to data gaps and the coverage statement says so.'
+input:
+  view: incident_aging
+  anchor_field: Accident Date
+  as_of: '2026-11-03'
+  matters:
+  - id: SYN-0001
+    fields:
+      Accident Date: '2026-07-26'
+  - id: SYN-0002
+    fields:
+      Accident Date: '2025-11-03'
+  - id: SYN-0003
+    fields:
+      Accident Date: null
+expect:
+  view: incident_aging
+  rows:
+  - matter: SYN-0001
+    Accident Date: '2026-07-26'
+    days: 100
+  - matter: SYN-0002
+    Accident Date: '2025-11-03'
+    days: 365
+  data_gaps:
+  - SYN-0003
+  coverage: 'coverage: 2 of 3 matters retrieved for Incident aging; 1 not retrieved because Accident Date
+    is empty'

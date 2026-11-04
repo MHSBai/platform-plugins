@@ -1,0 +1,22 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: civ-brief-01
+pack: mhsb-pack-civil-litigation
+skill: brief
+description: Event updates due view anchored on the last key event date.
+input:
+  view: event_updates_due
+  anchor_field: Last Key Event
+  as_of: '2026-11-03'
+  matters:
+  - id: SYN-CV-1
+    fields:
+      Last Key Event: '2026-10-27'
+expect:
+  rows:
+  - matter: SYN-CV-1
+    Last Key Event: '2026-10-27'
+    days: 7
+  data_gaps: []
+  coverage: 'coverage: 1 of 1 matters retrieved for Event updates due; 0 not retrieved because Last Key
+    Event is empty'
