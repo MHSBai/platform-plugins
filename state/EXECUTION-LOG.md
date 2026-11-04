@@ -423,3 +423,7 @@ Planned run when a key is SET (`python tools/model_evals.py --dry-run`): routing
 ### Step 6. Firm identifier check
 
 The private identifier list (17 identifiers: pilot firm codes, full firm names, one brand name) is held in the session scratchpad, outside the repository; the counts are in Step 4 (0 hits). The Stage 9 log line that named two short codes was rewritten (decision 0005, Section 8).
+
+### Step 7. Push and pull request
+
+Command: `git push -u origin cloud/pp8-skills-evals`. Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/4 ("Stage 8: skills to final text, routing suite and evals"), base `cloud/pp9-pack-fragments`. Not merged. Outcome: DONE PP-8, with model evals pending (no key).
