@@ -1,6 +1,6 @@
 {
   "name": "mhsb-operations",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Read-only operations commands for subscribing firms: briefs, consultation preparation, matter status, intake triage, adopted letters, dates, document checklists, data hygiene, reports, register checks and setup verification. Bundles the MHSB firm connector.",
   "author": {
     "name": "MHSB Solutions",
