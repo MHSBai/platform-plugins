@@ -1,0 +1,26 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: bt-brief-01
+pack: mhsb-pack-business-transactional
+skill: brief
+description: Entity roster view anchored on the next compliance date; an entity without one is a data
+  gap.
+input:
+  view: entity_roster
+  anchor_field: Next Compliance Date
+  as_of: '2026-11-03'
+  matters:
+  - id: SYN-ENT-1
+    fields:
+      Next Compliance Date: '2026-10-04'
+  - id: SYN-ENT-2
+    fields: {}
+expect:
+  rows:
+  - matter: SYN-ENT-1
+    Next Compliance Date: '2026-10-04'
+    days: 30
+  data_gaps:
+  - SYN-ENT-2
+  coverage: 'coverage: 1 of 2 matters retrieved for Entity roster with the next compliance item; 1 not
+    retrieved because Next Compliance Date is empty'

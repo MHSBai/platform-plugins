@@ -1,5 +1,5 @@
 ---
-template_id: immigration.renewal-reminder
+template_id: imm_renewal_reminder
 title: Renewal reminder
 pack: mhsb-pack-immigration
 adoption:

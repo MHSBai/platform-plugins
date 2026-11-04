@@ -1,5 +1,5 @@
 ---
-template_id: criminal-defense.authorized-family-contact
+template_id: crim_authorized_family_contact
 title: Authorized family contact
 pack: mhsb-pack-criminal-defense
 adoption:

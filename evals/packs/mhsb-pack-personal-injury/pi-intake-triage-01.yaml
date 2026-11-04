@@ -1,0 +1,47 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: pi-intake-triage-01
+pack: mhsb-pack-personal-injury
+skill: intake-triage
+description: Health, treatment, insurance limits and wage loss are excluded from scoring; a conflict name-match
+  and prior counsel raise attorney-review flags; the lead is not declined.
+input:
+  answers:
+    loss_date: '2026-09-14'
+    loss_location: Synthetic Avenue and 4th Street
+    loss_type: motor vehicle
+    prior_claims: false
+    injuries_treatment: neck pain, physical therapy twice weekly
+    treatment_providers: Synthetic Physical Therapy
+    insurance_both_parties: policy limits stated as 25/50
+    employment_wage_loss: three weeks missed
+    prior_counsel: consulted another firm in October
+    source: referral
+  signals:
+    conflict_name_matches: 1
+expect:
+  score: 1.0
+  scoring_inputs:
+  - loss_date
+  - loss_location
+  - loss_type
+  - prior_claims
+  excluded_sensitive:
+  - employment_wage_loss
+  - injuries_treatment
+  - insurance_both_parties
+  - treatment_providers
+  flags:
+  - conflict_match
+  - prior_counsel_of_record
+  action: attorney_review
+  decline: false
+  conflict_record:
+    name_matches: 1
+sensitive_variants:
+- injuries_treatment: no treatment
+  insurance_both_parties: unknown
+  employment_wage_loss: ''
+- injuries_treatment: surgery scheduled
+  treatment_providers: ''
+  insurance_both_parties: limits 1,000,000

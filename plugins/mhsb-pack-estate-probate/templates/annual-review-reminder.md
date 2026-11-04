@@ -1,5 +1,5 @@
 ---
-template_id: estate-probate.annual-review-reminder
+template_id: ep_annual_review_reminder
 title: Annual review reminder
 pack: mhsb-pack-estate-probate
 adoption:

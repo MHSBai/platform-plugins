@@ -1,12 +1,11 @@
 ---
-template_id: business-transactional.compliance-reminder
+template_id: bt_compliance_reminder
 title: Compliance reminder
 pack: mhsb-pack-business-transactional
 adoption:
-  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
-  date: '2026-11-03'
-  version: 0.1.0
-  synthetic: true
+  adopted_by: PENDING ADOPTION
+  date: PENDING ADOPTION
+  version: PENDING ADOPTION
 ---
 
 # Compliance reminder

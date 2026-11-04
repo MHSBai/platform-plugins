@@ -1,5 +1,5 @@
 ---
-template_id: estate-probate.questionnaire-drip
+template_id: ep_questionnaire_drip
 title: Questionnaire reminder
 pack: mhsb-pack-estate-probate
 adoption:

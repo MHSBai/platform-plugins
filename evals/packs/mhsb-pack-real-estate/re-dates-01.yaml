@@ -1,0 +1,40 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: re-dates-01
+pack: mhsb-pack-real-estate
+skill: dates
+description: 'Catalog 3.6 defines no statutory category: contract dates are entered and govern. The case
+  checks two firm-set rows and that no category is statutory.'
+input:
+  as_of: '2026-11-03'
+  mapping:
+    closing_date: Closing Date
+    title_objection: Title Objection Date
+  record:
+    Closing Date:
+      value: '2026-12-15'
+      source: purchase agreement
+      owner: paralegal
+    Title Objection Date:
+      value: '2026-11-20'
+      source: purchase agreement
+      owner: paralegal
+  computed:
+    closing_date: '2026-12-14'
+expect:
+  rows:
+    closing_date:
+      kind: firm_set
+      governing_date: '2026-12-15'
+      cross_check: '2026-12-14'
+      disagreement: true
+    title_objection:
+      kind: firm_set
+      governing_date: '2026-11-20'
+      disagreement: false
+    contingency_date:
+      status: unmapped
+    recording_date:
+      status: unmapped
+  statutory_categories: []
+  computed_markers: []

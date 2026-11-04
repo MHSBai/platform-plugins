@@ -1,110 +1,81 @@
-# Fragment for employment, plaintiff side. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: employment-plaintiff
-practice: employment, plaintiff side
+# Practice-area pack fragment: employment, plaintiff side (Catalog v2.1 Section 3.9).
+# HIDDEN DRAFT. Not for use by any firm until an attorney in the practice co-designs it;
+# see CO-DESIGN.md.
+# Data only. Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Agency charge windows, the window after a right-to-sue notice and
+# wage claims are statutory, with citation placeholders. Protected activity or class is
+# recorded as stated and never scored. Flags are attorney-review flags and never decline.
+# Defense-side source patterns only; no MHSB engagement supports this pack.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier hidden.
+fragment_id: employment_plaintiff
+practice_area: employment_plaintiff
+version: 0.1.0
 release_tier: hidden
-status: hidden draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
 intake_questions:
-- id: employment_status
-  prompt: Employment status
-  type: choice
-- id: employer_size
-  prompt: Employer size
-  type: text
-- id: adverse_action
-  prompt: Adverse action and dates
-  type: text
-- id: stated_reason
-  prompt: Employer's stated reason
-  type: text
-- id: witnesses
-  prompt: Witnesses
-  type: text
-- id: notice_given
-  prompt: Notice given
-  type: text
-- id: pay_hours
-  prompt: Pay and hours
-  type: text
-- id: right_to_sue
-  prompt: Existing right-to-sue notice
-  type: boolean
-- id: prior_counsel
-  prompt: Prior counsel
-  type: text
-- id: protected_activity
-  prompt: Protected activity or class, recorded as stated and never scored
-  type: text
+- {id: employment_status, prompt: "Current employment status", answer_type: choice, choices: [employed, terminated, resigned, on leave, other], required: true, sensitive_tag: null}
+- {id: employer_size, prompt: "Approximate number of employees at the employer", answer_type: number, required: false, sensitive_tag: null}
+- {id: adverse_action, prompt: "The adverse action, in the person's words", answer_type: text, required: true, sensitive_tag: null}
+- {id: adverse_action_date, prompt: "Date of the adverse action, as stated", answer_type: date, required: true, sensitive_tag: null}
+- {id: stated_reason, prompt: "The employer's stated reason", answer_type: text, required: false, sensitive_tag: null}
+- {id: witnesses, prompt: "Witnesses", answer_type: text, required: false, sensitive_tag: null}
+- {id: notice_given, prompt: "Any complaint or notice the person gave, and when", answer_type: text, required: false, sensitive_tag: null}
+- {id: pay_hours, prompt: "Pay and hours", answer_type: text, required: false, sensitive_tag: financial}
+- {id: right_to_sue, prompt: "Whether a right-to-sue notice exists, and its date", answer_type: text, required: false, sensitive_tag: null}
+- {id: prior_counsel, prompt: "Any lawyer already consulted or retained", answer_type: text, required: false, sensitive_tag: null}
+- {id: protected_activity_or_class, prompt: "Protected activity or characteristic, recorded as stated", answer_type: text, required: false, sensitive_tag: protected_class}
 attorney_review_flags:
-- possible_agency_deadline_issue
+- agency_deadline_question
 - employer_threshold_question
 - conflict_match
 - prior_counsel_of_record
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
 document_list:
-- pay stubs
-- timeline
-- HR correspondence
-- original recordings kept on the original device
-- social media archive
+- {id: pay_stubs, name: "Pay stubs", required: true}
+- {id: timeline, name: "Timeline in the person's words", required: true}
+- {id: hr_correspondence, name: "HR correspondence", required: false}
+- {id: original_recordings, name: "Original recordings, kept on the original device", required: false}
+- {id: social_media_archive, name: "Social media archive", required: false}
 stage_map:
-- screen
-- questionnaire
-- consult
-- agreement
-- preservation instructions
-- agency charge
-- right-to-sue
-- suit or settlement
+- {fragment_stage: Screen, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Questionnaire, canonical: stage_intake_03_consult_scheduled}
+- {fragment_stage: Consult, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Agreement, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Preservation instructions, canonical: stage_matter_10_open}
+- {fragment_stage: Agency charge, canonical: stage_matter_20_active}
+- {fragment_stage: Right-to-sue, canonical: stage_matter_20_active}
+- {fragment_stage: Suit or settlement, canonical: stage_matter_30_resolution}
 fee_model:
-  model: contingency
-  notes: With fee-shifting language.
+  types: [contingency]
+  notes: "Contingency with fee-shifting language in the adopted agreement."
 deadline_categories:
-- id: agency_charge_windows
-  label: Agency charge windows
+- id: agency_charge_window
+  name: "Agency charge windows"
   kind: statutory
-  citation: null
-  adopter: null
+  entered_date_governs: true
+  citation: "CITATION PENDING: agency charge provisions, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
 - id: post_right_to_sue_window
-  label: Window after a right-to-sue notice
+  name: "Ninety-day window after a right-to-sue notice"
   kind: statutory
-  citation: null
-  adopter: null
-- id: wage_claims
-  label: Wage claims
+  entered_date_governs: true
+  citation: "CITATION PENDING: provision fixing the suit window after a right-to-sue notice, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
+- id: wage_claim
+  name: "Wage claims"
   kind: statutory
-  citation: null
-  adopter: null
+  entered_date_governs: true
+  citation: "CITATION PENDING: wage claim provisions, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
 communication_templates:
-- preservation-instructions
-- agency-step-update
+- emp_preservation_instructions
+- emp_agency_step_update
 consent_flags:
-- id: recording_states
-  label: Recording consent by state
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: client_taken_documents
-  label: Client-taken documents and discoverability
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
+- {id: recording_state_rules_reviewed, label: "Recording consent rules of the state reviewed with the client", evidence: [recorded_verbal], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
+- {id: client_taken_documents_reviewed, label: "Documents the client took from the employer reviewed by the attorney", evidence: [platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
+- {id: no_case_discussion_by_text_or_social, label: "Client acknowledged that the case is not discussed by text or social media", evidence: [signed_form, engagement_letter_clause], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- protected_class
-- health
-sensitive_field_semantics: excluded from any scoring
+- {field: intake.protected_activity_or_class, tag: protected_class, excluded_from_scoring: true}
+- {field: intake.pay_hours, tag: financial, excluded_from_scoring: true}
+- {field: record.health_information, tag: health, excluded_from_scoring: true}
 brief_views: []
 reports: []

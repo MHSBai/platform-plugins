@@ -1,12 +1,11 @@
 ---
-template_id: business-transactional.engagement-letter
+template_id: bt_engagement_letter
 title: Engagement letter naming the client
 pack: mhsb-pack-business-transactional
 adoption:
-  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
-  date: '2026-11-03'
-  version: 0.1.0
-  synthetic: true
+  adopted_by: PENDING ADOPTION
+  date: PENDING ADOPTION
+  version: PENDING ADOPTION
 ---
 
 # Engagement letter naming the client

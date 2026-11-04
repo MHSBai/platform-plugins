@@ -13,8 +13,8 @@ Commands run as `/<plugin>:<command>` in Claude Code and Cowork; in chat they lo
 | mhsb-lawmatics | platform | ga | yes | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/lawmatics | 2 |
 | mhsb-clio | platform | ga | yes | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/clio | 3 |
 | mhsb-mycase | platform | ga | yes | LicenseRef-MHSB-Source-Available | none | 0 |
-| mhsb-pack-personal-injury | practice | ga | yes | LicenseRef-MHSB-Source-Available | none | 0 |
-| mhsb-pack-business-transactional | practice | ga | yes | LicenseRef-MHSB-Source-Available | none | 0 |
+| mhsb-pack-personal-injury | practice | pilot | no | LicenseRef-MHSB-Source-Available | none | 0 |
+| mhsb-pack-business-transactional | practice | pilot | no | LicenseRef-MHSB-Source-Available | none | 0 |
 | mhsb-pack-estate-probate | practice | pilot | no | LicenseRef-MHSB-Source-Available | none | 0 |
 | mhsb-pack-criminal-defense | practice | pilot | no | LicenseRef-MHSB-Source-Available | none | 0 |
 | mhsb-pack-civil-litigation | practice | pilot | no | LicenseRef-MHSB-Source-Available | none | 0 |
@@ -74,20 +74,22 @@ Commands run as `/<plugin>:<command>` in Claude Code and Cowork; in chat they lo
 
 ## Practice packs
 
-| Pack | Practice | Tier |
-|---|---|---|
-| mhsb-pack-personal-injury | personal injury | ga |
-| mhsb-pack-business-transactional | business and transactional | ga |
-| mhsb-pack-estate-probate | estate planning and probate | pilot |
-| mhsb-pack-criminal-defense | criminal defense | pilot |
-| mhsb-pack-civil-litigation | civil litigation, general | pilot |
-| mhsb-pack-real-estate | real estate | pilot |
-| mhsb-pack-family-law | family law | hidden |
-| mhsb-pack-immigration | immigration | hidden |
-| mhsb-pack-employment-plaintiff | employment, plaintiff side | hidden |
-| mhsb-pack-bankruptcy-consumer | bankruptcy, consumer | hidden |
-| mhsb-pack-workers-compensation | workers' compensation | hidden |
-| mhsb-pack-landlord-tenant-consumer | landlord-tenant and consumer | hidden |
+A pack whose catalog tier is ga and whose tier is pilot is held unlisted until an attorney adoption is recorded (decision 0004).
+
+| Pack | Practice | Tier | Catalog tier |
+|---|---|---|---|
+| mhsb-pack-personal-injury | personal injury | pilot | ga |
+| mhsb-pack-business-transactional | business and transactional | pilot | ga |
+| mhsb-pack-estate-probate | estate planning and probate | pilot | pilot |
+| mhsb-pack-criminal-defense | criminal defense | pilot | pilot |
+| mhsb-pack-civil-litigation | civil litigation, general | pilot | pilot |
+| mhsb-pack-real-estate | real estate | pilot | pilot |
+| mhsb-pack-family-law | family law | hidden | hidden |
+| mhsb-pack-immigration | immigration | hidden | hidden |
+| mhsb-pack-employment-plaintiff | employment, plaintiff side | hidden | hidden |
+| mhsb-pack-bankruptcy-consumer | bankruptcy, consumer | hidden | hidden |
+| mhsb-pack-workers-compensation | workers' compensation | hidden | hidden |
+| mhsb-pack-landlord-tenant-consumer | landlord-tenant and consumer | hidden | hidden |
 
 ## Supported combinations
 
@@ -116,8 +118,8 @@ Lint cap: 24. Design figure: 22.
 | mhsb-lawmatics | platform | ga | 2 |
 | mhsb-clio | platform | ga | 3 |
 | mhsb-mycase | platform | ga | 0 |
-| mhsb-pack-personal-injury | practice | ga | 0 |
-| mhsb-pack-business-transactional | practice | ga | 0 |
+| mhsb-pack-personal-injury | practice | pilot | 0 |
+| mhsb-pack-business-transactional | practice | pilot | 0 |
 | mhsb-pack-estate-probate | practice | pilot | 0 |
 | mhsb-pack-criminal-defense | practice | pilot | 0 |
 | mhsb-pack-civil-litigation | practice | pilot | 0 |

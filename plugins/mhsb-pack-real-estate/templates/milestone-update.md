@@ -1,5 +1,5 @@
 ---
-template_id: real-estate.milestone-update
+template_id: re_milestone_update
 title: Milestone update
 pack: mhsb-pack-real-estate
 adoption:

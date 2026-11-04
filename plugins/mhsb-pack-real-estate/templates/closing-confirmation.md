@@ -1,5 +1,5 @@
 ---
-template_id: real-estate.closing-confirmation
+template_id: re_closing_confirmation
 title: Closing confirmation
 pack: mhsb-pack-real-estate
 adoption:

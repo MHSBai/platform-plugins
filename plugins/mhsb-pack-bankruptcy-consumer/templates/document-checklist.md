@@ -1,5 +1,5 @@
 ---
-template_id: bankruptcy-consumer.document-checklist
+template_id: bk_document_checklist
 title: Document checklist
 pack: mhsb-pack-bankruptcy-consumer
 adoption:

@@ -1,5 +1,5 @@
 ---
-template_id: landlord-tenant-consumer.hearing-reminder
+template_id: ltc_hearing_reminder
 title: Hearing reminder
 pack: mhsb-pack-landlord-tenant-consumer
 adoption:

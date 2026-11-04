@@ -1,0 +1,28 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: pi-dates-02
+pack: mhsb-pack-personal-injury
+skill: dates
+description: A mapped date that is empty is 'date not established' with source and owner; the computed
+  value is a cross-check only and never becomes the governing date. No mapping at all is a refusal.
+input:
+  as_of: '2026-11-03'
+  mapping:
+    lien_deadline: Lien Deadline
+  record:
+    Lien Deadline:
+      value: null
+      source: lien notice not yet received
+      owner: case manager
+  computed:
+    lien_deadline: '2027-02-01'
+expect:
+  rows:
+    lien_deadline:
+      kind: firm_set
+      status: not_established
+      governing_date: null
+      cross_check: '2027-02-01'
+      not_established:
+        source: lien notice not yet received
+        owner: case manager

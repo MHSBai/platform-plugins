@@ -1,0 +1,13 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: fam-outreach-01
+pack: mhsb-pack-family-law
+skill: outreach-gate
+description: 'No contact rule on the record: unknown is never permitted, so the outreach draft is refused.'
+input:
+  as_of: '2026-11-03'
+  channel: sms
+  record: {}
+expect:
+  draft: refused
+  reason: contact rule unknown

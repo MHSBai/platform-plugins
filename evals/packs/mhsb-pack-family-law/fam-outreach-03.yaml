@@ -1,0 +1,17 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: fam-outreach-03
+pack: mhsb-pack-family-law
+skill: outreach-gate
+description: A verified rule with verifier and date permits the draft only on a channel the rule names.
+input:
+  as_of: '2026-11-03'
+  channel: sms
+  record:
+    verified_contact_rule:
+      verified_by: intake attorney
+      verified_on: '2026-10-30'
+      channels:
+      - sms
+expect:
+  draft: permitted

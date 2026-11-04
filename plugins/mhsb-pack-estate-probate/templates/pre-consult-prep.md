@@ -1,5 +1,5 @@
 ---
-template_id: estate-probate.pre-consult-prep
+template_id: ep_pre_consult_prep
 title: Pre-consultation preparation
 pack: mhsb-pack-estate-probate
 adoption:

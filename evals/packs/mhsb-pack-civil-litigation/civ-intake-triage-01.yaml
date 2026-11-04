@@ -1,0 +1,34 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: civ-intake-triage-01
+pack: mhsb-pack-civil-litigation
+skill: intake-triage
+description: Insurance and budget are excluded from scoring; a date not established raises possible_limitation_issue
+  and the attorney's collectability signal raises collectability_question; the lead is not declined.
+input:
+  answers:
+    parties_counsel: a supplier, counsel unknown
+    claim_type: contract
+    key_dates: invoice dates unclear
+    writing_or_contract: 'yes'
+    prior_suits: false
+    insurance: none known
+    goals_budget: recover 40,000
+  signals:
+    dates_not_established:
+    - key_dates
+    attorney_signals:
+    - collectability_question
+expect:
+  score: 1.0
+  excluded_sensitive:
+  - goals_budget
+  - insurance
+  flags:
+  - possible_limitation_issue
+  - collectability_question
+  action: attorney_review
+  decline: false
+sensitive_variants:
+- insurance: general liability, limits 1,000,000
+  goals_budget: ''

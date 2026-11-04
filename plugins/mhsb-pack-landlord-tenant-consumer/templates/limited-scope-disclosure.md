@@ -1,5 +1,5 @@
 ---
-template_id: landlord-tenant-consumer.limited-scope-disclosure
+template_id: ltc_limited_scope_disclosure
 title: Limited-scope disclosure
 pack: mhsb-pack-landlord-tenant-consumer
 adoption:

@@ -1,5 +1,5 @@
 ---
-template_id: civil-litigation.scope-letter
+template_id: civ_scope_letter
 title: Scope letter
 pack: mhsb-pack-civil-litigation
 adoption:

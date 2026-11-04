@@ -1,5 +1,5 @@
 ---
-template_id: bankruptcy-consumer.course-deadlines
+template_id: bk_course_deadlines
 title: Course deadlines
 pack: mhsb-pack-bankruptcy-consumer
 adoption:

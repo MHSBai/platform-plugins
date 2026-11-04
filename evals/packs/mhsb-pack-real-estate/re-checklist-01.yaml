@@ -1,0 +1,16 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: re-checklist-01
+pack: mhsb-pack-real-estate
+skill: checklist
+description: 'Closing checklist: required items present except the closing disclosure.'
+input:
+  documents_present:
+  - purchase_agreement
+  - disclosures
+  - title_commitment
+  - deed
+expect:
+  missing_required:
+  - closing_disclosure
+  ready: false

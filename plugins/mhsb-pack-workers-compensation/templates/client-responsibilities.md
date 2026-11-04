@@ -1,5 +1,5 @@
 ---
-template_id: workers-compensation.client-responsibilities
+template_id: wc_client_responsibilities
 title: Client responsibilities sheet
 pack: mhsb-pack-workers-compensation
 adoption:

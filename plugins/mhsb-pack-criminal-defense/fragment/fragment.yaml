@@ -1,123 +1,90 @@
-# Fragment for criminal defense. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: criminal-defense
-practice: criminal defense
+# Practice-area pack fragment: criminal defense (Catalog v2.1 Section 3.4).
+# Data only. Merged into the Firm Profile and overridden by the firm's answers.
+# Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Court dates and cutoffs are entered from the court's notices and
+# govern; no speedy-trial or other marker is computed, so no category is statutory here.
+# Flags are attorney-review flags and never decline. Sensitive fields are excluded from
+# scoring. The NACDL materials are used only as an element checklist in MHSB's words.
+# Reports: the Catalog's speed-to-lead and conversion report has no identifier in the
+# Stage 3 report registry, so it is not listed; see HANDOFF.md.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier pilot.
+fragment_id: criminal_defense
+practice_area: criminal_defense
+version: 1.0.0
 release_tier: pilot
-status: pilot draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
 intake_questions:
-- id: name_as_charged
-  prompt: Name as charged
-  type: text
-- id: case_number
-  prompt: Case number
-  type: text
-- id: charges
-  prompt: Charges
-  type: text
-- id: offense_arrest_dates
-  prompt: Offense and arrest dates
-  type: date
-- id: agency
-  prompt: Arresting agency
-  type: text
-- id: release_conditions
-  prompt: Release conditions, warrants and next court date
-  type: text
-- id: co_defendants
-  prompt: Co-defendants and their counsel
-  type: text
-- id: citizenship_interpreter
-  prompt: Citizenship and interpreter need
-  type: text
-- id: supervision_status
-  prompt: Probation or parole status
-  type: text
-- id: pending_prior_charges
-  prompt: Pending and prior charges
-  type: text
-- id: authorized_locators
-  prompt: Who may be called to locate the client
-  type: text
+- {id: name_as_charged, prompt: "Name as charged, and other names used", answer_type: person, required: true, sensitive_tag: null}
+- {id: case_number, prompt: "Case number and court", answer_type: text, required: false, sensitive_tag: null}
+- {id: charges, prompt: "Charges, as stated on the charging document or citation", answer_type: text, required: true, sensitive_tag: null}
+- {id: offense_date, prompt: "Offense date", answer_type: date, required: false, sensitive_tag: null}
+- {id: arrest_date, prompt: "Arrest date", answer_type: date, required: false, sensitive_tag: null}
+- {id: agency, prompt: "Arresting or charging agency", answer_type: text, required: false, sensitive_tag: null}
+- {id: release_conditions, prompt: "Custody status and release conditions", answer_type: text, required: true, sensitive_tag: null}
+- {id: warrants, prompt: "Any outstanding warrant", answer_type: choice, choices: ["yes", "no", unknown], required: true, sensitive_tag: null}
+- {id: next_court_date, prompt: "Next court date and where it came from", answer_type: date, required: true, sensitive_tag: null}
+- {id: co_defendants, prompt: "Co-defendants and their counsel", answer_type: text, required: false, sensitive_tag: null}
+- {id: complainants, prompt: "Complainants and named witnesses, for the conflict check", answer_type: text, required: false, sensitive_tag: null}
+- {id: citizenship, prompt: "Citizenship, recorded for the attorney's review only", answer_type: text, required: false, sensitive_tag: citizenship}
+- {id: interpreter_need, prompt: "Whether an interpreter is needed, and the language", answer_type: text, required: false, sensitive_tag: null}
+- {id: probation_parole, prompt: "Probation or parole status", answer_type: text, required: false, sensitive_tag: prior_record}
+- {id: pending_prior_charges, prompt: "Pending and prior charges, as stated", answer_type: text, required: false, sensitive_tag: prior_record}
+- {id: authorized_contacts, prompt: "People the client authorizes the firm to call to locate the client", answer_type: text, required: false, sensitive_tag: null}
 attorney_review_flags:
-- possible_conflict_codefendants_complainants
-- outside_jurisdiction_or_court
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+- possible_conflict
+- outside_jurisdiction
 document_list:
-- charging documents
-- bail paperwork
-- citation
-- discovery
-- prior record
-- identification
+- {id: charging_documents, name: "Charging documents", required: true}
+- {id: bail_paperwork, name: "Bail and release paperwork", required: false}
+- {id: citation, name: "Citation", required: false}
+- {id: discovery, name: "Discovery received", required: false}
+- {id: prior_record, name: "Prior record", required: false}
+- {id: identification, name: "Identification", required: true}
 stage_map:
-- intake pipeline
-- arraignment
-- discovery
-- motions
-- plea or trial
-- sentencing
-- close
-- expungement follow-up
+- {fragment_stage: Emergency Lead, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Contacted, canonical: stage_intake_02_contact_attempted}
+- {fragment_stage: Consult Scheduled, canonical: stage_intake_03_consult_scheduled}
+- {fragment_stage: Retainer Sent, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Hired, canonical: stage_intake_06_retained}
+- {fragment_stage: Closed Out, canonical: stage_intake_99_closed}
+- {fragment_stage: Arraignment, canonical: stage_matter_10_open}
+- {fragment_stage: Discovery, canonical: stage_matter_20_active}
+- {fragment_stage: Motions, canonical: stage_matter_20_active}
+- {fragment_stage: Plea or trial, canonical: stage_matter_30_resolution}
+- {fragment_stage: Sentencing, canonical: stage_matter_30_resolution}
+- {fragment_stage: Close, canonical: stage_matter_40_closing}
+- {fragment_stage: Expungement follow-up, canonical: stage_matter_40_closing}
 fee_model:
-  model: flat
-  notes: Refundability and trust handling as the firm states them.
+  types: [flat]
+  notes: "Flat fees; refundability and trust handling as the firm states them in its adopted agreement."
 deadline_categories:
-- id: court_dates
-  label: Court dates (entered; govern)
-  kind: entered
-- id: discovery_motion_cutoffs
-  label: Discovery and motion cutoffs (entered)
-  kind: entered
+- id: court_date
+  name: "Court dates, entered from the court's notice"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: discovery_motion_cutoff
+  name: "Discovery and motion cutoffs, entered from the court's order"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
 communication_templates:
-- court-date-reminder
-- authorized-family-contact
-- status-update
+- crim_court_date_reminder
+- crim_authorized_family_contact
+- crim_status_update
 consent_flags:
-- id: jail_calls_recorded
-  label: Jail calls are recorded
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: third_party_presence
-  label: Third-party presence and privilege
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: immigration_consequences
-  label: Immigration consequences flag
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: interpreter
-  label: Interpreter
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
+- {id: authorized_family_contact, label: "Family or other contacts the client has authorized, and for what", evidence: [signed_form, recorded_verbal], verifier_required: true, permitted_channels: [phone, sms, email], expiry_days: null, when_unknown: not_permitted}
+- {id: jail_calls_recorded_advised, label: "Client advised that jail calls are recorded", evidence: [recorded_verbal, platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
+- {id: third_party_presence, label: "Third parties present during attorney communications, recorded for privilege review", evidence: [platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- citizenship
-- prior_record
-- health
-sensitive_field_semantics: excluded from any scoring
+- {field: intake.citizenship, tag: citizenship, excluded_from_scoring: true}
+- {field: intake.probation_parole, tag: prior_record, excluded_from_scoring: true}
+- {field: intake.pending_prior_charges, tag: prior_record, excluded_from_scoring: true}
+- {field: record.health_information, tag: health, excluded_from_scoring: true}
 brief_views:
-- next_court_dates
-- release_conditions
-- urgent_leads
-reports:
-- speed_to_lead_conversion
+- {id: next_court_dates, name: "Next court dates"}
+- {id: release_conditions, name: "Release conditions"}
+- {id: urgent_leads, name: "Urgent leads"}
+reports: []

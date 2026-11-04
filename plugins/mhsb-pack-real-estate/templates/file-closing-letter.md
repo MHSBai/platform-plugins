@@ -1,5 +1,5 @@
 ---
-template_id: real-estate.file-closing-letter
+template_id: re_file_closing_letter
 title: File-closing letter
 pack: mhsb-pack-real-estate
 adoption:

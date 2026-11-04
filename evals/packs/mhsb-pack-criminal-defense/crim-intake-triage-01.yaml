@@ -1,0 +1,33 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: crim-intake-triage-01
+pack: mhsb-pack-criminal-defense
+skill: intake-triage
+description: Citizenship, probation status and prior charges are excluded from scoring; co-defendant name-matches
+  raise possible_conflict; the lead is not declined.
+input:
+  answers:
+    name_as_charged: Synthetic Person
+    charges: as on the citation
+    release_conditions: released on bond
+    warrants: 'no'
+    next_court_date: '2026-11-18'
+    citizenship: not a citizen
+    pending_prior_charges: one prior misdemeanor
+    probation_parole: none
+  signals:
+    conflict_name_matches: 1
+expect:
+  score: 1.0
+  excluded_sensitive:
+  - citizenship
+  - pending_prior_charges
+  - probation_parole
+  flags:
+  - possible_conflict
+  action: attorney_review
+  decline: false
+sensitive_variants:
+- citizenship: citizen
+  pending_prior_charges: ''
+  probation_parole: on probation

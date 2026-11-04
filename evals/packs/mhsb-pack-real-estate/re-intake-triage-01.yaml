@@ -1,0 +1,23 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: re-intake-triage-01
+pack: mhsb-pack-real-estate
+skill: intake-triage
+description: Adverse parties with unsettled terms are an attorney signal for dual_representation_question;
+  the lead is not declined.
+input:
+  answers:
+    role: buyer
+    property: 100 Synthetic Lane
+    residential_or_commercial: residential
+    contract_status: signed
+    other_party_counsel: seller unrepresented
+  signals:
+    attorney_signals:
+    - dual_representation_question
+expect:
+  score: 1.0
+  flags:
+  - dual_representation_question
+  action: attorney_review
+  decline: false

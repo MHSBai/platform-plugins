@@ -1,5 +1,5 @@
 ---
-template_id: criminal-defense.court-date-reminder
+template_id: crim_court_date_reminder
 title: Court-date and release-condition reminder
 pack: mhsb-pack-criminal-defense
 adoption:

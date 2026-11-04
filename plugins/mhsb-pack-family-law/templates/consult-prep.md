@@ -1,5 +1,5 @@
 ---
-template_id: family-law.consult-prep
+template_id: fam_consult_prep
 title: Consultation preparation
 pack: mhsb-pack-family-law
 adoption:

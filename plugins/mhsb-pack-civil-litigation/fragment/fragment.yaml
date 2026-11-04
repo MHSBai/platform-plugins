@@ -1,108 +1,92 @@
-# Fragment for civil litigation, general. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: civil-litigation
-practice: civil litigation, general
+# Practice-area pack fragment: civil litigation, general (Catalog v2.1 Section 3.5).
+# Data only. Merged into the Firm Profile and overridden by the firm's answers.
+# Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Answer deadlines and appeal windows are fixed by rule, so they are
+# marked statutory with a citation placeholder; the date entered from the docket governs.
+# Discovery cutoffs are entered from the court's order (firm-set). Limitation periods are
+# firm-set and the firm records the statute as its own. Flags are attorney-review flags
+# and never decline. Sensitive fields are excluded from scoring.
+# Intake question ids match the AssemblyLine-derived blocks in intake-blocks.yaml.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier pilot.
+fragment_id: civil_litigation
+practice_area: civil_litigation
+version: 1.0.0
 release_tier: pilot
-status: pilot draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
 intake_questions:
-- id: parties_counsel
-  prompt: Parties and counsel
-  type: text
-- id: claim_type
-  prompt: Claim type
-  type: choice
-- id: key_dates
-  prompt: Key dates
-  type: text
-- id: writing_or_contract
-  prompt: Writing or contract
-  type: text
-- id: damages
-  prompt: Damages
-  type: text
-- id: prior_suits
-  prompt: Prior suits
-  type: text
-- id: insurance
-  prompt: Insurance
-  type: text
-- id: goals_budget
-  prompt: Goals and budget
-  type: text
+- {id: parties_counsel, prompt: "Parties and their counsel", answer_type: text, required: true, sensitive_tag: null}
+- {id: claim_type, prompt: "Type of claim", answer_type: choice, choices: [contract, property damage, business tort, debt collection, other, unknown], required: true, sensitive_tag: null}
+- {id: key_dates, prompt: "Key dates, each with its source", answer_type: text, required: true, sensitive_tag: null}
+- {id: writing_or_contract, prompt: "Whether a contract or other writing exists", answer_type: choice, choices: ["yes", "no", unknown], required: true, sensitive_tag: null}
+- {id: damages, prompt: "Damages claimed, in the person's words", answer_type: text, required: false, sensitive_tag: null}
+- {id: prior_suits, prompt: "Prior suits between the parties or on the same facts", answer_type: boolean, required: true, sensitive_tag: null}
+- {id: insurance, prompt: "Insurance that may respond, and limits if known", answer_type: text, required: false, sensitive_tag: insurance_limits}
+- {id: goals_budget, prompt: "Goals and budget for the matter", answer_type: text, required: false, sensitive_tag: financial}
 attorney_review_flags:
 - possible_limitation_issue
 - collectability_question
 - conflict_match
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
 document_list:
-- contracts
-- correspondence
-- invoices
-- photos
-- prior pleadings
-- policies
-- preservation of electronic records
+- {id: contracts, name: "Contracts", required: true}
+- {id: correspondence, name: "Correspondence", required: true}
+- {id: invoices, name: "Invoices", required: false}
+- {id: photos, name: "Photographs", required: false}
+- {id: prior_pleadings, name: "Prior pleadings", required: false}
+- {id: policies, name: "Insurance policies", required: false}
+- {id: electronic_records_preservation, name: "Electronic records preservation confirmation", required: true}
 stage_map:
-- screen
-- conflict check
-- consult
-- retainer
-- demand
-- pleadings
-- discovery
-- motions
-- mediation
-- trial
-- judgment and collection
+- {fragment_stage: Screen, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Conflict check, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Consult, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Retainer, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Demand, canonical: stage_matter_10_open}
+- {fragment_stage: Pleadings, canonical: stage_matter_20_active}
+- {fragment_stage: Discovery, canonical: stage_matter_20_active}
+- {fragment_stage: Motions, canonical: stage_matter_20_active}
+- {fragment_stage: Mediation, canonical: stage_matter_30_resolution}
+- {fragment_stage: Trial, canonical: stage_matter_30_resolution}
+- {fragment_stage: Judgment and collection, canonical: stage_matter_40_closing}
 fee_model:
-  model: hybrid
-  notes: Hourly with advance retainer; flat for defined steps; contingency on collections.
+  types: [hourly, flat, contingency]
+  notes: "Hourly with an advance retainer; flat fees for defined steps; contingency on collections, as the firm states in its adopted agreement."
 deadline_categories:
-- id: limitation_by_claim_type
-  label: Limitation periods by claim type; the firm records the statute
+- id: limitation_period
+  name: "Limitation periods by claim type; the firm records the governing statute as its own"
   kind: firm_set
-- id: docket_deadlines
-  label: Answer deadlines, discovery cutoffs and appeal windows (entered from the docket; govern)
-  kind: entered
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: answer_deadline
+  name: "Answer deadlines, entered from the docket"
+  kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: rule fixing the answer period in the forum, to be confirmed and recorded by the adopting attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
+- id: discovery_cutoff
+  name: "Discovery cutoffs, entered from the court's order"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: appeal_window
+  name: "Appeal windows, entered from the docket"
+  kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: rule fixing the appeal period in the forum, to be confirmed and recorded by the adopting attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
 communication_templates:
-- scope-letter
-- litigation-hold-notice
-- monthly-statement-cover
-- event-update
-- closing-letter
+- civ_scope_letter
+- civ_litigation_hold_notice
+- civ_monthly_statement_cover
+- civ_event_update
+- civ_closing_letter
 consent_flags:
-- id: preservation_duties
-  label: Preservation duties
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: limited_scope
-  label: Limited scope with informed consent
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: recording_consent
-  label: Recording consent
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
-sensitive_field_tags: []
-sensitive_field_semantics: excluded from any scoring
+- {id: preservation_duties_acknowledged, label: "Client acknowledged the preservation instructions", evidence: [signed_form, engagement_letter_clause], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
+- {id: limited_scope_informed_consent, label: "Informed consent to a limited scope of representation", evidence: [signed_form], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
+- {id: recording_consent, label: "Recording consent where the state requires it", evidence: [recorded_verbal, signed_form], verifier_required: true, permitted_channels: [phone], expiry_days: null, when_unknown: not_permitted}
+sensitive_field_tags:
+- {field: intake.insurance, tag: insurance_limits, excluded_from_scoring: true}
+- {field: intake.goals_budget, tag: financial, excluded_from_scoring: true}
 brief_views:
-- event_updates_due
+- {id: event_updates_due, name: "Event updates due"}
 reports: []

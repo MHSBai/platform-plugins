@@ -1,5 +1,5 @@
 ---
-template_id: bankruptcy-consumer.meeting-341-prep
+template_id: bk_meeting_341_prep
 title: 341 meeting preparation
 pack: mhsb-pack-bankruptcy-consumer
 adoption:
