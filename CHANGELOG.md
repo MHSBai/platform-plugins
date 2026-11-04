@@ -2,6 +2,14 @@
 
 Each entry describes what changed for the people who use the plugins at a firm. Version numbers follow the plugin versions in the marketplace.
 
+## Unreleased (Stage 9, 2026-11-03)
+
+All twelve practice packs now carry a complete or draft fragment in the shape the Firm Profile accepts: structured intake questions, attorney-review flags, the document list, a stage map to the canonical stages, the fee model, date categories marked statutory or firm-set, template references, consent rules, sensitive fields kept out of scoring, pack views and pack reports. No fragment states a citation; each statutory category waits for the adopting attorney to confirm one.
+
+The personal injury and business packs are complete but are not yet in the marketplace listing. They return to it when an attorney adopts them. The six hidden packs each list the questions an attorney in the practice must answer first. The family law draft refuses any outreach draft unless the record carries a verified contact rule.
+
+Pack evals check that the fragments support the date, intake, checklist and brief promises. Nothing changes in what the plugins never do.
+
 ## Unreleased (Stage 2, 2026-11-03)
 
 The commands now draw on rewritten material from permissively licensed sources: intake screening, deadline reporting rules, letter rules and the approval step, matter status variants, contact records, brief views, report covers, the setup runbook, the start routing, and the AI policy base. The personal injury, civil litigation and business packs gain reusable intake question blocks and, for the first two, chronology, briefing and preservation notes. Each adapted file names its source and license at its top. Nothing changes in what the plugins never do.

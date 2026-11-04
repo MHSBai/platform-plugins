@@ -1,50 +1,50 @@
 {
   "project": "MHSB Platform Plugins: platform-plugins repository",
-  "stage": "PP-2, Stage 2: harvest, provenance and adapted sources",
-  "branch": "cloud/pp2-harvest",
-  "base": "cloud/pp1-repository-marketplace (pull request open, not merged)",
+  "stage": "PP-9, Stage 9: twelve pack fragments and pack evals",
+  "branch": "cloud/pp9-pack-fragments",
+  "base": "cloud/pp2-harvest (Stage 1 and Stage 2 pull requests open, not merged)",
   "checkpoints": [
     {
       "id": "C1",
-      "name": "ledger complete",
-      "command": "python -c (see state/EXECUTION-LOG.md, PP-2 Step 5)",
+      "name": "twelve fragments validate against the Stage 3 schema",
+      "command": "python tools/validate_fragments_service.py --service ../mhsb-firm-service",
       "status": "pass",
-      "evidence": "17 entries, 0 incomplete; 16 ALLOWED, 1 ABSENT (anthropics/skills, BENCHMARK)"
+      "evidence": "12 of 12 schema-valid; cross rules pass on 10; PI and business HELD on XR-GA-ADOPTION and XR-STATUTORY until Stage 11 adoption"
     },
     {
       "id": "C2",
-      "name": "license gate green",
-      "command": "python tools/license_gate.py --clones",
+      "name": "GA and pilot fragment evals green",
+      "command": "python tools/pack_evals.py",
       "status": "pass",
-      "evidence": "17 ledger entries, 32 PROVENANCE rows, 0 failures"
+      "evidence": "28 cases, 28 passed (24 GA and pilot, 1 extra PI dates, 3 family law outreach gate)"
     },
     {
       "id": "C3",
-      "name": "adapted files carry headers",
-      "command": "grep -rlF 'MHSB modification notice' plugins | wc -l",
+      "name": "hidden fragments carry CO-DESIGN.md",
+      "command": "ls plugins/mhsb-pack-*/CO-DESIGN.md | wc -l",
       "status": "pass",
-      "evidence": "32 files; gate rule G3 and lint rule L12 pass"
+      "evidence": "6 of 6; enforced by lint rule L15"
     },
     {
       "id": "C4",
-      "name": "element checklists for every restricted form",
-      "command": "ls catalog/element-checklists",
+      "name": "counts unchanged",
+      "command": "python tools/gen_manifest.py --check && python tools/gen_manifest.py --counts",
       "status": "pass",
-      "evidence": "7 of 7 (OSB PLF, SC Bar PMAP, WSBA, ACTEC, NACDL, IDP, ABA DV)"
+      "evidence": "895 combinations, maximum 22, combination table identical; two plugin tier rows changed ga to pilot"
     },
     {
       "id": "C5",
-      "name": "lint and tests green",
-      "command": "python tools/gen_manifest.py --check && python tools/lint.py && python -m pytest -q",
+      "name": "lint green",
+      "command": "python tools/lint.py && python tools/lint.py --release && python tools/license_gate.py && python -m pytest -q",
       "status": "pass",
-      "evidence": "lint 0 errors, 12 warnings (synthetic adoption, decision 0002); 70 tests passed"
+      "evidence": "15 rules, 0 errors, 0 warnings (also under --release); license gate 0 failures; 97 tests passed"
     },
     {
       "id": "C6",
       "name": "no firm name from the specification",
       "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
       "status": "pass",
-      "evidence": "15 identifiers, 0 hits"
+      "evidence": "17 identifiers, 0 hits"
     }
   ],
   "provenance_rows_by_license": {
@@ -52,17 +52,64 @@
     "MIT": 3,
     "CC0-1.0": 2
   },
-  "incidents": [
-    "pytest collection imported clone test modules once before pytest.ini pinned discovery; see EXECUTION-LOG PP-2 Step 2"
-  ],
+  "incidents": [],
   "gates": [
     {
-      "id": "G1",
-      "name": "required repository unreachable",
-      "action": "record and continue",
+      "id": "G-S3",
+      "name": "Stage 3 fragment schema present",
+      "action": "STOP if absent",
       "status": "not triggered",
-      "evidence": "17 of 17 cloned"
+      "evidence": "firm_profile/schemas/fragment.schema.json on cloud/pp3-firm-profile-v2 at bfcddee"
     }
   ],
-  "last_verified": "2026-11-03"
+  "last_verified": "2026-11-03",
+  "history": [
+    {
+      "stage": "PP-2",
+      "checkpoints": [
+        {
+          "id": "C1",
+          "name": "ledger complete",
+          "command": "python -c (see state/EXECUTION-LOG.md, PP-2 Step 5)",
+          "status": "pass",
+          "evidence": "17 entries, 0 incomplete; 16 ALLOWED, 1 ABSENT (anthropics/skills, BENCHMARK)"
+        },
+        {
+          "id": "C2",
+          "name": "license gate green",
+          "command": "python tools/license_gate.py --clones",
+          "status": "pass",
+          "evidence": "17 ledger entries, 32 PROVENANCE rows, 0 failures"
+        },
+        {
+          "id": "C3",
+          "name": "adapted files carry headers",
+          "command": "grep -rlF 'MHSB modification notice' plugins | wc -l",
+          "status": "pass",
+          "evidence": "32 files; gate rule G3 and lint rule L12 pass"
+        },
+        {
+          "id": "C4",
+          "name": "element checklists for every restricted form",
+          "command": "ls catalog/element-checklists",
+          "status": "pass",
+          "evidence": "7 of 7 (OSB PLF, SC Bar PMAP, WSBA, ACTEC, NACDL, IDP, ABA DV)"
+        },
+        {
+          "id": "C5",
+          "name": "lint and tests green",
+          "command": "python tools/gen_manifest.py --check && python tools/lint.py && python -m pytest -q",
+          "status": "pass",
+          "evidence": "lint 0 errors, 12 warnings (synthetic adoption, decision 0002); 70 tests passed"
+        },
+        {
+          "id": "C6",
+          "name": "no firm name from the specification",
+          "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
+          "status": "pass",
+          "evidence": "15 identifiers, 0 hits"
+        }
+      ]
+    }
+  ]
 }
