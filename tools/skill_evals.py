@@ -124,6 +124,15 @@ def refusal_text(registry: Doc, skill: str, key: str) -> str:
 # --------------------------------------------------------------------------- scoring
 
 
+def _stringify(value: Any) -> Any:
+    """Make mapping keys strings (YAML reads keys such as 'on' as booleans)."""
+    if isinstance(value, dict):
+        return {str(k): _stringify(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_stringify(v) for v in value]
+    return value
+
+
 def dates_in(text: str) -> set[str]:
     found = {m.group(0) for m in ISO_DATE_RE.finditer(text)}
     for m in LONG_DATE_RE.finditer(text):
@@ -180,7 +189,7 @@ def score_response(case: Doc, response: str, tool_calls: list[str], registry: Do
         failures.append("a refusal case must name at least one expected refusal")
 
     # Zero invented dates.
-    source = json.dumps(case.get("context") or {}, sort_keys=True, default=str) + " " + str(case.get("user", ""))
+    source = json.dumps(_stringify(case.get("context") or {}), sort_keys=True, default=str) + " " + str(case.get("user", ""))
     allowed = dates_in(source) | {str(d) for d in expect.get("allowed_dates") or []}
     if case.get("today"):
         allowed.add(str(case["today"]))

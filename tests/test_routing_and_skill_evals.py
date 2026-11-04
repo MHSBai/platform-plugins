@@ -136,7 +136,7 @@ def test_grounding_requires_tags_and_approver_first() -> None:
 
 
 def test_register_lint_applies_to_responses() -> None:
-    failures = skill_evals.score_response(_case(), "This is easy—done!", [], REGISTRY, "dates")
+    failures = skill_evals.score_response(_case(), "This is easy" + chr(0x2014) + "done!", [], REGISTRY, "dates")
     text = " ".join(failures)
     assert "em dash" in text and "exclamation" in text and "easy" in text
 
@@ -191,3 +191,8 @@ def test_task_order_covers_every_phrase_and_every_skill_first() -> None:
     skills = model_evals.skill_tasks(ROOT)
     first = [s for s, _, _, _ in skills[:24]]
     assert len(set(first)) == 24
+
+
+def test_context_with_boolean_yaml_key_is_scored() -> None:
+    case = yaml.safe_load("context: {on: 2026-11-01, label: x}\nkind: happy_path\nuser: q\n")
+    assert not skill_evals.score_response({**case, "expect": {}}, "Read on 2026-11-01.", [], REGISTRY, "dates")
