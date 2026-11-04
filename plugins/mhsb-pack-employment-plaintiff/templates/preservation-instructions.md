@@ -1,5 +1,5 @@
 ---
-template_id: employment-plaintiff.preservation-instructions
+template_id: emp_preservation_instructions
 title: Preservation instructions
 pack: mhsb-pack-employment-plaintiff
 adoption:

@@ -1,5 +1,5 @@
 ---
-template_id: civil-litigation.closing-letter
+template_id: civ_closing_letter
 title: Closing letter with retention notice
 pack: mhsb-pack-civil-litigation
 adoption:

@@ -1,5 +1,5 @@
 ---
-template_id: landlord-tenant-consumer.document-checklist
+template_id: ltc_document_checklist
 title: Document checklist
 pack: mhsb-pack-landlord-tenant-consumer
 adoption:

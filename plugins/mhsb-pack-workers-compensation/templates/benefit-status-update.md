@@ -1,5 +1,5 @@
 ---
-template_id: workers-compensation.benefit-status-update
+template_id: wc_benefit_status_update
 title: Benefit status update
 pack: mhsb-pack-workers-compensation
 adoption:

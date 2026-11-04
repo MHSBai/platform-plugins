@@ -1,91 +1,88 @@
-# Fragment for immigration. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+# Practice-area pack fragment: immigration (Catalog v2.1 Section 3.8). HIDDEN DRAFT.
+# Not for use by any firm until an immigration attorney co-designs it; see CO-DESIGN.md.
+# Data only. Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Any eligibility question is an attorney-review flag, never a score.
+# The one-year asylum window and response windows are statutory and never firm-set; status
+# expiration is entered from the person's document. Status, entry manner, criminal history
+# and national origin are excluded from scoring and masked in reports.
+# The IDP worksheet is used only as an element checklist in MHSB's words.
+# Reports: the Catalog's deadline risk inventory has no identifier in the Stage 3 report
+# registry, so it is not listed; see HANDOFF.md.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier hidden.
 fragment_id: immigration
-practice: immigration
+practice_area: immigration
+version: 0.1.0
 release_tier: hidden
-status: hidden draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
 intake_questions:
-- id: country_of_birth
-  prompt: Country of birth
-  type: text
-- id: current_status
-  prompt: Current status and its expiry, distinguishing EAD, I-94, visa and period of authorized stay
-  type: text
-- id: a_number
-  prompt: A-number
-  type: text
-- id: entry
-  prompt: Entry date and manner
-  type: text
-- id: travel_history
-  prompt: Travel history
-  type: text
-- id: relatives_status
-  prompt: Relatives' status
-  type: text
-- id: prior_applications
-  prompt: Prior applications and denials
-  type: text
-- id: proceedings_detention
-  prompt: Proceedings or detention
-  type: text
-- id: criminal_history
-  prompt: Criminal history including tickets
-  type: text
-- id: language
-  prompt: Language
-  type: text
-- id: sponsor
-  prompt: Sponsor
-  type: text
+- {id: country_of_birth, prompt: "Country of birth", answer_type: text, required: true, sensitive_tag: national_origin}
+- {id: current_status, prompt: "Current immigration status, as the person states it", answer_type: text, required: true, sensitive_tag: immigration_status}
+- {id: status_document_type, prompt: "Which document shows the status or its expiry", answer_type: multi_choice, choices: [EAD, I-94, visa, period of authorized stay, other, unknown], required: true, sensitive_tag: immigration_status}
+- {id: status_expiry_date, prompt: "Expiry date shown on that document", answer_type: date, required: false, sensitive_tag: immigration_status}
+- {id: a_number, prompt: "A-number, if any", answer_type: text, required: false, sensitive_tag: immigration_status}
+- {id: entry_date, prompt: "Date of last entry", answer_type: date, required: false, sensitive_tag: immigration_status}
+- {id: entry_manner, prompt: "Manner of last entry, as the person states it", answer_type: text, required: false, sensitive_tag: immigration_status}
+- {id: travel_history, prompt: "Travel history", answer_type: text, required: false, sensitive_tag: immigration_status}
+- {id: relatives_status, prompt: "Status of close relatives", answer_type: text, required: false, sensitive_tag: immigration_status}
+- {id: prior_applications, prompt: "Prior applications and any denials", answer_type: text, required: false, sensitive_tag: immigration_status}
+- {id: proceedings_detention, prompt: "Any removal proceedings or detention", answer_type: choice, choices: ["yes", "no", unknown], required: true, sensitive_tag: immigration_status}
+- {id: criminal_history, prompt: "Any arrests, charges or citations, including traffic tickets", answer_type: text, required: false, sensitive_tag: criminal_history}
+- {id: language, prompt: "Preferred language", answer_type: text, required: false, sensitive_tag: null}
+- {id: sponsor, prompt: "Prospective sponsor or petitioner, if any", answer_type: text, required: false, sensitive_tag: null}
 attorney_review_flags:
 - possible_conflict
-- outside_practice
-- eligibility_question_for_attorney
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+- outside_case_types
+- eligibility_question
 document_list:
-- passport
-- I-94
-- USCIS notices and receipt numbers
-- civil documents
+- {id: passport, name: "Passport", required: true}
+- {id: i94_record, name: "I-94 record", required: false}
+- {id: uscis_notices, name: "USCIS notices and receipt numbers", required: false}
+- {id: civil_documents, name: "Civil documents such as birth and marriage certificates", required: false}
 stage_map:
-- intake pipeline
+- {fragment_stage: New Lead, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Eligibility Review, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Docs Requested, canonical: stage_matter_10_open}
+- {fragment_stage: Filed, canonical: stage_matter_20_active}
+- {fragment_stage: Awaiting Decision, canonical: stage_matter_30_resolution}
+- {fragment_stage: Closed, canonical: stage_matter_99_closed}
 fee_model:
-  model: flat
-  notes: Flat with payment plans.
+  types: [flat]
+  notes: "Flat fees with payment plans as the firm states them."
 deadline_categories:
 - id: status_expiration
-  label: Status expiration (entered)
-  kind: entered
-- id: asylum_one_year_window
-  label: One-year asylum window
-  kind: statutory
+  name: "Status expiration, entered from the person's document"
+  kind: firm_set
+  entered_date_governs: true
   citation: null
   adopter: null
-- id: response_windows
-  label: Response windows
+- id: one_year_asylum_window
+  name: "One-year asylum filing window"
   kind: statutory
-  citation: null
-  adopter: null
+  entered_date_governs: true
+  citation: "CITATION PENDING: asylum filing provision, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
+- id: response_window
+  name: "Response windows on agency notices"
+  kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: response period stated in the notice or the governing regulation, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
 communication_templates:
-- milestone-update
-- renewal-reminder
+- imm_milestone_update
+- imm_renewal_reminder
 consent_flags: []
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
 sensitive_field_tags:
-- status
-- entry_manner
-- criminal_history
-- national_origin
-sensitive_field_semantics: excluded from any scoring
+- {field: intake.country_of_birth, tag: national_origin, excluded_from_scoring: true}
+- {field: intake.current_status, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.status_document_type, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.status_expiry_date, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.a_number, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.entry_date, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.entry_manner, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.travel_history, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.relatives_status, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.prior_applications, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.proceedings_detention, tag: immigration_status, excluded_from_scoring: true}
+- {field: intake.criminal_history, tag: criminal_history, excluded_from_scoring: true}
 brief_views: []
-reports:
-- deadline_risk_inventory
+reports: []

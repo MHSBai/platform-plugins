@@ -290,11 +290,47 @@ def test_phrase_overlap_semantics() -> None:
 # --------------------------------------------------------------------- L11
 
 
-def test_l11_not_adopted_in_ga(repo: Path) -> None:
-    path = repo / "plugins/mhsb-pack-personal-injury/templates/welcome.md"
+PI = "plugins/mhsb-pack-personal-injury"
+SYNTHETIC = ("adoption:\n  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)\n"
+             "  date: '2026-11-03'\n  version: 0.1.0\n  synthetic: true\n")
+
+
+def set_template_adoption(path: Path, block: str) -> None:
     text = path.read_text(encoding="utf-8")
-    text = text.replace("adopted_by: Synthetic Adopter (fixture, not an attorney adoption)", "adopted_by: NOT ADOPTED")
-    path.write_text(text, encoding="utf-8")
+    head, rest = text.split("adoption:\n", 1)
+    _, tail = rest.split("---\n", 1)
+    path.write_text(head + block + "---\n" + tail, encoding="utf-8")
+
+
+def test_l11_not_adopted_in_held_pack(repo: Path) -> None:
+    path = repo / PI / "templates/welcome.md"
+    path.write_text(path.read_text(encoding="utf-8").replace("PENDING ADOPTION", "NOT ADOPTED"), encoding="utf-8")
+    assert "L11" in rules_failed(repo)
+
+
+def test_l11_pending_adoption_outside_held_pack(repo: Path) -> None:
+    path = repo / "plugins/mhsb-pack-real-estate/fragment/adoption.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace("NOT ADOPTED", "PENDING ADOPTION"), encoding="utf-8")
+    assert "L11" in rules_failed(repo)
+
+
+def test_l11_pending_adoption_in_ga_tier(repo: Path) -> None:
+    edit_manifest(repo, lambda d: (plugin_entry(d, "mhsb-pack-personal-injury").update(tier="ga"),
+                                   plugin_entry(d, "mhsb-pack-personal-injury").pop("catalog_tier")))
+    assert "L11" in rules_failed(repo)
+
+
+def test_l11_mixed_placeholder(repo: Path) -> None:
+    path = repo / PI / "fragment/adoption.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace("date: PENDING ADOPTION", "date: '2026-11-03'"),
+                    encoding="utf-8")
+    assert "L11" in rules_failed(repo)
+
+
+def test_l11_fragment_tier_must_follow_catalog_tier(repo: Path) -> None:
+    path = repo / PI / "fragment/fragment.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace("release_tier: ga", "release_tier: pilot"),
+                    encoding="utf-8")
     assert "L11" in rules_failed(repo)
 
 
@@ -307,17 +343,34 @@ def test_l11_missing_record_in_pilot(repo: Path) -> None:
     assert "L11" in rules_failed(repo)
 
 
-def test_l11_fragment_without_adoption(repo: Path) -> None:
-    path = repo / "plugins/mhsb-pack-immigration/fragment/fragment.yaml"
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    data.pop("adoption")
-    path.write_text(yaml.safe_dump(data), encoding="utf-8")
+def test_l11_fragment_without_adoption_record(repo: Path) -> None:
+    (repo / "plugins/mhsb-pack-immigration/fragment/adoption.yaml").unlink()
+    assert {"L11", "L13"} <= rules_failed(repo)
+
+
+def test_l11_real_record_must_match_fragment(repo: Path) -> None:
+    path = repo / "plugins/mhsb-pack-real-estate/fragment/adoption.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        "adopted_by: NOT ADOPTED\ndate: NOT ADOPTED\nversion: NOT ADOPTED",
+        "adopted_by: A. Attorney\ndate: '2026-11-03'\nversion: 1.0.0"), encoding="utf-8")
+    assert "L11" in rules_failed(repo)
+
+
+def test_l11_hidden_pack_with_real_record(repo: Path) -> None:
+    set_template_adoption(repo / "plugins/mhsb-pack-immigration/templates/milestone-update.md",
+                          "adoption:\n  adopted_by: A. Attorney\n  date: '2026-11-03'\n  version: 0.1.0\n")
     assert "L11" in rules_failed(repo)
 
 
 def test_l11_synthetic_fails_release(repo: Path) -> None:
+    set_template_adoption(repo / "plugins/mhsb-pack-real-estate/templates/milestone-update.md", SYNTHETIC)
     assert "L11" not in rules_failed(repo)
     assert "L11" in rules_failed(repo, release=True)
+
+
+def test_manifest_rejects_catalog_tier_outside_held_case(repo: Path) -> None:
+    edit_manifest(repo, lambda d: plugin_entry(d, "mhsb-pack-real-estate").update(catalog_tier="hidden"))
+    assert "L00" in rules_failed(repo)
 
 
 def test_l11_non_markdown_template(repo: Path) -> None:
@@ -411,8 +464,53 @@ def test_l14_counts_table_stale(repo: Path) -> None:
 
 def test_cli_exit_codes(repo: Path) -> None:
     assert lint.main(["--root", str(repo)]) == 0
+    assert lint.main(["--root", str(repo), "--release"]) == 0
+    set_template_adoption(repo / "plugins/mhsb-pack-real-estate/templates/milestone-update.md", SYNTHETIC)
     assert lint.main(["--root", str(repo), "--release"]) == 1
     assert gen_manifest.main(["--root", str(repo), "--check"]) == 0
+
+
+# --------------------------------------------------------------------- L15
+
+
+def test_l15_schema_violation(repo: Path) -> None:
+    path = repo / PI / "fragment/fragment.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace("- outside_service_area\n", "- automatic_decline\n"),
+                    encoding="utf-8")
+    assert "L15" in rules_failed(repo)
+
+
+def test_l15_statutory_without_placeholder_citation(repo: Path) -> None:
+    path = repo / PI / "fragment/fragment.yaml"
+    text = path.read_text(encoding="utf-8")
+    start = text.index('  citation: "CITATION PENDING: notice-of-claim')
+    end = text.index("\n", start)
+    path.write_text(text[:start] + '  citation: "Example Code section 1"' + text[end:], encoding="utf-8")
+    assert "L15" in rules_failed(repo)
+
+
+def test_l15_unresolved_template_reference(repo: Path) -> None:
+    (repo / PI / "templates/welcome.md").unlink()
+    assert "L15" in rules_failed(repo)
+
+
+def test_l15_sensitive_question_without_tag(repo: Path) -> None:
+    path = repo / PI / "fragment/fragment.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace(
+        "- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true}\n", ""), encoding="utf-8")
+    assert "L15" in rules_failed(repo)
+
+
+def test_l15_intake_block_map_drift(repo: Path) -> None:
+    path = repo / PI / "fragment/intake-blocks.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace("    prior_counsel: {block: other_parties, "
+                                                             "field: party_counsel}\n", ""), encoding="utf-8")
+    assert "L15" in rules_failed(repo)
+
+
+def test_l15_hidden_pack_needs_co_design(repo: Path) -> None:
+    (repo / "plugins/mhsb-pack-family-law/CO-DESIGN.md").unlink()
+    assert "L15" in rules_failed(repo)
 
 
 def test_l04_skips_harvest_clones_but_lints_ledger(repo: Path) -> None:

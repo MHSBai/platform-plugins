@@ -1,86 +1,88 @@
-# Fragment for real estate. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: real-estate
-practice: real estate
+# Practice-area pack fragment: real estate (Catalog v2.1 Section 3.6).
+# Data only. Merged into the Firm Profile and overridden by the firm's answers.
+# Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Every date category is entered from the contract and governs; the
+# Catalog defines no statutory category for this pack. Flags are attorney-review flags and
+# never decline. Sensitive fields are excluded from scoring.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier pilot.
+fragment_id: real_estate
+practice_area: real_estate
+version: 1.0.0
 release_tier: pilot
-status: pilot draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
 intake_questions:
-- id: role
-  prompt: Role in the transaction
-  type: choice
-- id: property
-  prompt: Property
-  type: text
-- id: contract_status
-  prompt: Contract status and dates
-  type: text
-- id: lender_title
-  prompt: Lender and title company
-  type: text
-- id: other_party
-  prompt: Other party and counsel
-  type: text
-- id: closing_date
-  prompt: Closing date
-  type: date
+- {id: role, prompt: "The person's role in the transaction", answer_type: choice, choices: [buyer, seller, borrower, lender, landlord, tenant, other], required: true, sensitive_tag: null}
+- {id: property, prompt: "Property address and type", answer_type: address, required: true, sensitive_tag: null}
+- {id: residential_or_commercial, prompt: "Residential or commercial", answer_type: choice, choices: [residential, commercial], required: true, sensitive_tag: null}
+- {id: contract_status, prompt: "Contract status", answer_type: choice, choices: [not yet signed, signed, under contingency, closed, unknown], required: true, sensitive_tag: null}
+- {id: contract_dates, prompt: "Contract dates, each as written in the contract", answer_type: text, required: false, sensitive_tag: null}
+- {id: lender_title, prompt: "Lender and title company", answer_type: text, required: false, sensitive_tag: null}
+- {id: other_party_counsel, prompt: "Other party and counsel", answer_type: text, required: true, sensitive_tag: null}
+- {id: closing_date, prompt: "Scheduled closing date, as written in the contract", answer_type: date, required: false, sensitive_tag: null}
 attorney_review_flags:
-- adverse_parties_unsettled_terms
+- dual_representation_question
 - conflict_match
 - outside_jurisdiction
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
 document_list:
-- purchase agreement and addenda
-- disclosures
-- pre-approval
-- title commitment
-- survey
-- deed
-- note and mortgage
-- closing disclosure
-- inspections
-- leases (commercial)
-- estoppels (commercial)
-- environmental (commercial)
+- {id: purchase_agreement, name: "Purchase agreement and addenda", required: true}
+- {id: disclosures, name: "Disclosures", required: true}
+- {id: pre_approval, name: "Pre-approval", required: false}
+- {id: title_commitment, name: "Title commitment", required: true}
+- {id: survey, name: "Survey", required: false}
+- {id: deed, name: "Deed", required: true}
+- {id: note_mortgage, name: "Note and mortgage", required: false}
+- {id: closing_disclosure, name: "Closing disclosure", required: true}
+- {id: inspections, name: "Inspection reports", required: false}
+- {id: leases_estoppels, name: "Leases and estoppels (commercial)", required: false}
+- {id: environmental, name: "Environmental reports (commercial)", required: false}
 stage_map:
-- contract review
-- title and survey review
-- contingency tracking
-- closing prep
-- closing
-- recording and post-closing
+- {fragment_stage: Contract review, canonical: stage_matter_10_open}
+- {fragment_stage: Title and survey review, canonical: stage_matter_20_active}
+- {fragment_stage: Contingency tracking, canonical: stage_matter_20_active}
+- {fragment_stage: Closing prep, canonical: stage_matter_30_resolution}
+- {fragment_stage: Closing, canonical: stage_matter_30_resolution}
+- {fragment_stage: Recording and post-closing, canonical: stage_matter_40_closing}
 fee_model:
-  model: hybrid
-  notes: Flat per closing; hourly for disputes.
+  types: [flat, hourly]
+  notes: "Flat fee per closing; hourly for disputes."
 deadline_categories:
-- id: contract_dates
-  label: Contingency, title objection, closing and recording dates (entered from the contract; govern)
-  kind: entered
+- id: contingency_date
+  name: "Contingency dates, entered from the contract"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: title_objection
+  name: "Title objection date, entered from the contract"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: closing_date
+  name: "Closing date, entered from the contract"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: recording_date
+  name: "Recording date, entered from the closing file"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
 communication_templates:
-- milestone-update
-- closing-document-request
-- closing-confirmation
-- file-closing-letter
+- re_milestone_update
+- re_closing_document_request
+- re_closing_confirmation
+- re_file_closing_letter
 consent_flags:
-- id: multi_party_representation
-  label: Multi-party representation rules per the firm's state
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
-sensitive_field_tags: []
-sensitive_field_semantics: excluded from any scoring
+- {id: multi_party_representation, label: "Multi-party representation consent under the firm's state rule", evidence: [signed_form, engagement_letter_clause], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
+- {id: withdraw_on_conflict_acknowledged, label: "Client acknowledged the withdraw-on-conflict term", evidence: [engagement_letter_clause], verifier_required: true, permitted_channels: [email, letter], expiry_days: null, when_unknown: not_permitted}
+sensitive_field_tags:
+- {field: documents.pre_approval, tag: financial, excluded_from_scoring: true}
+- {field: documents.note_mortgage, tag: financial, excluded_from_scoring: true}
 brief_views:
-- contingency_dates
-- closing_checklist
-- title_items
+- {id: contingency_dates, name: "Contingency dates"}
+- {id: closing_checklist, name: "Closing checklist"}
+- {id: title_items, name: "Open title items"}
 reports: []

@@ -1,5 +1,5 @@
 ---
-template_id: bankruptcy-consumer.discharge-notice
+template_id: bk_discharge_notice
 title: Discharge notice
 pack: mhsb-pack-bankruptcy-consumer
 adoption:

@@ -1,90 +1,82 @@
-# Fragment for family law. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: family-law
-practice: family law
+# Practice-area pack fragment: family law (Catalog v2.1 Section 3.7). HIDDEN DRAFT.
+# Not for use by any firm until an attorney in the practice co-designs it and the firm
+# owns a safety protocol; see CO-DESIGN.md.
+# Data only. Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Each deadline category is statutory, with a citation placeholder
+# that the adopting attorney confirms, or entered from the court (firm-set). Flags are
+# attorney-review flags and never decline. Sensitive fields are excluded from scoring.
+# Safety: the screen is the firm's own protocol, asked by a person with the client alone.
+# The fragment records only that the protocol was followed and the resulting contact rule.
+# Outreach drafts are refused unless the record carries the verified_contact_rule flag with
+# its verifier and date; an absent rule is unknown, and unknown is never permitted.
+# The ABA screening tool is used only as an element checklist in MHSB's words.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier hidden.
+fragment_id: family_law
+practice_area: family_law
+version: 0.1.0
 release_tier: hidden
-status: hidden draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
 intake_questions:
-- id: parties_children
-  prompt: Parties and children
-  type: text
-- id: dates
-  prompt: Key dates
-  type: text
-- id: prior_pending_cases
-  prompt: Prior or pending cases and orders, including protective orders
-  type: text
-- id: income
-  prompt: Income
-  type: text
-- id: assets_debts
-  prompt: Assets and debts
-  type: text
-- id: goals
-  prompt: Goals
-  type: text
-- id: opposing_party
-  prompt: Opposing party and counsel
-  type: text
-- id: safety_protocol_followed
-  prompt: The firm's safety protocol was followed, and the resulting contact rules
-  type: text
+- {id: parties_children, prompt: "Parties and any children of the relationship", answer_type: text, required: true, sensitive_tag: null}
+- {id: key_dates, prompt: "Key dates such as marriage, separation and filing, each with its source", answer_type: text, required: false, sensitive_tag: null}
+- {id: prior_pending_cases, prompt: "Prior or pending cases and orders, including protective orders", answer_type: text, required: true, sensitive_tag: null}
+- {id: income, prompt: "Income of each party, if known", answer_type: text, required: false, sensitive_tag: financial}
+- {id: assets_debts, prompt: "Assets and debts", answer_type: text, required: false, sensitive_tag: financial}
+- {id: goals, prompt: "What the person wants from the matter", answer_type: text, required: true, sensitive_tag: null}
+- {id: opposing_party_counsel, prompt: "Opposing party and counsel", answer_type: text, required: true, sensitive_tag: null}
+- {id: safety_protocol_followed, prompt: "Whether the firm's safety protocol was followed by a person speaking with the client alone", answer_type: boolean, required: true, sensitive_tag: null}
+- {id: contact_rule_status, prompt: "Status of the resulting contact rule", answer_type: choice, choices: [verified, not verified, unknown], required: true, sensitive_tag: null}
 attorney_review_flags:
-- possible_conflict_other_spouse_prior_contact
-- outside_matter_types_or_jurisdiction
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+- possible_conflict
+- outside_case_types
+- outside_jurisdiction
 document_list:
-- collected after engagement
+- {id: existing_orders, name: "Existing orders, including protective orders (collected after engagement)", required: false}
+- {id: income_records, name: "Income records (collected after engagement)", required: false}
+- {id: asset_debt_statements, name: "Asset and debt statements (collected after engagement)", required: false}
 stage_map:
-- inquiry
-- conflict check
-- consult
-- retainer
-- pleadings and temporary orders
-- disclosure
-- mediation or settlement
-- trial
-- judgment
-- post-judgment
+- {fragment_stage: Inquiry, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Conflict check, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Consult, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Retainer, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Pleadings and temporary orders, canonical: stage_matter_10_open}
+- {fragment_stage: Disclosure, canonical: stage_matter_20_active}
+- {fragment_stage: Mediation or settlement, canonical: stage_matter_30_resolution}
+- {fragment_stage: Trial, canonical: stage_matter_30_resolution}
+- {fragment_stage: Judgment, canonical: stage_matter_40_closing}
+- {fragment_stage: Post-judgment, canonical: stage_matter_40_closing}
 fee_model:
-  model: hourly
-  notes: Hourly retainer; flat for uncontested matters; contingency prohibited.
+  types: [hourly, flat]
+  notes: "Hourly retainer; flat fee for uncontested matters. Contingency is excluded, as the Catalog records; the co-designing attorney confirms the rule for the state."
 deadline_categories:
-- id: response_disclosure
-  label: Response to petition and disclosure deadlines, by state
+- id: response_to_petition
+  name: "Response to petition, by state"
   kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: response period of the forum state, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
+- id: disclosure_deadline
+  name: "Financial disclosure deadlines, by state"
+  kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: disclosure provisions of the forum state, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
+- id: hearing_date
+  name: "Hearings, entered from the court's notice"
+  kind: firm_set
+  entered_date_governs: true
   citation: null
   adopter: null
-- id: hearings
-  label: Hearings (entered)
-  kind: entered
 communication_templates:
-- urgent-routing
-- consult-prep
-- hearing-reminder
-- final-letter
+- fam_urgent_routing
+- fam_consult_prep
+- fam_hearing_reminder
+- fam_final_letter
 consent_flags:
-- id: verified_contact_rule
-  label: Verified contact rule; outreach drafts are refused unless the record carries it with verifier
-    and date
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
+- {id: verified_contact_rule, label: "Verified contact rule from the firm's safety protocol; outreach drafts are refused without it", evidence: [recorded_verbal, platform_field], verifier_required: true, permitted_channels: [], expiry_days: 90, when_unknown: not_permitted}
 sensitive_field_tags:
-- safety_screen
-- health
-- children
-sensitive_field_semantics: excluded from any scoring
+- {field: intake.income, tag: financial, excluded_from_scoring: true}
+- {field: intake.assets_debts, tag: financial, excluded_from_scoring: true}
+- {field: record.health_information, tag: health, excluded_from_scoring: true}
 brief_views: []
 reports: []

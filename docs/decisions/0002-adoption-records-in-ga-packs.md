@@ -1,6 +1,6 @@
 # 0002. Adoption records in general availability packs before an attorney has adopted them
 
-Status: accepted, 2026-11-03 (Stage 1).
+Status: accepted, 2026-11-03 (Stage 1). Items 1 and 2 superseded for the two general availability packs by decision 0004 (Stage 9); item 4 answered there.
 
 ## Problem
 

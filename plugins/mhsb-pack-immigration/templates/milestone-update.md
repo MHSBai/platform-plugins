@@ -1,5 +1,5 @@
 ---
-template_id: immigration.milestone-update
+template_id: imm_milestone_update
 title: Milestone update
 pack: mhsb-pack-immigration
 adoption:

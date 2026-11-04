@@ -1,5 +1,5 @@
 ---
-template_id: landlord-tenant-consumer.closing-letter
+template_id: ltc_closing_letter
 title: Closing letter
 pack: mhsb-pack-landlord-tenant-consumer
 adoption:

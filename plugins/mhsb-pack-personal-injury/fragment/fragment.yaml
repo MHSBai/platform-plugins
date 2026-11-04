@@ -1,48 +1,33 @@
-# Fragment for personal injury. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: personal-injury
-practice: personal injury
+# Practice-area pack fragment: personal injury (Catalog v2.1 Section 3.1).
+# Data only. Merged into the Firm Profile and overridden by the firm's answers.
+# Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Each deadline category is statutory, with a citation placeholder
+# that the adopting attorney confirms, or firm-set. Flags are attorney-review flags and
+# never decline. Sensitive fields are excluded from scoring. Nothing is copied from a
+# restricted form; bar forms are used only as element checklists in MHSB's words.
+# Intake question ids match the AssemblyLine-derived blocks in intake-blocks.yaml.
+# PHI flag on by default, with documents and note bodies off: a Firm Profile data rule,
+# set at activation; the fragment schema carries no field for it.
+# Adoption: adoption.yaml (PENDING ADOPTION). Catalog tier ga; held at pilot in the
+# manifest until an attorney adoption is recorded (Stage 11).
+fragment_id: personal_injury
+practice_area: personal_injury
+version: 1.0.0
 release_tier: ga
-status: complete
-adoption:
-  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
-  date: '2026-11-03'
-  version: 0.1.0
-  synthetic: true
+adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
 intake_questions:
-- id: loss_date
-  prompt: Date of the loss
-  type: date
-- id: loss_location
-  prompt: Location of the loss
-  type: text
-- id: loss_type
-  prompt: Type of loss
-  type: choice
-- id: injuries_treatment
-  prompt: Injuries and treatment to date
-  type: text
-- id: insurance_both_parties
-  prompt: Both parties' insurance and limits
-  type: text
-- id: witnesses
-  prompt: Witnesses
-  type: text
-- id: employment_wage_loss
-  prompt: Employment and wage loss
-  type: text
-- id: prior_claims
-  prompt: Prior claims or suits
-  type: text
-- id: impact_statement
-  prompt: Impact statement
-  type: text
-- id: source
-  prompt: How the lead found the firm
-  type: choice
+- {id: loss_date, prompt: "Date of the loss, as the person states it", answer_type: date, required: true, sensitive_tag: null}
+- {id: loss_location, prompt: "Where the loss occurred", answer_type: address, required: true, sensitive_tag: null}
+- {id: loss_type, prompt: "Type of loss", answer_type: choice, choices: [motor vehicle, premises, dog bite, product, workplace, other], required: true, sensitive_tag: null}
+- {id: injuries_treatment, prompt: "Injuries and treatment to date, in the person's words", answer_type: text, required: false, sensitive_tag: health}
+- {id: treatment_providers, prompt: "Treating providers seen so far", answer_type: text, required: false, sensitive_tag: treatment}
+- {id: insurance_both_parties, prompt: "Insurance carriers and limits for both parties, if known", answer_type: text, required: false, sensitive_tag: insurance_limits}
+- {id: witnesses, prompt: "Witnesses, with contact details if known", answer_type: text, required: false, sensitive_tag: null}
+- {id: employment_wage_loss, prompt: "Employment and any wage loss", answer_type: text, required: false, sensitive_tag: financial}
+- {id: prior_claims, prompt: "Prior claims or suits arising from this or another loss", answer_type: boolean, required: true, sensitive_tag: null}
+- {id: prior_counsel, prompt: "Any lawyer already consulted or retained on this loss", answer_type: text, required: false, sensitive_tag: null}
+- {id: impact_statement, prompt: "How the loss has affected daily life, in the person's words", answer_type: text, required: false, sensitive_tag: null}
+- {id: source, prompt: "How the person heard of the firm", answer_type: choice, choices: [referral, search, advertising, event, prior client, other, unknown], required: false, sensitive_tag: null}
 attorney_review_flags:
 - possible_limitation_issue
 - outside_case_types
@@ -50,79 +35,69 @@ attorney_review_flags:
 - conflict_match
 - prior_counsel_of_record
 - outside_service_area
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
 document_list:
-- incident or police report
-- photos
-- insurance cards and declarations
-- provider list and bills
-- wage-loss proof
-- property damage estimates
-- records authorization
+- {id: incident_report, name: "Incident or police report", required: true}
+- {id: photos, name: "Photographs of the scene, vehicles or injuries", required: false}
+- {id: insurance_declarations, name: "Insurance cards and declarations pages", required: true}
+- {id: provider_list_bills, name: "Provider list and bills", required: true}
+- {id: wage_loss_proof, name: "Wage-loss proof", required: false}
+- {id: property_damage_estimates, name: "Property damage estimates", required: false}
+- {id: records_authorization, name: "Records authorization", required: true}
 stage_map:
-- new lead
-- triage complete
-- records requested
-- retainer sent
-- hired or closed out
+- {fragment_stage: New PI Lead, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Triage Complete, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Records Requested, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Retainer Sent, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Hired, canonical: stage_intake_06_retained}
+- {fragment_stage: Closed Out, canonical: stage_intake_99_closed}
 fee_model:
-  model: contingency
-  notes: Percentages as the firm states them; closing statement reminder.
+  types: [contingency]
+  notes: "Contingency at the percentages the firm states in its adopted agreement; a closing statement reminder accompanies every settlement."
 deadline_categories:
 - id: limitation_period
-  label: Limitation period per matter type and incident-date range; the firm records the governing statute
+  name: "Limitation period per matter type and incident-date range; the firm records the governing statute as its own"
   kind: firm_set
-- id: government_notice_of_claim
-  label: Government notice-of-claim windows
-  kind: statutory
+  entered_date_governs: true
   citation: null
   adopter: null
+- id: government_notice_of_claim
+  name: "Government notice-of-claim window"
+  kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: notice-of-claim provision of the adopting firm's state, to be confirmed and recorded by the adopting attorney; MHSB supplies no citation"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
 - id: records_turnaround
-  label: Records turnaround
+  name: "Records turnaround"
   kind: firm_set
-- id: lien_deadlines
-  label: Lien deadlines
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: lien_deadline
+  name: "Lien deadlines"
   kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
 communication_templates:
-- contact-capture
-- reminder
-- not-a-fit-notice
-- welcome
-- treatment-check-in
-- offer-update
-- settlement-statement
+- pi_contact_capture
+- pi_reminder
+- pi_not_a_fit_notice
+- pi_welcome
+- pi_treatment_check_in
+- pi_offer_update
+- pi_settlement_statement
 consent_flags:
-- id: records_authorization
-  label: Records authorization elements
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: psychotherapy_notes_separate
-  label: Psychotherapy notes authorized separately
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: all_party_recording
-  label: All-party recording consent where the state requires it
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: true
+- {id: records_authorization, label: "Records authorization with its required elements on file", evidence: [signed_form], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
+- {id: psychotherapy_notes_authorization, label: "Psychotherapy notes authorized separately from other records", evidence: [signed_form], verifier_required: true, permitted_channels: [portal, letter], expiry_days: null, when_unknown: not_permitted}
+- {id: all_party_recording, label: "Recording consent from every party where the state requires it", evidence: [recorded_verbal, signed_form], verifier_required: true, permitted_channels: [phone], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- health
-- treatment
-- insurance_limits
-sensitive_field_semantics: excluded from any scoring
+- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true}
+- {field: intake.treatment_providers, tag: treatment, excluded_from_scoring: true}
+- {field: intake.insurance_both_parties, tag: insurance_limits, excluded_from_scoring: true}
+- {field: intake.employment_wage_loss, tag: financial, excluded_from_scoring: true}
 brief_views:
-- incident_aging
-- records_requested
+- {id: incident_aging, name: "Incident aging"}
+- {id: records_requested, name: "Records requested"}
 reports:
 - incident_aging
 - sol_tracker

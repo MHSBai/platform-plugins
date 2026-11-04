@@ -18,7 +18,7 @@ Applies to every tag of MHSBai/platform-plugins from 0.1.0 onward.
    python tools/gen_manifest.py --check && python tools/lint.py --release && python -m pytest -q
    ```
 
-   `--release` turns warnings into errors. A synthetic adoption record (decision 0002) fails it.
+   `--release` turns warnings into errors. A synthetic adoption record (decision 0002) fails it. A pack held at pilot with `PENDING ADOPTION` (decision 0004) is unlisted and does not block a release.
 3. Run the firm-name check from outside this repository (HANDOFF item 5) and record zero hits.
 4. Merge with the second identity's approval.
 5. With the second identity, on the merge commit: `git tag -s vX.Y.Z -m "Release X.Y.Z"` and `git push origin vX.Y.Z`.
