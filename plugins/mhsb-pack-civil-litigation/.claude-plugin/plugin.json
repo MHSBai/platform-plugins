@@ -1,6 +1,6 @@
 {
   "name": "mhsb-pack-civil-litigation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "General civil litigation practice fragment. Pilot only; installed by MHSB for a named firm. Data only; adds no commands.",
   "author": {
     "name": "MHSB Solutions",

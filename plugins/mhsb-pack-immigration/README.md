@@ -2,7 +2,7 @@
 
 Immigration practice fragment, draft. Hidden until an immigration attorney co-designs it. Data only.
 
-Release tier: hidden. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
+Release tier: hidden. License: `LicenseRef-MHSB-Source-Available`. Version: 0.2.0.
 
 Contains no commands. The fragment in `fragment/fragment.yaml` is merged into the Firm Profile and is overridden by the firm's own answers. Templates in `templates/` carry adoption records; the generator fills variables only.
 

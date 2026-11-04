@@ -1,50 +1,50 @@
 {
   "project": "MHSB Platform Plugins: platform-plugins repository",
-  "stage": "PP-9, Stage 9: twelve pack fragments and pack evals",
-  "branch": "cloud/pp9-pack-fragments",
-  "base": "cloud/pp2-harvest (Stage 1 and Stage 2 pull requests open, not merged)",
+  "stage": "PP-8, Stage 8: skills to final text, routing suite and evals",
+  "branch": "cloud/pp8-skills-evals",
+  "base": "cloud/pp9-pack-fragments at adfce89 (Stages 1, 2 and 9 open, not merged)",
   "checkpoints": [
     {
       "id": "C1",
-      "name": "twelve fragments validate against the Stage 3 schema",
-      "command": "python tools/validate_fragments_service.py --service ../mhsb-firm-service",
+      "name": "lint green across all skills",
+      "command": "python tools/lint.py && python tools/lint.py --release && python tools/skill_evals.py",
       "status": "pass",
-      "evidence": "12 of 12 schema-valid; cross rules pass on 10; PI and business HELD on XR-GA-ADOPTION and XR-STATUTORY until Stage 11 adoption"
+      "evidence": "15 rules, 0 errors, 0 warnings (also --release); 24 skills, 144 reference cases, 144 passed; reading grades 3.1 to 4.9"
     },
     {
       "id": "C2",
-      "name": "GA and pilot fragment evals green",
-      "command": "python tools/pack_evals.py",
+      "name": "routing deterministic check green",
+      "command": "python tools/routing_check.py",
       "status": "pass",
-      "evidence": "28 cases, 28 passed (24 GA and pilot, 1 extra PI dates, 3 family law outreach gate)"
+      "evidence": "60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failures"
     },
     {
       "id": "C3",
-      "name": "hidden fragments carry CO-DESIGN.md",
-      "command": "ls plugins/mhsb-pack-*/CO-DESIGN.md | wc -l",
-      "status": "pass",
-      "evidence": "6 of 6; enforced by lint rule L15"
+      "name": "model routing and skill evals",
+      "command": "python tools/model_evals.py",
+      "status": "pending",
+      "evidence": "ANTHROPIC_API_KEY EMPTY; 0 requests, USD 0.00; runner, models (claude-sonnet-5-5, claude-opus-5-5) and USD 40 cap in place"
     },
     {
       "id": "C4",
-      "name": "counts unchanged",
+      "name": "counts table unchanged, at most 22",
       "command": "python tools/gen_manifest.py --check && python tools/gen_manifest.py --counts",
       "status": "pass",
-      "evidence": "895 combinations, maximum 22, combination table identical; two plugin tier rows changed ga to pilot"
+      "evidence": "895 combinations, maximum 22, combination table identical to adfce89"
     },
     {
       "id": "C5",
-      "name": "lint green",
-      "command": "python tools/lint.py && python tools/lint.py --release && python tools/license_gate.py && python -m pytest -q",
+      "name": "CHANGELOG updated",
+      "command": "sed -n '/## 0.2.0/,/## Included/p' CHANGELOG.md",
       "status": "pass",
-      "evidence": "15 rules, 0 errors, 0 warnings (also under --release); license gate 0 failures; 97 tests passed"
+      "evidence": "0.2.0 entry for staff; versions 0.2.0 in manifest, plugin.json and READMEs"
     },
     {
       "id": "C6",
       "name": "no firm name from the specification",
       "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
       "status": "pass",
-      "evidence": "17 identifiers, 0 hits"
+      "evidence": "17 identifiers, 0 hits (case-insensitive and short codes case-sensitive)"
     }
   ],
   "provenance_rows_by_license": {
@@ -62,8 +62,55 @@
       "evidence": "firm_profile/schemas/fragment.schema.json on cloud/pp3-firm-profile-v2 at bfcddee"
     }
   ],
-  "last_verified": "2026-11-03",
+  "last_verified": "2026-11-04",
   "history": [
+    {
+      "stage": "PP-9",
+      "checkpoints": [
+        {
+          "id": "C1",
+          "name": "twelve fragments validate against the Stage 3 schema",
+          "command": "python tools/validate_fragments_service.py --service ../mhsb-firm-service",
+          "status": "pass",
+          "evidence": "12 of 12 schema-valid; cross rules pass on 10; PI and business HELD on XR-GA-ADOPTION and XR-STATUTORY until Stage 11 adoption"
+        },
+        {
+          "id": "C2",
+          "name": "GA and pilot fragment evals green",
+          "command": "python tools/pack_evals.py",
+          "status": "pass",
+          "evidence": "28 cases, 28 passed (24 GA and pilot, 1 extra PI dates, 3 family law outreach gate)"
+        },
+        {
+          "id": "C3",
+          "name": "hidden fragments carry CO-DESIGN.md",
+          "command": "ls plugins/mhsb-pack-*/CO-DESIGN.md | wc -l",
+          "status": "pass",
+          "evidence": "6 of 6; enforced by lint rule L15"
+        },
+        {
+          "id": "C4",
+          "name": "counts unchanged",
+          "command": "python tools/gen_manifest.py --check && python tools/gen_manifest.py --counts",
+          "status": "pass",
+          "evidence": "895 combinations, maximum 22, combination table identical; two plugin tier rows changed ga to pilot"
+        },
+        {
+          "id": "C5",
+          "name": "lint green",
+          "command": "python tools/lint.py && python tools/lint.py --release && python tools/license_gate.py && python -m pytest -q",
+          "status": "pass",
+          "evidence": "15 rules, 0 errors, 0 warnings (also under --release); license gate 0 failures; 97 tests passed"
+        },
+        {
+          "id": "C6",
+          "name": "no firm name from the specification",
+          "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
+          "status": "pass",
+          "evidence": "17 identifiers, 0 hits"
+        }
+      ]
+    },
     {
       "stage": "PP-2",
       "checkpoints": [

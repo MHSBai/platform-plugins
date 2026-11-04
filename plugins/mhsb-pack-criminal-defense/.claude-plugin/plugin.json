@@ -1,6 +1,6 @@
 {
   "name": "mhsb-pack-criminal-defense",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Criminal defense practice fragment. Pilot only; installed by MHSB for a named firm. Data only; adds no commands.",
   "author": {
     "name": "MHSB Solutions",

@@ -114,3 +114,11 @@ Stage 2 adds harvested files with ledger rows in PROVENANCE.md and the 4(b) noti
 6. Hidden packs: each `CO-DESIGN.md` lists the questions an attorney in the practice must answer before any pilot. The family law draft sets a 90-day re-verification on the contact rule as a placeholder for that attorney's answer.
 7. The service-side validator run needs a local checkout of mhsb-firm-service: `python tools/validate_fragments_service.py --service ../mhsb-firm-service`. CI in this public repository runs L15 against the vendored schema and the pack evals, not the private validator.
 8. Stacking: `cloud/pp9-pack-fragments` is based on `cloud/pp2-harvest`; merge Stage 1 and Stage 2 first, then rebase this branch onto `main`.
+
+## PP-8 (Stage 8) items
+
+1. Model evals: pending because `ANTHROPIC_API_KEY` was EMPTY in the cloud session. With a key set in a trusted shell, run `pip install anthropic` and `python tools/model_evals.py`; the run appends token counts, estimated cost and pass rates to state/EXECUTION-LOG.md and writes `evals/results/model-evals.json`. Estimated full run about USD 11, capped at USD 40. Re-check the identifiers and prices in `evals/model-config.yaml` against the models page first.
+2. Tool contract: the skills name read tools by group (decision 0005, Section 2) that the connector stages must implement under these names, including `fields_read`, `templates_read`, `reports_read`, `documents_metadata_read`, `lawmatics_forms_read`, `lawmatics_pipelines_read`, `lawmatics_automations_read`, `lawmatics_templates_read`, `lawmatics_sends_read` and `clio_time_entries_read`.
+3. AI policy state modules: Florida and California read "state module not yet reviewed". Counsel review is needed before either carries wording; California SB 574 text needs a decision record verifying the chaptered statute first.
+4. Readiness views: the personal injury fragment defines no readiness view, so `/checklist` answers "ready to settle" with the document list only. Add a view to the fragment if the firm wants one.
+5. Stacking: `cloud/pp8-skills-evals` is based on `cloud/pp9-pack-fragments`; merge Stages 1, 2 and 9 first, then rebase this branch onto `main`.

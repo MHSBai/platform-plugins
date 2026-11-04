@@ -18,7 +18,7 @@ marketplace:
     url: https://mhsbsolutions.com
 
 defaults:
-  version: 0.1.0
+  version: 0.2.0
   author:
     name: MHSB Solutions
     url: https://mhsbsolutions.com
@@ -92,6 +92,8 @@ plugins:
           - where do i begin
           - show me my commands
           - what changed in the plugin
+          - where do i start
+          - what can this do
       - name: before-i-paste
         register: operational
         connector: none
@@ -101,6 +103,8 @@ plugins:
           - is it safe to paste
           - check before i paste
           - may i share this document with claude
+          - can i paste
+          - is it okay to put
       - name: explain-this
         register: operational
         connector: none
@@ -109,6 +113,8 @@ plugins:
           - explain this in plain language
           - what does this mean
           - help me understand this document
+          - what does this letter
+          - explain this paragraph
       - name: follow-up
         register: operational
         connector: none
@@ -118,6 +124,9 @@ plugins:
           - write back to the client
           - what should i send next
           - reply to this client email
+          - write back to
+          - what should i say to
+          - waiting on a reply
       - name: meeting-notes
         register: operational
         connector: none
@@ -127,6 +136,8 @@ plugins:
           - meeting notes
           - summarize this consultation
           - tasks from this meeting
+          - file note
+          - write it up
       - name: ai-policy-draft
         register: document
         connector: none
@@ -135,6 +146,8 @@ plugins:
           - draft our ai policy
           - we need an ai use policy
           - ai policy for the firm
+          - rules for using ai
+          - tell clients we use ai
       - name: ai-training
         register: operational
         connector: none
@@ -143,6 +156,8 @@ plugins:
           - train my staff on ai
           - how should paralegals use claude
           - ai training for the team
+          - how to use this safely
+          - how do i bill time
       - name: ask-mhsb
         register: operational
         connector: none
@@ -151,6 +166,8 @@ plugins:
           - contact mhsb support
           - something is broken with the plugin
           - ask mhsb a question
+          - who do i tell
+          - note to mhsb
 
   - name: mhsb-operations
     kind: operations
@@ -174,6 +191,10 @@ plugins:
           - give me my morning brief
           - what is missing from my matters
           - caseload by staff
+          - on my plate
+          - nothing scheduled
+          - most open cases
+          - slipping through the cracks
       - name: consult-prep
         register: document
         connector: firm
@@ -183,6 +204,9 @@ plugins:
           - consult prep
           - get ready for the hearing
           - one page before the meeting with the prospect
+          - get me ready for
+          - what do i need to ask
+          - what should i know
       - name: matter-status
         register: document
         connector: firm
@@ -191,6 +215,8 @@ plugins:
           - where does this matter stand
           - status of the matter
           - client update on the case
+          - where are we on
+          - case stands
       - name: intake-triage
         register: operational
         connector: firm
@@ -200,6 +226,9 @@ plugins:
           - which leads should we call first
           - score the intake queue
           - check new inquiries for conflicts
+          - came in overnight
+          - should we call first
+          - conflict with anyone
       - name: letter
         register: document
         connector: firm
@@ -209,6 +238,9 @@ plugins:
           - welcome letter for the new client
           - document request letter
           - prepare a closing letter
+          - say no to
+          - papers we need
+          - welcome packet
       - name: dates
         register: operational
         connector: firm
@@ -218,6 +250,9 @@ plugins:
           - statute of limitations date
           - how many days since the accident
           - list the court dates
+          - how many days since
+          - does the statute run
+          - court dates
       - name: checklist
         register: operational
         connector: firm
@@ -226,6 +261,9 @@ plugins:
           - which documents are missing
           - is the file ready for signing
           - document checklist for this matter
+          - still missing from
+          - do we have the
+          - file ready
       - name: hygiene
         register: operational
         connector: firm
@@ -235,6 +273,9 @@ plugins:
           - clean up the platform data
           - duplicate date fields
           - matters without a responsible attorney
+          - nobody use
+          - two date fields
+          - no attorney assigned
       - name: report
         register: document
         connector: firm
@@ -244,6 +285,10 @@ plugins:
           - list available reports
           - schedule the monday report
           - set up a weekly report
+          - monday numbers
+          - run the
+          - reports can i get
+          - emailed to me
       - name: on-brand
         register: operational
         connector: firm
@@ -252,6 +297,9 @@ plugins:
           - is this on brand
           - check this draft against our voice
           - does this sound like the firm
+          - sound like us
+          - before it goes out
+          - mention claude
       - name: check-setup
         register: operational
         connector: firm
@@ -261,6 +309,9 @@ plugins:
           - am i signed in
           - which version am i running
           - is the connector working
+          - why cannot i see
+          - did the monday report
+          - hooked up
 
   - name: mhsb-lawmatics
     kind: platform
@@ -280,6 +331,7 @@ plugins:
           - are our intake forms protected
           - public form exposure
           - can someone submit a fake booking
+          - bot fill out
       - name: pipeline-health
         register: operational
         connector: platform
@@ -289,6 +341,7 @@ plugins:
           - which automations are dark
           - templates never sent
           - duplicate sends
+          - actually going out
 
   - name: mhsb-clio
     kind: platform
@@ -309,6 +362,7 @@ plugins:
           - hours per timekeeper
           - how many hours did each attorney record
           - team hours this month
+          - how many hours did
       - name: production
         register: operational
         connector: platform
@@ -325,6 +379,7 @@ plugins:
           - budget versus actual
           - flat fee matters over budget
           - budgeted hours versus recorded
+          - over budget
 
   - name: mhsb-mycase
     kind: platform

@@ -2,7 +2,7 @@
 
 General civil litigation practice fragment. Pilot only; installed by MHSB for a named firm. Data only; adds no commands.
 
-Release tier: pilot. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
+Release tier: pilot. License: `LicenseRef-MHSB-Source-Available`. Version: 0.2.0.
 
 Contains no commands. The fragment in `fragment/fragment.yaml` is merged into the Firm Profile and is overridden by the firm's own answers. Templates in `templates/` carry adoption records; the generator fills variables only.
 

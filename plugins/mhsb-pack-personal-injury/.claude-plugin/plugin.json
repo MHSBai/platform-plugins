@@ -1,6 +1,6 @@
 {
   "name": "mhsb-pack-personal-injury",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Personal injury practice fragment: intake questions, attorney-review flags, document list, stage map, deadline categories, template references and report entries. Data only; adds no commands.",
   "author": {
     "name": "MHSB Solutions",
