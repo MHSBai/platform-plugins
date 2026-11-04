@@ -319,3 +319,107 @@ $ dash check U+2014 U+2013 U+2012 in changed and new files
 Marketplace load check, rerun because the listing lost the two held packs: `bash tools/verify_marketplace.sh` passed `claude plugin validate . --strict`, installed the five listed plugins in a throwaway configuration, and refused the hidden family law pack.
 
 The plugin tier rows of `catalog/counts.md` changed for the two held packs (ga to pilot); the combination counts table above it is unchanged.
+
+## PP-8, Stage 8: skills to final text, routing suite and evals
+
+### Step 0. Resume check and base (2026-11-04)
+
+Command: `git ls-remote origin; git log --oneline origin/main`
+
+Output: `main` holds only `080d165`; `cloud/pp1-repository-marketplace`, `cloud/pp2-harvest` and `cloud/pp9-pack-fragments` are open and unmerged, each stacked on the previous one. No PP-8 entry existed in this log. Branch `cloud/pp8-skills-evals` was created from `cloud/pp9-pack-fragments` (head adfce89), the most recent open `cloud/pp*` branch. Stage 1 skeleton present; Stage 2 adapted sources present (32 files), so the skills were written against them. The session harness named `roo/sleepy-hopper-sgigzr`; the task's branch name was used, as in earlier stages.
+
+### Step 1. Reading
+
+Design v2.1 Sections 4, 5, 6, 12 (and the remainder for context); Catalog v2.1 Section 1 (and Sections 2, 3 for report identifiers and fragment content); the 24 skill skeletons and their adapted references; capability-forge `skills/mhsb-brand/SKILL.md` (voice, punctuation, banned phrases). No skill-creator skill exists under capability-forge `skills/` or `plugins/`; recorded, not a stop. The PI sample firm in mhsb-firm-service (`firm_profile/samples/pi_lawmatics.json`, synthetic) supplies the example firm. No docs/decisions record verifies California SB 574 against the chaptered statute, so no SB 574 text was written.
+
+### Step 2. Model identifiers and key
+
+`ANTHROPIC_API_KEY`: EMPTY. `curl -sSL https://platform.claude.com/docs/en/about-claude/models` returned 200 (redirect to /docs/en/models/overview) and lists `claude-sonnet-5-5` and `claude-opus-5-5` as the current Sonnet and Opus; recorded in `evals/model-config.yaml` with prices of 2/10 and 4/20 US dollars per million input/output tokens.
+
+### Step 3. Build
+
+Triggers extended in `catalog/manifest.yaml`; `evals/routing/phrases.yaml` (60 phrases, expected skill per command set); `tools/routing_check.py`; `evals/skills/refusals.yaml` (exact sentences); `tools/skill_evals.py` (pass bar of Design Section 12); `tools/model_evals.py` and `evals/model-config.yaml`; 24 SKILL.md files to final text; 24 eval files of six cases each; Florida and California state modules marked "state module not yet reviewed"; decision 0005; tests; CI steps; version 0.2.0; CHANGELOG. Commits 228ebc2, 04f3b7d, 5cd6b6f, fbedfd5, 763679b, 358736d, 2314558.
+
+### Step 4. Checkpoint run
+
+```
+$ python tools/lint.py
+lint: 15 rules, 0 error(s), 0 warning(s)
+exit 0
+$ python tools/lint.py --release
+lint: 15 rules, 0 error(s), 0 warning(s)
+$ python tools/routing_check.py
+routing check: 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+exit 0
+$ python tools/skill_evals.py
+skill evals (deterministic): 24 skills, 144 cases, 144 passed, 0 failure(s)
+exit 0
+$ python tools/gen_manifest.py --check
+generated files current
+$ diff counts table vs Stage 9 base
+combination counts table unchanged
+$ python tools/gen_manifest.py --counts | sed -n 7,16p
+| Combination | Platform | Variants | Breakdown | Commands (min) | Commands (max) |
+|---|---|---|---|---|---|
+| core-only | none | 1 | 8 | 8 | 8 |
+| connected | mhsb-lawmatics | 298 | 8 + 11 + 2 + 0 | 21 | 21 |
+| connected | mhsb-clio | 298 | 8 + 11 + 3 + 0 | 22 | 22 |
+| connected | mhsb-mycase | 298 | 8 + 11 + 0 + 0 | 19 | 19 |
+
+Supported combinations enumerated: 895.
+Maximum commands in any combination: 22.
+Lint cap: 24. Design figure: 22.
+$ python tools/pack_evals.py | tail -1
+pack evals: 28 cases, 28 passed, 0 failed
+$ python tools/license_gate.py
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ denylist grep
+identifiers: 17
+hits (case-insensitive, word): 0
+hits (short codes, case-sensitive, word): 0
+$ dash check in files changed since adfce89
+0
+$ reading level per skill (Flesch-Kincaid; limits 9 operational, 12 document)
+mhsb-clio/budget-vs-actual operational 3.6
+mhsb-clio/production operational 3.6
+mhsb-clio/timekeeper-hours operational 3.8
+mhsb-firm-core/ai-policy-draft document 4.9
+mhsb-firm-core/ai-training operational 3.9
+mhsb-firm-core/ask-mhsb operational 3.7
+mhsb-firm-core/before-i-paste operational 4.6
+mhsb-firm-core/explain-this operational 3.5
+mhsb-firm-core/follow-up operational 3.1
+mhsb-firm-core/meeting-notes operational 3.2
+mhsb-firm-core/start operational 3.5
+mhsb-lawmatics/form-protections operational 3.8
+mhsb-lawmatics/pipeline-health operational 3.9
+mhsb-operations/brief operational 3.5
+mhsb-operations/check-setup operational 4.1
+mhsb-operations/checklist operational 4.3
+mhsb-operations/consult-prep document 3.9
+mhsb-operations/dates operational 4.2
+mhsb-operations/hygiene operational 4.2
+mhsb-operations/intake-triage operational 4.2
+mhsb-operations/letter document 4.4
+mhsb-operations/matter-status document 4.3
+mhsb-operations/on-brand operational 3.9
+mhsb-operations/report document 4.7
+$ python -m pytest -q | tail -1
+118 passed in 253.16s (0:04:13)
+$ bash tools/verify_marketplace.sh (filtered)
+Validation passed; five listed plugins installed; skills 8, 11, 2, 3; mhsb-pack-family-law not installable
+```
+
+### Step 5. Model evals
+
+Command: `python tools/model_evals.py`
+
+
+Model eval run 2026-11-04T00:55:00Z: key EMPTY; status pending.
+Reason: ANTHROPIC_API_KEY is EMPTY in this environment; deterministic checks ran (tools/routing_check.py, tools/skill_evals.py).
+Tokens: input 0, output 0; requests 0; estimated cost USD 0.00 (no request sent).
+Planned run when a key is SET (`python tools/model_evals.py --dry-run`): routing tasks: 240; skill tasks: 144; cap USD 40.00. At the configured estimates the full run is about USD 11 (240 routing requests on claude-sonnet-5-5, 144 skill requests on claude-opus-5-5), under the USD 40 cap.
+
+### Step 6. Firm identifier check
+
+The private identifier list (17 identifiers: pilot firm codes, full firm names, one brand name) is held in the session scratchpad, outside the repository; the counts are in Step 4 (0 hits). The Stage 9 log line that named two short codes was rewritten (decision 0005, Section 8).

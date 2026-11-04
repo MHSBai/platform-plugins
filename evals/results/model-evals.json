@@ -1,0 +1,14 @@
+{
+  "run_at": "2026-11-04T00:55:00Z",
+  "key": "EMPTY",
+  "suites": [
+    "routing",
+    "skills"
+  ],
+  "models": {
+    "routing": "claude-sonnet-5-5",
+    "skills": "claude-opus-5-5"
+  },
+  "status": "pending",
+  "reason": "ANTHROPIC_API_KEY is EMPTY in this environment; deterministic checks ran (tools/routing_check.py, tools/skill_evals.py)."
+}
