@@ -311,7 +311,7 @@ $ python -m pytest -q | tail -1
 $ grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv . | wc -l
 identifiers: 17
 hits (case-insensitive, word): 0
-hits (MAN, RW case-sensitive, word): 0
+hits (two short codes, case-sensitive, word): 0
 $ dash check U+2014 U+2013 U+2012 in changed and new files
 0
 ```

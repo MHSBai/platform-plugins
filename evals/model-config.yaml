@@ -1,0 +1,21 @@
+# Model eval configuration (tools/model_evals.py).
+#
+# Identifiers checked on 2026-11-04 against https://platform.claude.com/docs/en/about-claude/models
+# (redirects to /docs/en/models/overview), which lists claude-sonnet-5-5 and claude-opus-5-5 as the
+# current Sonnet and Opus. Prices are the first-party API rates per million tokens; re-check the
+# models page before a run and update both fields together.
+
+schema_version: 1
+models:
+  routing: claude-sonnet-5-5
+  skills: claude-opus-5-5
+prices:
+  claude-sonnet-5-5: {input_per_mtok: 2.00, output_per_mtok: 10.00}
+  claude-opus-5-5: {input_per_mtok: 4.00, output_per_mtok: 20.00}
+# Stage 8 cap on total estimated spend for one run, in US dollars.
+budget_usd: 40.0
+# Per-request estimates used only to decide whether the next request fits under the cap.
+# Routing: about 3,000 input and 50 output tokens. Skills: about 6,000 input and 1,500 output.
+estimates:
+  routing_request_usd: 0.01
+  skill_request_usd: 0.06

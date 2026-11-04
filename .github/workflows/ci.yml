@@ -24,6 +24,10 @@ jobs:
         run: python tools/lint.py
       - name: Pack evals
         run: python tools/pack_evals.py
+      - name: Routing suite (deterministic)
+        run: python tools/routing_check.py
+      - name: Skill evals (deterministic)
+        run: python tools/skill_evals.py
       - name: License gate (LEDGER.yaml and PROVENANCE.md)
         run: python tools/license_gate.py
       - name: Release gate (tags only)

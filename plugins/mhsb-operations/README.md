@@ -2,7 +2,7 @@
 
 Read-only operations commands for subscribing firms: briefs, consultation preparation, matter status, intake triage, adopted letters, dates, document checklists, data hygiene, reports, register checks and setup verification. Bundles the MHSB firm connector.
 
-Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
+Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.2.0.
 
 Bundles the MHSB firm connector (`https://mcp.mhsbsolutions.com/firm`) as a remote MCP server. Every command is read-only.
 

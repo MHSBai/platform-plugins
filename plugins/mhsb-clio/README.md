@@ -2,7 +2,7 @@
 
 Clio platform commands: timekeeper hours, production by billing method and flat-fee budget versus actual. Bundles the MHSB Clio connector. Read-only.
 
-Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
+Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.2.0.
 
 Bundles the MHSB Clio connector (`https://mcp.mhsbsolutions.com/clio`) as a remote MCP server. Every command is read-only.
 
