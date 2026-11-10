@@ -4,7 +4,7 @@ Items that need Richard Berman, or a later stage, after PP-1 (Stage 1: repositor
 
 ## 1. Protect main
 
-Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`. `agent-scan` is left out of the required contexts until the Snyk token exists (item 2), because on a pull request without the token the job succeeds without scanning. Item 2 adds it.
+Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`. `agent-scan` is left out of the required contexts until the Snyk token exists (item 2): on a pull request without the token the job is skipped, and branch protection would count a skipped required check as passed. Item 2 adds it.
 
 ```bash
 gh api -X PUT repos/MHSBai/platform-plugins/branches/main/protection -H "Accept: application/vnd.github+json" --input - <<'JSON'
@@ -35,7 +35,7 @@ With one approving review required, the second identity (item 3) approves pull r
 
 ## 2. Snyk token for agent-scan
 
-The `agent-scan` job prints `SNYK_TOKEN: SET` or `SNYK_TOKEN: EMPTY` and skips the scan when the secret is empty. The command prompts for the value; it is not echoed.
+The `agent-scan-token` job prints `SNYK_TOKEN: SET` or `SNYK_TOKEN: EMPTY`, never the value. With the secret empty, `agent-scan` is skipped on pull requests (the `agent-scan-token` job states the reason in a notice) and fails with an error on every push to main and every `v*` tag. Whenever `agent-scan` concludes success, the scan ran. The command below prompts for the value; it is not echoed.
 
 ```bash
 gh secret set SNYK_TOKEN --repo MHSBai/platform-plugins
