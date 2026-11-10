@@ -15,10 +15,10 @@ Applies to every tag of MHSBai/platform-plugins from 0.1.0 onward.
 2. Run the release gate locally and paste the output into the pull request:
 
    ```bash
-   python tools/gen_manifest.py --check && python tools/lint.py --release && python -m pytest -q
+   python tools/gen_manifest.py --check && python tools/lint.py --release && python -m pytest -q && python tools/model_evals.py --check-release
    ```
 
-   `--release` turns warnings into errors. A synthetic adoption record (decision 0002) fails it. A pack held at pilot with `PENDING ADOPTION` (decision 0004) is unlisted and does not block a release.
+   The last command fails unless `evals/results/model-evals.json` records a model eval run that covered every routing and skill task and passed all of them (Design v2.1 Section 12; decision 0005, Section 9). CI runs the same gate on every `v*` tag. `--release` turns warnings into errors. A synthetic adoption record (decision 0002) fails it. A pack held at pilot with `PENDING ADOPTION` (decision 0004) is unlisted and does not block a release.
 3. Run the firm-name check from outside this repository (HANDOFF item 5) and record zero hits.
 4. Merge with the second identity's approval.
 5. With the second identity, on the merge commit: `git tag -s vX.Y.Z -m "Release X.Y.Z"` and `git push origin vX.Y.Z`.

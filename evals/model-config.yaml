@@ -14,8 +14,9 @@ prices:
   claude-opus-5-5: {input_per_mtok: 4.00, output_per_mtok: 20.00}
 # Stage 8 cap on total estimated spend for one run, in US dollars.
 budget_usd: 40.0
-# Per-request estimates used only to decide whether the next request fits under the cap.
-# Routing: about 3,000 input and 50 output tokens. Skills: about 6,000 input and 1,500 output.
+# Planning estimates only (the cap is enforced on each request's worst case in
+# tools/model_evals.py). Routing: about 3,000 input and 50 output tokens, max_tokens 2048.
+# Skills: about 6,000 input and 1,500 output tokens, max_tokens 4096.
 estimates:
   routing_request_usd: 0.01
   skill_request_usd: 0.06

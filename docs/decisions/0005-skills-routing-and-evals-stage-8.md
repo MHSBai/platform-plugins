@@ -14,7 +14,7 @@ The service core (mhsb-firm-service, Stage 4a) registers `firm_profile_get`, `fi
 
 Design Section 4 requires that each of sixty ambiguous phrases resolve to exactly one skill in every supported combination. The manifest's trigger sets were extended so that every phrase in `evals/routing/phrases.yaml` contains a trigger of its expected skill and no other installed skill's trigger. Matching is a contiguous word run after lower-casing, contraction expansion and punctuation removal (`tools/routing_check.py`). The lint rule L10 still forbids any trigger that overlaps another skill's trigger.
 
-A phrase whose expected command is not installed (for example a Clio command in a Lawmatics combination, or any operations command in the core-only combination) resolves to `/start`, which names the plugin that provides it (`start/references/routing.md`, Step 5). The suite records the expected skill for each of the four command sets; the check expands them to all 895 combinations.
+A phrase whose expected command is not installed (for example a Clio command in a Lawmatics combination, or any operations command in the core-only combination) resolves to `/start`, which names the plugin that provides it (`start/SKILL.md`, Procedure step 8). The suite records the expected skill for each of the four command sets; the check expands them to all 895 combinations.
 
 ## 4. Exact refusals
 
@@ -39,3 +39,15 @@ In this session `ANTHROPIC_API_KEY` was EMPTY. The model evals are recorded as p
 ## 8. Firm identifiers in the execution log
 
 The Stage 9 log entry for the private denylist check named two short pilot codes in its output line. This branch rewrites that line to "two short codes" so that no identifier from the specification appears in the public repository. The check's result is unchanged.
+
+## 9. Review XREVIEW-PP-STACK-A dispositions (2026-11-10)
+
+PP4-M1. The deterministic results are labelled for what they show: the routing check shows trigger-list disjointness (no phrase is claimed by two installed skills' trigger sets), and the skill check shows reference-transcript conformance (the written reference answers meet the pass bar). Neither shows how a model routes or behaves; Claude selects a skill from its name and description, not from `metadata.triggers`. The CHANGELOG says so. A release is gated on the model evals: on a `v*` tag CI runs `python tools/model_evals.py --check-release`, which fails unless `evals/results/model-evals.json` records `status: ran`, every routing and skill task run, and 100 percent passed on both suites. Version 0.2.0 is not tagged until that gate passes.
+
+PP4-L1. The spend cap is enforced per request on that request's worst case (max_tokens of output and one input token per three characters) rather than a fixed estimate, so the cap cannot be overshot. A `--budget` above 40 US dollars is clamped unless `--allow-over-cap` is given. The routing request's max_tokens is 2048 so that thinking cannot exhaust it. At worst case a full run is about 22 US dollars.
+
+PP4-L2. `report_run` counts as a send. It stays a decoy and a write-tool match in the evals: no interactive session may call it. The scheduled task of route 2 is exempt from the session refusal for four reasons, stated also in `/report`. The owner creates the task on the owner's own account. The owner allows the tool once during the buildout sitting. In the task the model chooses only an enumerated report identifier. The service, not the model, delivers to recipients fixed in the Firm Profile (Design Section 6).
+
+PP4-L3. The fallback citation now names `start/SKILL.md`, Procedure step 8.
+
+The inherited findings PP1-H1, PP1-M1, PP1-M3 and PP2-M1 belong to the Stage 1 and Stage 2 pull requests and are fixed there, not on this branch.

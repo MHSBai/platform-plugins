@@ -302,7 +302,7 @@ def run(root: Path, only: str | None = None, json_out: Path | None = None) -> in
         report["skills"][name] = {"cases": len(results), "passed": sum(r.passed for r in results)}
     for line in problems:
         print(f"FAIL {line}")
-    print(f"skill evals (deterministic): {len(report['skills'])} skills, {total} cases, {passed} passed, "
+    print(f"skill evals (reference-transcript conformance): {len(report['skills'])} skills, {total} cases, {passed} passed, "
           f"{len(problems)} failure(s)")
     if json_out:
         report.update(total=total, passed=passed, failures=problems)

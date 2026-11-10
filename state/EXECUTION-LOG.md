@@ -427,3 +427,27 @@ The private identifier list (17 identifiers: pilot firm codes, full firm names, 
 ### Step 7. Push and pull request
 
 Command: `git push -u origin cloud/pp8-skills-evals`. Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/4 ("Stage 8: skills to final text, routing suite and evals"), base `cloud/pp9-pack-fragments`. Not merged. Outcome: DONE PP-8, with model evals pending (no key).
+
+### Step 8. Review XREVIEW-PP-STACK-A (2026-11-10)
+
+Findings PP4-M1, PP4-L1, PP4-L2 and PP4-L3 fixed on this branch (decision 0005, Section 9). The inherited findings PP1-H1, PP1-M1, PP1-M3 and PP2-M1 belong to the Stage 1 and Stage 2 pull requests.
+
+```
+$ python tools/lint.py | tail -1
+lint: 15 rules, 0 error(s), 0 warning(s)
+$ python tools/routing_check.py
+routing check (trigger-list disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/gen_manifest.py --check
+generated files current
+$ python tools/model_evals.py --check-release; echo $?
+RELEASE BLOCKED model evals status is 'pending', not 'ran'
+(four coverage and pass-rate lines)
+model eval release gate: 5 problem(s)
+1
+$ python -m pytest -q | tail -1
+121 passed in 173.09s (0:02:53)
+```
+
+The release gate fails as intended while the model evals are pending; it does not run on pull requests.

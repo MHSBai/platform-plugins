@@ -9,7 +9,7 @@ matches when its words appear as a contiguous run in the phrase after normalizat
 * a phrase matches the trigger sets of two or more installed skills (ambiguous routing);
 * the resolved skill differs from the expected skill for that command set. A phrase that
   matches no installed trigger set resolves to /start, which names the plugin that
-  provides the command (start/references/routing.md, Step 5);
+  provides the command (start/SKILL.md, Procedure step 8);
 * a phrase, command set or skill named in the suite does not exist, or the suite does not
   hold exactly sixty phrases.
 
@@ -158,7 +158,7 @@ def run(root: Path, verbose: bool = False) -> int:
     for line in failures:
         print(line)
     sets = sorted({command_set(manifest, c) for c in combos})
-    print(f"routing check: {len(phrases)} phrases, {len(combos)} combinations, {len(sets)} command sets, "
+    print(f"routing check (trigger-list disjointness): {len(phrases)} phrases, {len(combos)} combinations, {len(sets)} command sets, "
           f"{checks} checks, {len(failures)} failure(s)")
     return 1 if failures else 0
 

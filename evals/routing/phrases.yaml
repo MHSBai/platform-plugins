@@ -3,8 +3,8 @@
 # Each phrase names the single skill expected in each command set. A command set is the
 # set of commands installed by a supported combination: core-only, or connected with one
 # platform plugin (practice packs add no commands). When the expected command is not
-# installed, /start answers and names the plugin that provides it (start/references/routing.md,
-# Step 5). tools/routing_check.py expands every set to all supported combinations.
+# installed, /start answers and names the plugin that provides it (start/SKILL.md,
+# Procedure step 8). tools/routing_check.py expands every set to all supported combinations.
 
 schema_version: 1
 phrases:

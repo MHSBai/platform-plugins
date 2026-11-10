@@ -9,14 +9,14 @@ This release gathers the Stage 2, Stage 8 and Stage 9 changes below. It still re
 What changes for staff:
 
 - Every command now has its full instructions. Each one says what it promises, what it reads first, the steps it follows, the exact shape of its answer, what it refuses, who approves a draft, and how it states the next step and its date. Each has worked examples from an invented firm.
-- Ask in your own words. You do not need to know the command name or say which platform a matter is in. Sixty everyday phrases, such as "what's due this week", "anything stale" or "write back to Mrs. Alvarez", were tested so that each one reaches exactly one command. If a phrase needs a command your firm does not have, /start says which plugin provides it.
+- Ask in your own words. You do not need to know the command name or say which platform a matter is in. Sixty everyday phrases, such as "what's due this week", "anything stale" or "write back to Mrs. Alvarez", are written into the commands' trigger lists so that no two commands claim the same phrase. Whether Claude picks the right command for each phrase has not been tested yet; that test runs before this version is released. If a phrase needs a command your firm does not have, /start is written to say which plugin provides it.
 - The commands ask before they guess. If two clients or matters could match, or a date is missing, the command asks or writes "date not established". It never makes up a date.
 - Answers say what they could not read. Every answer from the firm's records opens with what was searched and when, and ends with a "Not retrieved" line. A partial read is never shown as a complete one.
 - Refusals use the same plain sentence everywhere, so staff can recognise them.
 - /report can now set up a weekly or daily report that the MHSB service emails to the people named in the firm's profile. It gives the owner the exact text to paste into a scheduled task on the owner's own Claude account.
 - /ai-policy-draft uses the base policy for every state. The Florida and California additions are marked "state module not yet reviewed" until counsel has reviewed them.
 
-Behind the scenes: each command has six test conversations (an ordinary request, an unclear person, a missing date, a record that contains hidden instructions, a request it must refuse, and a partial read). The automatic checks pass. The tests that use a Claude model are written and waiting for an API key; they have not been run yet.
+Behind the scenes: each command has six test conversations (an ordinary request, an unclear person, a missing date, a record that contains hidden instructions, a request it must refuse, and a partial read). The automatic checks pass, but they check that the trigger lists do not overlap and that the written example answers meet the rules; they do not show how Claude behaves. The tests that use a Claude model are written and waiting for an API key; they have not been run yet, and version 0.2.0 is not released until they pass.
 
 What the plugins never do is unchanged: legal research, filings, citations, trust account actions, sending messages, deleting, bulk edits, or writing to the firm's platform.
 

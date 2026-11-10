@@ -196,3 +196,38 @@ def test_task_order_covers_every_phrase_and_every_skill_first() -> None:
 def test_context_with_boolean_yaml_key_is_scored() -> None:
     case = yaml.safe_load("context: {on: 2026-11-01, label: x}\nkind: happy_path\nuser: q\n")
     assert not skill_evals.score_response({**case, "expect": {}}, "Read on 2026-11-01.", [], REGISTRY, "dates")
+
+
+def test_release_gate_refuses_pending_and_partial_runs(repo: Path) -> None:
+    results = repo / "evals" / "results" / "model-evals.json"
+    results.parent.mkdir(parents=True, exist_ok=True)
+    results.write_text(json.dumps({"status": "pending"}), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+    routing_total = len(model_evals.routing_tasks(repo))
+    skill_total = len(model_evals.skill_tasks(repo))
+    partial = {"status": "ran", "routing": {"cases": routing_total, "passed": routing_total},
+               "skills": {"cases": 24, "passed": 24}}
+    results.write_text(json.dumps(partial), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+    full = {**partial, "skills": {"cases": skill_total, "passed": skill_total}}
+    results.write_text(json.dumps(full), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 0
+    failing = {**full, "routing": {"cases": routing_total, "passed": routing_total - 1}}
+    results.write_text(json.dumps(failing), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+
+
+def test_worst_case_bounds_the_cap() -> None:
+    spend = model_evals.Spend(cap=0.11, prices={"m": {"input_per_mtok": 4.0, "output_per_mtok": 20.0}})
+    worst = spend.worst_case("m", prompt_chars=18_000, max_tokens=4096)
+    assert round(worst, 4) == round(6000 * 4 / 1e6 + 4096 * 20 / 1e6, 4)
+    assert spend.room_for(worst)
+    spend.cost = 0.01
+    assert not spend.room_for(worst)
+
+
+def test_budget_above_cap_is_clamped(repo: Path, monkeypatch: pytest.MonkeyPatch,
+                                     capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    assert model_evals.main(["--root", str(repo), "--budget", "100", "--no-log"]) == 0
+    assert "clamped" in capsys.readouterr().out
