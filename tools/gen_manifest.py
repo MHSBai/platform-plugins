@@ -37,7 +37,7 @@ def _json(data: object) -> str:
 def plugin_json(manifest: Manifest, name: str) -> dict[str, object]:
     plugin = manifest.plugin(name)
     defaults = manifest.defaults
-    return OrderedDict([
+    data: OrderedDict[str, object] = OrderedDict([
         ("name", plugin.name),
         ("version", defaults["version"]),
         ("description", plugin.description),
@@ -47,6 +47,16 @@ def plugin_json(manifest: Manifest, name: str) -> dict[str, object]:
         ("license", plugin.license_id),
         ("keywords", list(dict.fromkeys(["legal", "law-firm", plugin.kind, plugin.category]))),
     ])
+    if plugin.mcp is not None:
+        # Directory listing fields for plugins that route firm data to a remote
+        # connector. Emitted only once the manifest declares the URLs; rule L16
+        # refuses a general availability connector plugin without them.
+        listing = defaults.get("connector_listing") or {}
+        for key, field in (("privacy_policy_url", "privacyPolicyUrl"),
+                           ("terms_of_service_url", "termsOfServiceUrl")):
+            if listing.get(key):
+                data[field] = listing[key]
+    return data
 
 
 def mcp_json(manifest: Manifest, name: str) -> dict[str, object] | None:
