@@ -2,20 +2,13 @@
 name: hygiene
 description: 'Data hygiene findings for the firm to act on: defined versus populated fields, duplicate
   and conflicting date fields, matters without a practice area or responsible attorney, templates never
-  used, and a retire list. Changes nothing. Use when a user asks, for example: "audit our fields";
-  "which fields does nobody use"; "duplicate date fields"; "cases with no attorney assigned".'
+  used, and a retire list. Changes nothing. Use when a user asks, for example: "audit our fields"; "which
+  fields does nobody use"; "duplicate date fields"; "cases with no attorney assigned"; "clean up the platform
+  data"; "matters without a responsible attorney"; "nobody use"; "two date fields"; "no attorney assigned".'
 metadata:
   register: operational
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - audit our fields
-  - clean up the platform data
-  - duplicate date fields
-  - matters without a responsible attorney
-  - nobody use
-  - two date fields
-  - no attorney assigned
 ---
 
 # /hygiene

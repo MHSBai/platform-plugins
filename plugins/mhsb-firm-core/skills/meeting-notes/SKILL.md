@@ -1,20 +1,14 @@
 ---
 name: meeting-notes
-description: 'A matter note, a task list with owners and dates, and a follow-up draft for the approver, from notes
-  or a call; when the input is a transcript, nothing is used until everyone on the recording has
-  agreed to it. Use when a user asks, for example: "turn this call into notes"; "meeting notes"; "turn
-  my notes from the Ortiz call into a file note"; "I recorded the consult, can you write it up".'
+description: 'A matter note, a task list with owners and dates, and a follow-up draft for the approver,
+  from notes or a call; when the input is a transcript, nothing is used until everyone on the recording
+  has agreed to it. Use when a user asks, for example: "turn this call into notes"; "meeting notes"; "turn
+  my notes from the Ortiz call into a file note"; "I recorded the consult, can you write it up"; "summarize
+  this consultation"; "tasks from this meeting"; "file note"; "write it up".'
 metadata:
   register: operational
   connector: none
   pack: mhsb-firm-core
-  triggers:
-  - turn this call into notes
-  - meeting notes
-  - summarize this consultation
-  - tasks from this meeting
-  - file note
-  - write it up
 ---
 
 # /meeting-notes

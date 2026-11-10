@@ -51,3 +51,10 @@ PP4-L2. `report_run` counts as a send. It stays a decoy and a write-tool match i
 PP4-L3. The fallback citation now names `start/SKILL.md`, Procedure step 8.
 
 The inherited findings PP1-H1, PP1-M1, PP1-M3 and PP2-M1 belong to the Stage 1 and Stage 2 pull requests and are fixed there, not on this branch.
+
+## 10. Trigger phrases in the description (fix session FIX-PP-STACK-A, 2026-11-10)
+
+Claude Code selects a skill from its `name` and `description` and does not act on `metadata`, so a trigger list in `metadata.triggers` could not route anything at runtime. Every trigger phrase that the manifest declares for a command is now quoted in that skill's description, in the "Use when a user asks, for example" sentence, exactly as the routing suite matches it. `metadata.triggers` is removed from all 24 skills; the manifest keeps the phrases because the generated catalog and lint rule L10 read them there. Lint rule L03 fails when a manifest phrase is not quoted in the description or when `metadata.triggers` reappears. `tools/routing_check.py` takes each skill's trigger set from the phrases quoted in its SKILL.md description, the same text the model evals send. The check now shows description-phrase disjointness: no routing phrase matches the descriptions of two installed skills, and each phrase reaches its expected skill or `/start`. It still does not show how a model routes.
+
+The model evals recorded in `evals/results/model-evals.json` (run 2026-11-10: routing 223 of 240, skills 46 of 144) used the descriptions as they stood before this change. They must be re-run on the current descriptions, and both suites must reach 100 percent, before version 0.2.0 is tagged (Section 9).
+

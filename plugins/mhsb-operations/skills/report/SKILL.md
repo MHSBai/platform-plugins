@@ -3,20 +3,12 @@ name: report
 description: 'Lists the firm''s report catalog, runs one report now with the coverage statement, or sets
   up service delivery by returning the exact scheduled-task text the owner pastes. Explains the three
   delivery routes. Use when a user asks, for example: "what reports can I get"; "run the incident aging
-  report"; "schedule the Monday report"; "how do I get the report emailed to me".'
+  report"; "schedule the Monday report"; "how do I get the report emailed to me"; "list available reports";
+  "set up a weekly report"; "monday numbers"; "run the"; "reports can i get"; "emailed to me".'
 metadata:
   register: document
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - run the incident aging report
-  - list available reports
-  - schedule the monday report
-  - set up a weekly report
-  - monday numbers
-  - run the
-  - reports can i get
-  - emailed to me
 ---
 
 # /report

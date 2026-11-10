@@ -1,20 +1,14 @@
 ---
 name: on-brand
 description: 'Checks a draft against the firm''s voice, register and vocabulary, its own field and stage
-  names, and its banned phrases; flags any tool or AI name in client copy except the adopted AI
-  disclosure sentence. Use when a user asks, for example: "is this on brand"; "does this email sound
-  like us"; "check my letter before it goes out"; "is it fine to mention Claude in this email".'
+  names, and its banned phrases; flags any tool or AI name in client copy except the adopted AI disclosure
+  sentence. Use when a user asks, for example: "is this on brand"; "does this email sound like us"; "check
+  my letter before it goes out"; "is it fine to mention Claude in this email"; "check this draft against
+  our voice"; "does this sound like the firm"; "sound like us"; "before it goes out"; "mention claude".'
 metadata:
   register: operational
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - is this on brand
-  - check this draft against our voice
-  - does this sound like the firm
-  - sound like us
-  - before it goes out
-  - mention claude
 ---
 
 # /on-brand

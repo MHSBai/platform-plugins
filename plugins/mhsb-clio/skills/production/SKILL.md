@@ -1,16 +1,12 @@
 ---
 name: production
-description: 'Billed amounts by billing method from Clio bills, for a period in the firm''s time zone, with
-  data gaps and items not retrieved. Use when a user asks, for example: "production by billing method";
-  "billed amounts this month"; "how much did we bill in October".'
+description: 'Billed amounts by billing method from Clio bills, for a period in the firm''s time zone,
+  with data gaps and items not retrieved. Use when a user asks, for example: "production by billing method";
+  "billed amounts this month"; "how much did we bill in October"; "how much did we bill".'
 metadata:
   register: operational
   connector: platform
   pack: mhsb-clio
-  triggers:
-  - production by billing method
-  - billed amounts this month
-  - how much did we bill
 ---
 
 # /production

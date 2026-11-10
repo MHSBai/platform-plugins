@@ -3,17 +3,11 @@ name: pipeline-health
 description: 'Lawmatics pipeline health: stage definitions versus use, dark automations, templates never
   sent and duplicate sends; parts the platform shows only in its own screens are listed as not retrieved.
   Use when a user asks, for example: "pipeline health"; "which automations are dark"; "templates never
-  sent"; "are our follow-up emails actually going out".'
+  sent"; "are our follow-up emails actually going out"; "duplicate sends"; "actually going out".'
 metadata:
   register: operational
   connector: platform
   pack: mhsb-lawmatics
-  triggers:
-  - pipeline health
-  - which automations are dark
-  - templates never sent
-  - duplicate sends
-  - actually going out
 ---
 
 # /pipeline-health

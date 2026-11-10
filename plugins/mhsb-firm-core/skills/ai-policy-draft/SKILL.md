@@ -1,20 +1,15 @@
 ---
 name: ai-policy-draft
 description: 'A firm AI policy draft for attorney adoption: the decision sheet first, then the counsel-reviewed
-  base template filled with those decisions only, then a state module only where a reviewed module
-  exists; Florida and California read "state module not yet reviewed"; the adoption line stays blank
-  until the attorney adopts it. Use when a user asks, for example: "draft our ai policy"; "we need an
-  ai use policy"; "we need rules for using AI at the firm"; "do we have to tell clients we use AI".'
+  base template filled with those decisions only, then a state module only where a reviewed module exists;
+  Florida and California read "state module not yet reviewed"; the adoption line stays blank until the
+  attorney adopts it. Use when a user asks, for example: "draft our ai policy"; "we need an ai use policy";
+  "we need rules for using AI at the firm"; "do we have to tell clients we use AI"; "ai policy for the
+  firm"; "rules for using ai"; "tell clients we use ai".'
 metadata:
   register: document
   connector: none
   pack: mhsb-firm-core
-  triggers:
-  - draft our ai policy
-  - we need an ai use policy
-  - ai policy for the firm
-  - rules for using ai
-  - tell clients we use ai
 ---
 
 # /ai-policy-draft

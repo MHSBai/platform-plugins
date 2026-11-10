@@ -1,23 +1,14 @@
 ---
 name: brief
 description: 'Views for today, week, stale, missing, caseload and leaks, plus the views the practice packs
-  add; every view carries the coverage statement and a data-gaps section. Use when a user asks, for
-  example: "what is due this week"; "anything stale"; "what is on my plate today"; "who has the most open
-  cases".'
+  add; every view carries the coverage statement and a data-gaps section. Use when a user asks, for example:
+  "what is due this week"; "anything stale"; "what is on my plate today"; "who has the most open cases";
+  "give me my morning brief"; "what is missing from my matters"; "caseload by staff"; "on my plate"; "nothing
+  scheduled"; "most open cases"; "slipping through the cracks".'
 metadata:
   register: operational
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - what is due this week
-  - anything stale
-  - give me my morning brief
-  - what is missing from my matters
-  - caseload by staff
-  - on my plate
-  - nothing scheduled
-  - most open cases
-  - slipping through the cracks
 ---
 
 # /brief

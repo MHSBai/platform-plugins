@@ -1,22 +1,15 @@
 ---
 name: dates
 description: 'Dates from mapped fields only, in the firm''s time zone; the entered date governs; computed
-  dates are a cross-check; disagreements listed, never resolved; each category marked statutory or
-  firm-set; "date not established" with source and owner. Use when a user asks, for example: "what
-  deadlines are coming up"; "how many days since the accident"; "when does the statute run"; "any court
-  dates next week".'
+  dates are a cross-check; disagreements listed, never resolved; each category marked statutory or firm-set;
+  "date not established" with source and owner. Use when a user asks, for example: "what deadlines are
+  coming up"; "how many days since the accident"; "when does the statute run"; "any court dates next week";
+  "statute of limitations date"; "list the court dates"; "how many days since"; "does the statute run";
+  "court dates".'
 metadata:
   register: operational
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - what deadlines are coming up
-  - statute of limitations date
-  - how many days since the accident
-  - list the court dates
-  - how many days since
-  - does the statute run
-  - court dates
 ---
 
 # /dates

@@ -1,20 +1,14 @@
 ---
 name: ask-mhsb
-description: 'A support request packaged for MHSB: what the user was doing, what happened, the plugin and profile
-  versions and the setup check, with all client and matter content removed and refused; the user
-  reviews the package and passes it on. Use when a user asks, for example: "contact mhsb support";
+description: 'A support request packaged for MHSB: what the user was doing, what happened, the plugin
+  and profile versions and the setup check, with all client and matter content removed and refused; the
+  user reviews the package and passes it on. Use when a user asks, for example: "contact mhsb support";
   "something is broken with the plugin"; "the plugin keeps saying not retrieved, who do I tell"; "send
-  a note to MHSB about the error".'
+  a note to MHSB about the error"; "ask mhsb a question"; "who do i tell"; "note to mhsb".'
 metadata:
   register: operational
   connector: none
   pack: mhsb-firm-core
-  triggers:
-  - contact mhsb support
-  - something is broken with the plugin
-  - ask mhsb a question
-  - who do i tell
-  - note to mhsb
 ---
 
 # /ask-mhsb

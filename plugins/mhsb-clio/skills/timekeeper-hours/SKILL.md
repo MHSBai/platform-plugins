@@ -1,18 +1,13 @@
 ---
 name: timekeeper-hours
 description: 'Hourly, flat-fee and total hours per timekeeper from Clio time entries, in the firm''s time
-  zone; team totals by default, a named person only where the role mode allows. Use when a user asks, for
-  example: "hours per timekeeper"; "team hours this month"; "how many hours did the paralegals put in last
-  month".'
+  zone; team totals by default, a named person only where the role mode allows. Use when a user asks,
+  for example: "hours per timekeeper"; "team hours this month"; "how many hours did the paralegals put
+  in last month"; "how many hours did each attorney record"; "how many hours did".'
 metadata:
   register: operational
   connector: platform
   pack: mhsb-clio
-  triggers:
-  - hours per timekeeper
-  - how many hours did each attorney record
-  - team hours this month
-  - how many hours did
 ---
 
 # /timekeeper-hours

@@ -2,21 +2,14 @@
 name: intake-triage
 description: 'Scores new leads against the practice pack fragment''s structured criteria with sensitive
   fields excluded; records the conflict name-match as counts and identifiers only; raises attorney-review
-  flags rather than declines; proposes one action per lead. Use when a user asks, for example: "triage new
-  leads"; "who came in overnight"; "which leads should we call first"; "is the new lead a conflict with
-  anyone".'
+  flags rather than declines; proposes one action per lead. Use when a user asks, for example: "triage
+  new leads"; "who came in overnight"; "which leads should we call first"; "is the new lead a conflict
+  with anyone"; "score the intake queue"; "check new inquiries for conflicts"; "came in overnight"; "should
+  we call first"; "conflict with anyone".'
 metadata:
   register: operational
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - triage new leads
-  - which leads should we call first
-  - score the intake queue
-  - check new inquiries for conflicts
-  - came in overnight
-  - should we call first
-  - conflict with anyone
 ---
 
 # /intake-triage

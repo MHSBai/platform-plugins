@@ -1,20 +1,14 @@
 ---
 name: start
-description: 'Five things to do by role and practice area; what changed in this release; which packs the Firm
-  Profile enables, with pilot and held packs named; a request for a command that is not installed is
-  answered by naming the plugin that provides it. Use when a user asks, for example: "what can you do
-  for me"; "where do i start"; "show me my commands"; "what changed in the plugin".'
+description: 'Five things to do by role and practice area; what changed in this release; which packs the
+  Firm Profile enables, with pilot and held packs named; a request for a command that is not installed
+  is answered by naming the plugin that provides it. Use when a user asks, for example: "what can you
+  do for me"; "where do i start"; "show me my commands"; "what changed in the plugin"; "where do i begin";
+  "what can this do".'
 metadata:
   register: operational
   connector: none
   pack: mhsb-firm-core
-  triggers:
-  - what can you do for me
-  - where do i begin
-  - show me my commands
-  - what changed in the plugin
-  - where do i start
-  - what can this do
 ---
 
 # /start

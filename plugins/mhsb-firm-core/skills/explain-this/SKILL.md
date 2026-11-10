@@ -1,19 +1,14 @@
 ---
 name: explain-this
-description: 'Plain-language explanation of a passage, one point at a time, with terms that depend on the facts of
-  a case marked; no legal conclusions, no prediction of outcome and no advice on what to do. Use when
-  a user asks, for example: "what does this mean"; "explain this in plain language"; "what does this
-  letter from the insurance company mean"; "help me understand this document".'
+description: 'Plain-language explanation of a passage, one point at a time, with terms that depend on
+  the facts of a case marked; no legal conclusions, no prediction of outcome and no advice on what to
+  do. Use when a user asks, for example: "what does this mean"; "explain this in plain language"; "what
+  does this letter from the insurance company mean"; "help me understand this document"; "what does this
+  letter"; "explain this paragraph".'
 metadata:
   register: operational
   connector: none
   pack: mhsb-firm-core
-  triggers:
-  - explain this in plain language
-  - what does this mean
-  - help me understand this document
-  - what does this letter
-  - explain this paragraph
 ---
 
 # /explain-this

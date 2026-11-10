@@ -2,20 +2,13 @@
 name: check-setup
 description: 'Setup check: sign-in to the firm connector, plan attestation, enabled packs and role mode,
   profile version and hash, plugin and service versions with a warning when the plugin is behind, and
-  the scheduled reports with their last run. Use when a user asks, for example: "check my setup"; "am I
-  signed in"; "why can''t I see billing"; "did the Monday report go out".'
+  the scheduled reports with their last run. Use when a user asks, for example: "check my setup"; "am
+  I signed in"; "why can''t I see billing"; "did the Monday report go out"; "which version am i running";
+  "is the connector working"; "why cannot i see"; "did the monday report"; "hooked up".'
 metadata:
   register: operational
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - check my setup
-  - am i signed in
-  - which version am i running
-  - is the connector working
-  - why cannot i see
-  - did the monday report
-  - hooked up
 ---
 
 # /check-setup

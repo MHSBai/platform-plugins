@@ -2,20 +2,13 @@
 name: letter
 description: 'Renders a letter from an adopted template, filling only its variables from the record and
   the firm''s periods; refuses a template without an adoption record; writes the approver into the draft.
-  Use when a user asks, for example: "draft a decline letter"; "say no to the inquiry politely"; "the list
-  of papers we need from her"; "start his welcome packet".'
+  Use when a user asks, for example: "draft a decline letter"; "say no to the inquiry politely"; "the
+  list of papers we need from her"; "start his welcome packet"; "welcome letter for the new client"; "document
+  request letter"; "prepare a closing letter"; "say no to"; "papers we need"; "welcome packet".'
 metadata:
   register: document
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - draft a decline letter
-  - welcome letter for the new client
-  - document request letter
-  - prepare a closing letter
-  - say no to
-  - papers we need
-  - welcome packet
 ---
 
 # /letter

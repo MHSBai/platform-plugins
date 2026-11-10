@@ -2,16 +2,11 @@
 name: budget-vs-actual
 description: 'Budgeted hours versus recorded hours per Clio matter, with the variance; matters with no
   budget listed as data gaps. Use when a user asks, for example: "budget versus actual"; "flat fee matters
-  over budget"; "budgeted hours versus recorded"; "is the WE-2026-021 flat fee over budget".'
+  over budget"; "budgeted hours versus recorded"; "is the WE-2026-021 flat fee over budget"; "over budget".'
 metadata:
   register: operational
   connector: platform
   pack: mhsb-clio
-  triggers:
-  - budget versus actual
-  - flat fee matters over budget
-  - budgeted hours versus recorded
-  - over budget
 ---
 
 # /budget-vs-actual

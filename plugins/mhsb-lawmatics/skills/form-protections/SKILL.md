@@ -2,18 +2,13 @@
 name: form-protections
 description: 'Public Lawmatics forms without protection against automated submits, confirmation triggers
   that a fake booking could reach, and submit paths open without sign-in, each with a recommended change
-  and a click path for a person to follow. Use when a user asks, for example: "are our intake forms
-  protected"; "can someone submit a fake booking"; "could a bot fill out our contact form"; "public form
-  exposure".'
+  and a click path for a person to follow. Use when a user asks, for example: "are our intake forms protected";
+  "can someone submit a fake booking"; "could a bot fill out our contact form"; "public form exposure";
+  "bot fill out".'
 metadata:
   register: operational
   connector: platform
   pack: mhsb-lawmatics
-  triggers:
-  - are our intake forms protected
-  - public form exposure
-  - can someone submit a fake booking
-  - bot fill out
 ---
 
 # /form-protections

@@ -1,20 +1,13 @@
 ---
 name: checklist
 description: 'Documents present on the record versus the practice pack fragment''s document list, per
-  matter; readiness views only where the fragment defines them. Use when a user asks, for example:
-  "which documents are missing"; "is the file ready for signing"; "do we have the medical records yet";
-  "document checklist for this matter".'
+  matter; readiness views only where the fragment defines them. Use when a user asks, for example: "which
+  documents are missing"; "is the file ready for signing"; "do we have the medical records yet"; "document
+  checklist for this matter"; "still missing from"; "do we have the"; "file ready".'
 metadata:
   register: operational
   connector: firm
   pack: mhsb-operations
-  triggers:
-  - which documents are missing
-  - is the file ready for signing
-  - document checklist for this matter
-  - still missing from
-  - do we have the
-  - file ready
 ---
 
 # /checklist
