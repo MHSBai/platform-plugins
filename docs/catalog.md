@@ -9,9 +9,9 @@ Commands run as `/<plugin>:<command>` in Claude Code and Cowork; in chat they lo
 | Plugin | Kind | Tier | Listed | License | Connector | Commands |
 |---|---|---|---|---|---|---|
 | mhsb-firm-core | core | ga | yes | Apache-2.0 | none | 8 |
-| mhsb-operations | operations | ga | yes | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/firm | 11 |
-| mhsb-lawmatics | platform | ga | yes | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/lawmatics | 2 |
-| mhsb-clio | platform | ga | yes | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/clio | 3 |
+| mhsb-operations | operations | pilot | no | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/firm | 11 |
+| mhsb-lawmatics | platform | pilot | no | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/lawmatics | 2 |
+| mhsb-clio | platform | pilot | no | LicenseRef-MHSB-Source-Available | https://mcp.mhsbsolutions.com/clio | 3 |
 | mhsb-mycase | platform | ga | yes | LicenseRef-MHSB-Source-Available | none | 0 |
 | mhsb-pack-personal-injury | practice | ga | yes | LicenseRef-MHSB-Source-Available | none | 0 |
 | mhsb-pack-business-transactional | practice | ga | yes | LicenseRef-MHSB-Source-Available | none | 0 |
@@ -112,9 +112,9 @@ Lint cap: 24. Design figure: 22.
 | Plugin | Kind | Tier | Commands |
 |---|---|---|---|
 | mhsb-firm-core | core | ga | 8 |
-| mhsb-operations | operations | ga | 11 |
-| mhsb-lawmatics | platform | ga | 2 |
-| mhsb-clio | platform | ga | 3 |
+| mhsb-operations | operations | pilot | 11 |
+| mhsb-lawmatics | platform | pilot | 2 |
+| mhsb-clio | platform | pilot | 3 |
 | mhsb-mycase | platform | ga | 0 |
 | mhsb-pack-personal-injury | practice | ga | 0 |
 | mhsb-pack-business-transactional | practice | ga | 0 |

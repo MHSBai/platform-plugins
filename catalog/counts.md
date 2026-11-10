@@ -18,9 +18,9 @@ Lint cap: 24. Design figure: 22.
 | Plugin | Kind | Tier | Commands |
 |---|---|---|---|
 | mhsb-firm-core | core | ga | 8 |
-| mhsb-operations | operations | ga | 11 |
-| mhsb-lawmatics | platform | ga | 2 |
-| mhsb-clio | platform | ga | 3 |
+| mhsb-operations | operations | pilot | 11 |
+| mhsb-lawmatics | platform | pilot | 2 |
+| mhsb-clio | platform | pilot | 3 |
 | mhsb-mycase | platform | ga | 0 |
 | mhsb-pack-personal-injury | practice | ga | 0 |
 | mhsb-pack-business-transactional | practice | ga | 0 |

@@ -12,7 +12,8 @@ Claude plugin line for solo and small United States law firms on Lawmatics, Clio
 | `.claude-plugin/marketplace.json` | Marketplace `mhsb-platform-plugins` (generated; general availability plugins only) |
 | `plugins/` | Seventeen plugins: core, operations, three platform plugins, twelve practice packs |
 | `tools/gen_manifest.py` | Generator for every derived file |
-| `tools/lint.py` | Catalog and content lint, rules L01 to L14 |
+| `tools/lint.py` | Catalog and content lint, rules L01 to L14 and L16 |
+| `tools/release_check.py` | Connector endpoint check (DNS, certificate, MCP response) run before a connector plugin is listed |
 | `tests/` | Lint tests, one failing fixture per rule |
 | `docs/decisions/` | Recorded decisions, including deltas from the plugin documentation |
 | `docs/release.md` | Release controls and steps |

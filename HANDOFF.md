@@ -105,3 +105,18 @@ The PP-1 prompt names `cloud/pp1-repository-marketplace`; the session environmen
 ## 7. Later stages
 
 Stage 2 adds harvested files with ledger rows in PROVENANCE.md and the 4(b) notice. Stage 3 defines the authoritative fragment schema, replaces the placeholder `schema_status` in each `fragment.yaml`, and adds the MyCase vocabulary. Stage 8 replaces the Stage 1 skill bodies with the full procedures, examples and the sixty-phrase routing suite. Stage 14 adds the directory listing fields (privacy policy, terms, support URL) to `mhsb-firm-core`.
+
+## 8. Connector endpoint: condition for releasing the connector plugins
+
+Requires DNS and hosting administration, which no session performs. On 2026-11-10 the connector host named in `catalog/manifest.yaml` (`connectors`) resolved, but no TLS session could be opened to it, so no MHSB-operated service answers at the URL that `mhsb-operations`, `mhsb-lawmatics` and `mhsb-clio` bundle. The three plugins are therefore held at tier pilot and are not listed in the marketplace.
+
+1. Bind the connector host to MHSB-operated infrastructure (Design v2.1 Section 9: the service behind the Cloudflare tunnel), or remove the DNS record until the service is live.
+2. Publish the privacy policy and terms of service that cover the connector service, and set `defaults.connector_listing.privacy_policy_url` and `terms_of_service_url` in `catalog/manifest.yaml`.
+3. Run the release check from any machine with network access:
+
+   ```bash
+   python tools/release_check.py
+   ```
+
+   Each connector must report `PASS`: the host resolves, the certificate is valid for the host, and the endpoint answers the MCP `initialize` request (an initialize result, or HTTP 401 with a Bearer challenge naming the protected resource metadata).
+4. Only then set `tier: ga` for the plugins whose connector passed, run `python tools/gen_manifest.py`, and confirm `python tools/lint.py --release` (rule L16) before the release pull request.
