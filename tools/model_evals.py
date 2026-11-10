@@ -27,7 +27,8 @@ as pending with that reason and exits 0, so deterministic CI is not blocked.
 Usage:
     python tools/model_evals.py [--routing] [--skills] [--budget USD] [--dry-run] [--no-log]
     python tools/model_evals.py --check-release   (release gate: status ran, every task, 100 percent,
-                                                  and an input digest equal to the current tree)
+                                                  an input digest equal to the current tree, and
+                                                  every case of every ga plugin passed)
 
 Requires the `anthropic` Python package only when a key is SET.
 """
@@ -226,8 +227,12 @@ def run_skills(client: Any, root: Path, cfg: dict[str, Any], spend: Spend) -> di
         response = text_of(message)
         calls = tool_calls_of(message)
         failures = skill_evals.score_response({**case, "today": today}, response, calls, registry, skill)
-        results.append({"skill": skill, "id": case.get("id"), "kind": case.get("kind"),
-                        "passed": not failures, "failures": failures, "tool_calls": calls})
+        row = {"skill": skill, "id": case.get("id"), "kind": case.get("kind"),
+               "passed": not failures, "failures": failures, "tool_calls": calls}
+        if failures:
+            # The transcript of a failed case, so that a review can tell behaviour from scoring.
+            row["response"] = response[:RESPONSE_CHARS]
+        results.append(row)
     skills_seen = sorted({r["skill"] for r in results})
     return {"model": model, "cases": len(results), "passed": sum(r["passed"] for r in results),
             "skills_covered": len(skills_seen), "results": results}
@@ -238,19 +243,66 @@ DIGEST_GLOBS = (
     "evals/routing/phrases.yaml",
     "evals/skills/*.yaml",
     "evals/model-config.yaml",
-    "catalog/manifest.yaml",
+    # The runner and the scorers: a change to a prompt, a task list or a scoring rule
+    # after a run makes the run stale (PP4-N1).
+    "tools/model_evals.py",
+    "tools/skill_evals.py",
+    "tools/routing_check.py",
 )
+MANIFEST = Path("catalog/manifest.yaml")
+RESPONSE_CHARS = 6000
+
+
+def _manifest_bytes(root: Path) -> bytes:
+    """The manifest without version labels, which change no eval input."""
+    data = yaml.safe_load((root / MANIFEST).read_text(encoding="utf-8"))
+    (data.get("defaults") or {}).pop("version", None)
+    for entry in data.get("plugins") or []:
+        entry.pop("version", None)
+    return json.dumps(data, sort_keys=True, default=str).encode("utf-8")
+
+
+def input_files(root: Path) -> dict[str, str]:
+    """sha256 of every file a model eval run reads, by repository path."""
+    paths = sorted({p for pattern in DIGEST_GLOBS for p in root.glob(pattern) if p.is_file()})
+    files = {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    files[MANIFEST.as_posix() + " (without version labels)"] = hashlib.sha256(_manifest_bytes(root)).hexdigest()
+    return files
 
 
 def input_digest(root: Path) -> str:
-    """sha256 over every file a model eval run reads, by sorted repository path and content."""
+    """sha256 over the sorted per-file digests: descriptions, skill bodies, phrases, cases, scorers."""
     h = hashlib.sha256()
-    paths = sorted({p for pattern in DIGEST_GLOBS for p in root.glob(pattern) if p.is_file()})
-    for path in paths:
-        rel = path.relative_to(root).as_posix().encode("utf-8")
-        data = path.read_bytes()
-        h.update(len(rel).to_bytes(4, "big") + rel + len(data).to_bytes(8, "big") + data)
+    for rel, digest in sorted(input_files(root).items()):
+        h.update(rel.encode("utf-8") + b"\0" + digest.encode("ascii") + b"\n")
     return h.hexdigest()
+
+
+def ga_plugin_problems(root: Path, record: dict[str, Any]) -> list[str]:
+    """Every general availability plugin needs every one of its cases run and passed in the record."""
+    manifest = load_manifest(root)
+    owner = {c.name: c.plugin for c in manifest.all_commands()}
+    problems = []
+    for plugin in manifest.plugins:
+        if plugin.tier != "ga" or not plugin.commands:
+            continue
+        skills = {c.name for c in plugin.commands}
+        expected = [(name, str(case.get("id"))) for name, plug, case, _ in skill_tasks(root) if plug == plugin.name]
+        results = {(r.get("skill"), str(r.get("id"))): r for r in (record.get("skills") or {}).get("results") or []}
+        missing = [cid for key in expected for cid in [key[1]] if key not in results]
+        failed = sorted(cid for key in expected for cid in [key[1]] if key in results and not results[key].get("passed"))
+        routing = [r for r in (record.get("routing") or {}).get("results") or []
+                   if not r.get("passed") and (r.get("expected") in skills or owner.get(r.get("answer")) == plugin.name)]
+        if missing or failed or routing:
+            detail = f"{len(failed)} of {len(expected)} skill cases failed"
+            if missing:
+                detail += f", {len(missing)} not run"
+            if routing:
+                detail += f", {len(routing)} routing failures involve its skills"
+            shown = ", ".join(failed[:12]) + (" and others" if len(failed) > 12 else "")
+            problems.append(f"{plugin.name} is tier ga and its latest eval record fails: {detail}"
+                            + (f" ({shown})" if failed else ""))
+    return problems
 
 
 def release_problems(root: Path) -> list[str]:
@@ -264,8 +316,12 @@ def release_problems(root: Path) -> list[str]:
     recorded = record.get("input_digest")
     current = input_digest(root)
     if recorded != current:
+        changed = sorted(rel for rel, digest in input_files(root).items()
+                         if (record.get("input_files") or {}).get(rel) != digest)
         problems.append(f"input digest {str(recorded)[:12]} does not match the tree {current[:12]}; "
-                        "re-run the model evals on the current text")
+                        "re-run the model evals on the current text"
+                        + (f" (changed: {', '.join(changed[:6])}{' and others' if len(changed) > 6 else ''})"
+                           if record.get("input_files") else ""))
     if record.get("status") != "ran":
         problems.append(f"model evals status is {record.get('status')!r}, not 'ran'")
     totals = {"routing": len(routing_tasks(root)), "skills": len(skill_tasks(root))}
@@ -276,6 +332,7 @@ def release_problems(root: Path) -> list[str]:
             problems.append(f"{suite}: {cases} of {total} tasks ran; a release needs every task")
         if passed != cases or cases == 0:
             problems.append(f"{suite}: {passed} of {cases} passed; a release needs 100 percent")
+    problems.extend(ga_plugin_problems(root, record))
     return problems
 
 
@@ -330,7 +387,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"ANTHROPIC_API_KEY: {status}")
     record: dict[str, Any] = {"run_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                               "key": status, "suites": suites, "models": cfg["models"],
-                              "input_digest": input_digest(root)}
+                              "input_digest": input_digest(root), "input_files": input_files(root)}
     if args.dry_run:
         print(f"routing tasks: {len(routing_tasks(root))}; skill tasks: {len(skill_tasks(root))}; cap USD {cap:.2f}")
         return 0

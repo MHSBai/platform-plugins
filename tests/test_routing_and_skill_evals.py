@@ -198,6 +198,18 @@ def test_context_with_boolean_yaml_key_is_scored() -> None:
     assert not skill_evals.score_response({**case, "expect": {}}, "Read on 2026-11-01.", [], REGISTRY, "dates")
 
 
+def _passing_record(repo: Path) -> dict:
+    """A record in which every routing and skill task ran and passed, on the current tree."""
+    routing = [{"id": ph.pid, "set": cset, "expected": exp, "answer": exp, "passed": True}
+               for cset, ph, exp in model_evals.routing_tasks(repo)]
+    skills = [{"skill": skill, "id": case.get("id"), "kind": case.get("kind"), "passed": True, "failures": []}
+              for skill, _, case, _ in model_evals.skill_tasks(repo)]
+    return {"status": "ran", "input_digest": model_evals.input_digest(repo),
+            "input_files": model_evals.input_files(repo),
+            "routing": {"cases": len(routing), "passed": len(routing), "results": routing},
+            "skills": {"cases": len(skills), "passed": len(skills), "results": skills}}
+
+
 def test_release_gate_refuses_pending_and_partial_runs(repo: Path) -> None:
     results = repo / "evals" / "results" / "model-evals.json"
     results.parent.mkdir(parents=True, exist_ok=True)
@@ -211,7 +223,8 @@ def test_release_gate_refuses_pending_and_partial_runs(repo: Path) -> None:
                "skills": {"cases": 24, "passed": 24}}
     results.write_text(json.dumps(partial), encoding="utf-8")
     assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
-    full = {**partial, "skills": {"cases": skill_total, "passed": skill_total}}
+    full = _passing_record(repo)
+    assert full["skills"]["cases"] == skill_total
     results.write_text(json.dumps(full), encoding="utf-8")
     assert model_evals.main(["--root", str(repo), "--check-release"]) == 0
     failing = {**full, "routing": {"cases": routing_total, "passed": routing_total - 1}}
@@ -275,21 +288,75 @@ def test_every_manifest_trigger_is_quoted_in_its_description() -> None:
 
 
 def test_release_gate_refuses_a_record_from_other_text(repo: Path) -> None:
+    """PP4-N1: a record from other skill text, phrases, cases or scorers does not pass."""
     results = repo / "evals" / "results" / "model-evals.json"
     results.parent.mkdir(parents=True, exist_ok=True)
-    routing_total = len(model_evals.routing_tasks(repo))
-    skill_total = len(model_evals.skill_tasks(repo))
-    record = {"status": "ran", "input_digest": model_evals.input_digest(repo),
-              "routing": {"cases": routing_total, "passed": routing_total},
-              "skills": {"cases": skill_total, "passed": skill_total}}
+    record = _passing_record(repo)
     results.write_text(json.dumps(record), encoding="utf-8")
     assert model_evals.main(["--root", str(repo), "--check-release"]) == 0
     skill = repo / "plugins" / "mhsb-operations" / "skills" / "dates" / "SKILL.md"
     skill.write_text(skill.read_text(encoding="utf-8") + "\nChanged.\n", encoding="utf-8")
-    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+    problems = model_evals.release_problems(repo)
+    assert len(problems) == 1 and "plugins/mhsb-operations/skills/dates/SKILL.md" in problems[0]
     del record["input_digest"]
     results.write_text(json.dumps(record), encoding="utf-8")
     assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+
+
+@pytest.mark.parametrize("path", ["tools/skill_evals.py", "evals/routing/phrases.yaml",
+                                  "evals/skills/refusals.yaml"])
+def test_digest_covers_scorers_phrases_and_refusals(repo: Path, path: str) -> None:
+    before = model_evals.input_digest(repo)
+    target = repo / path
+    target.write_text(target.read_text(encoding="utf-8") + "\n# changed\n", encoding="utf-8")
+    assert model_evals.input_digest(repo) != before
+
+
+def test_digest_ignores_version_labels(repo: Path) -> None:
+    before = model_evals.input_digest(repo)
+    path = repo / "catalog" / "manifest.yaml"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    data["defaults"]["version"] = "9.9.9"
+    path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+    assert model_evals.input_digest(repo) == before
+
+
+def test_release_gate_blocks_a_ga_plugin_with_a_failed_case(repo: Path) -> None:
+    """PP4-N3: --check-release names a ga plugin whose latest record fails."""
+    results = repo / "evals" / "results" / "model-evals.json"
+    results.parent.mkdir(parents=True, exist_ok=True)
+    record = _passing_record(repo)
+    row = next(r for r in record["skills"]["results"] if r["skill"] == "follow-up")
+    row["passed"] = False
+    results.write_text(json.dumps(record), encoding="utf-8")
+    problems = model_evals.release_problems(repo)
+    assert any(p.startswith("mhsb-firm-core is tier ga") and row["id"] in p for p in problems)
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+
+
+def test_failed_case_keeps_its_transcript(repo: Path) -> None:
+    class Block:
+        def __init__(self, text: str) -> None:
+            self.type, self.text = "text", text
+
+    class Message:
+        def __init__(self, text: str) -> None:
+            self.content = [Block(text)]
+            self.usage = type("U", (), {"input_tokens": 10, "output_tokens": 10})()
+
+    class Client:
+        class messages:  # noqa: N801
+            @staticmethod
+            def create(**_: object) -> Message:
+                return Message("Draft ready.")
+
+    cfg = model_evals.load_config(repo)
+    spend = model_evals.Spend(cap=0.5, prices=cfg["prices"])
+    result = model_evals.run_skills(Client(), repo, cfg, spend)
+    assert result["cases"] >= 1
+    failed = [r for r in result["results"] if not r["passed"]]
+    assert failed and all(r["response"] == "Draft ready." for r in failed)
+    assert all("response" not in r for r in result["results"] if r["passed"])
 
 
 def test_l06_grades_descriptions_without_the_trigger_sentence() -> None:
