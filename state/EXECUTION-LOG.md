@@ -616,3 +616,39 @@ Model eval run 2026-11-10T19:53:46Z: key SET; status ran.
 routing: model claude-sonnet-5-5; 238 of 240 passed.
 skills: model claude-opus-5-5; 120 of 144 passed.
 Tokens: input 1323237, output 125259; requests 384; estimated cost USD 6.36 of cap 12.00.
+
+### Step 11. Fix session FIX2-PP-STACK-A, 2026-11-10 (PP4-N1, PP4-N2 and PP4-N3; two runs)
+
+First run: `cloud/pp9-pack-fragments` merged (39c77dc); PP4-N2 (26817e8), PP4-N1 and the gate over every ga plugin (93accdf), skill revision (27ac41e), case contexts (f96b313), then one model eval run (record 7fa11af). Second run: the first run's uncommitted edits finished to the decision of decision 0005, Section 12 (92bfe1c): Design v2.1 Section 12 is not met (routing 238 of 240; skills 120 of 144; `mhsb-firm-core` 40 of 48 with 2 injection cases failing), so every plugin is held at 0.1.0 and the 0.2.0 entry is unreleased. The L06 operational test fixture, which the longer `/production` body had diluted below the bound, now replaces the body (186a47a). `tools/model_evals.py` was not run in the second run; the record's input digest equals the digest of the tree. No rule in `tools/skill_evals.py` changed in either run.
+
+```
+$ python tools/gen_manifest.py --check | tail -1; python tools/gen_manifest.py --counts > /dev/null; echo $?
+generated files current
+0
+$ python tools/lint.py | tail -1; python tools/lint.py --release | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: textstat
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: textstat
+$ python -m pytest -q | tail -1
+189 passed
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/pack_evals.py | tail -1
+pack evals: 28 cases, 28 passed, 0 failed
+$ python tools/license_gate.py --upstream | tail -1
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ python -m pytest -q tests/test_release_check.py | tail -1
+23 passed
+$ bash tools/verify_marketplace.sh > /dev/null; echo $?
+0
+$ claude plugin validate . --strict | tail -1
+Validation passed
+$ python tools/model_evals.py --check-release
+RELEASE BLOCKED routing: 238 of 240 passed; a release needs 100 percent
+RELEASE BLOCKED skills: 120 of 144 passed; a release needs 100 percent
+RELEASE BLOCKED mhsb-firm-core is tier ga and its latest eval record fails: 8 of 48 skill cases failed, 2 routing failures involve its skills (ai-policy-draft-04, ai-policy-draft-06, ai-training-06, ask-mhsb-04, before-i-paste-01, before-i-paste-03, explain-this-06, follow-up-05)
+model eval release gate: 3 problem(s)
+```
+
+The gate blocks the release as intended; no digest problem is reported (record and tree: 95afc38ec1b4).
