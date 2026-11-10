@@ -7,6 +7,7 @@ and the lint import this module so that they read the manifest identically.
 
 from __future__ import annotations
 
+import ipaddress
 import itertools
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -139,12 +140,36 @@ def _flag(mapping: dict[str, Any], key: str, where: str) -> bool:
     return value
 
 
+def _check_connector_expectations(raw: dict[str, Any]) -> None:
+    """connector_identity and connector_edge: declared keys and well-formed values."""
+    identity = raw.get("connector_identity") or {}
+    if not isinstance(identity, dict):
+        raise ManifestError("connector_identity must be a mapping")
+    for key, entry in identity.items():
+        if key not in raw["connectors"]:
+            raise ManifestError(f"connector_identity: connector '{key}' not declared")
+        if not isinstance(entry, dict) or not entry.get("server_name") or not entry.get("server_version"):
+            raise ManifestError(f"connector_identity {key}: server_name and server_version are required")
+    for key in raw["connectors"]:
+        if key not in identity:
+            raise ManifestError(f"connector_identity: connector '{key}' has no expected identity")
+    edge = raw.get("connector_edge") or {}
+    if not isinstance(edge, dict):
+        raise ManifestError("connector_edge must be a mapping")
+    for cidr in edge.get("addresses") or []:
+        try:
+            ipaddress.ip_network(str(cidr))
+        except ValueError as exc:
+            raise ManifestError(f"connector_edge.addresses: {exc}") from exc
+
+
 def parse_manifest(raw: dict[str, Any]) -> Manifest:
     """Validate the manifest structure and return a typed view of it."""
     for key in ("schema_version", "marketplace", "defaults", "licenses", "connectors",
                 "combinations", "limits", "plugins"):
         _require(raw, key, "manifest")
     licenses: dict[str, str] = raw["licenses"]
+    _check_connector_expectations(raw)
     manifest = Manifest(raw=raw)
     seen: set[str] = set()
     for entry in raw["plugins"]:
