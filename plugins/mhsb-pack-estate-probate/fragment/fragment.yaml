@@ -1,108 +1,101 @@
-# Fragment for estate planning and probate. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: estate-probate
-practice: estate planning and probate
+# Practice-area pack fragment: estate planning and probate (Catalog v2.1 Section 3.3).
+# Data only. Merged into the Firm Profile and overridden by the firm's answers.
+# Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Each deadline category is statutory, with a citation placeholder
+# that the adopting attorney confirms, or firm-set. Flags are attorney-review flags and
+# never decline. Sensitive fields are excluded from scoring. The ACTEC guide is used
+# only as an element checklist in MHSB's words.
+# Capacity and undue-influence observations are recorded as observations, never as findings.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier pilot.
+fragment_id: estate_planning_probate
+practice_area: estate_planning_probate
+version: 1.0.0
 release_tier: pilot
-status: pilot draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
 intake_questions:
-- id: family_tree
-  prompt: Family tree with spellings
-  type: text
-- id: special_needs
-  prompt: Special needs
-  type: text
-- id: assets_titling
-  prompt: Assets with titling and values
-  type: text
-- id: beneficiary_designations
-  prompt: Beneficiary designations
-  type: text
-- id: existing_documents
-  prompt: Existing documents
-  type: text
-- id: fiduciary_choices
-  prompt: Fiduciary choices
-  type: text
-- id: business_interests
-  prompt: Business interests
-  type: text
-- id: capacity_observations
-  prompt: Capacity and undue-influence observations, recorded as observations
-  type: text
+- {id: family_tree, prompt: "Family members, with the spelling of each name", answer_type: text, required: true, sensitive_tag: null}
+- {id: special_needs, prompt: "Any beneficiary with special needs", answer_type: boolean, required: true, sensitive_tag: null}
+- {id: assets_titling, prompt: "Assets, how each is titled, and approximate values", answer_type: text, required: true, sensitive_tag: financial}
+- {id: beneficiary_designations, prompt: "Accounts and policies with beneficiary designations", answer_type: text, required: false, sensitive_tag: financial}
+- {id: existing_documents, prompt: "Existing wills, trusts and powers of attorney", answer_type: text, required: false, sensitive_tag: null}
+- {id: fiduciary_choices, prompt: "Proposed executors, trustees, agents and guardians", answer_type: text, required: false, sensitive_tag: null}
+- {id: business_interests, prompt: "Business interests held", answer_type: text, required: false, sensitive_tag: financial}
+- {id: capacity_observations, prompt: "Observations bearing on capacity or undue influence, recorded as observations", answer_type: text, required: false, sensitive_tag: health}
+- {id: matter_kind, prompt: "Planning or probate", answer_type: choice, choices: [planning, probate, both], required: true, sensitive_tag: null}
 attorney_review_flags:
-- possible_conflict_joint_representation
+- possible_conflict
 - outside_jurisdiction
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
 document_list:
-- statements
-- out-of-state deeds
-- trust and entity documents
-- beneficiary forms
-- prior wills and powers of attorney
-- original will (probate)
-- death certificates (probate)
-- decedent's return (probate)
+- {id: account_statements, name: "Account statements", required: true}
+- {id: out_of_state_deeds, name: "Deeds for property in other states", required: false}
+- {id: trust_entity_documents, name: "Trust and entity documents", required: false}
+- {id: beneficiary_forms, name: "Beneficiary designation forms", required: false}
+- {id: prior_wills_poa, name: "Prior wills and powers of attorney", required: false}
+- {id: original_will, name: "Original will (probate)", required: false}
+- {id: death_certificates, name: "Death certificates (probate)", required: false}
+- {id: decedent_return, name: "Decedent's final income tax return (probate)", required: false}
 stage_map:
-- planning pipeline
-- probate open
-- inventory
-- creditor period
-- close
+- {fragment_stage: New EP Lead, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Consult Scheduled, canonical: stage_intake_03_consult_scheduled}
+- {fragment_stage: Questionnaire Sent, canonical: stage_intake_03_consult_scheduled}
+- {fragment_stage: Drafting, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Retainer Sent, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Hired, canonical: stage_intake_06_retained}
+- {fragment_stage: Probate open, canonical: stage_matter_10_open}
+- {fragment_stage: Inventory, canonical: stage_matter_20_active}
+- {fragment_stage: Creditor period, canonical: stage_matter_20_active}
+- {fragment_stage: Close, canonical: stage_matter_40_closing}
 fee_model:
-  model: hybrid
-  notes: Flat packages for planning; hourly for probate.
+  types: [flat, hourly]
+  notes: "Flat packages for planning; hourly for probate administration."
 deadline_categories:
 - id: signing_logistics
-  label: Signing logistics
+  name: "Signing logistics"
   kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
 - id: annual_review
-  label: Annual review
+  name: "Annual plan review"
   kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
 - id: probate_inventory_accounting
-  label: Probate inventory and accounting dates
+  name: "Probate inventory and accounting dates, by state"
   kind: statutory
-  citation: null
-  adopter: null
+  entered_date_governs: true
+  citation: "CITATION PENDING: probate inventory and accounting provisions of the administering state, to be confirmed and recorded by the adopting attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
 - id: creditor_claim_period
-  label: Creditor claim periods
+  name: "Creditor claim periods, by state"
   kind: statutory
-  citation: null
-  adopter: null
+  entered_date_governs: true
+  citation: "CITATION PENDING: creditor claim provisions of the administering state, to be confirmed and recorded by the adopting attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
 - id: estate_tax_return
-  label: Estate tax return timing
+  name: "Estate tax return timing"
   kind: statutory
-  citation: null
-  adopter: null
+  entered_date_governs: true
+  citation: "CITATION PENDING: estate tax return provisions that apply to the estate, to be confirmed and recorded by the adopting attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
 communication_templates:
-- pre-consult-prep
-- questionnaire-drip
-- engagement-receipt
-- signing-logistics
-- annual-review-reminder
-- closing-letter
+- ep_pre_consult_prep
+- ep_questionnaire_drip
+- ep_engagement_receipt
+- ep_signing_logistics
+- ep_annual_review_reminder
+- ep_closing_letter
 consent_flags:
-- id: joint_representation_spouses
-  label: Joint representation of spouses, in the firm's adopted language
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
+- {id: joint_representation_spouses, label: "Joint representation of spouses, in the firm's own adopted language", evidence: [signed_form, engagement_letter_clause], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- health
-sensitive_field_semantics: excluded from any scoring
+- {field: intake.assets_titling, tag: financial, excluded_from_scoring: true}
+- {field: intake.beneficiary_designations, tag: financial, excluded_from_scoring: true}
+- {field: intake.business_interests, tag: financial, excluded_from_scoring: true}
+- {field: intake.capacity_observations, tag: health, excluded_from_scoring: true}
 brief_views:
-- questionnaire_status
-- signing_readiness
-- annual_review_due
+- {id: questionnaire_status, name: "Questionnaire status"}
+- {id: signing_readiness, name: "Signing readiness"}
+- {id: annual_review_due, name: "Annual review due"}
 reports:
-- questionnaire_completion_conversion
+- questionnaire_completion

@@ -1,12 +1,11 @@
 ---
-template_id: personal-injury.settlement-statement
+template_id: pi_settlement_statement
 title: Settlement statement cover
 pack: mhsb-pack-personal-injury
 adoption:
-  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
-  date: '2026-11-03'
-  version: 0.1.0
-  synthetic: true
+  adopted_by: PENDING ADOPTION
+  date: PENDING ADOPTION
+  version: PENDING ADOPTION
 ---
 
 # Settlement statement cover

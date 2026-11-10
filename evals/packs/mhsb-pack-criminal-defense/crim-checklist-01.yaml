@@ -1,0 +1,13 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: crim-checklist-01
+pack: mhsb-pack-criminal-defense
+skill: checklist
+description: Charging documents and identification are required.
+input:
+  documents_present:
+  - charging_documents
+expect:
+  missing_required:
+  - identification
+  ready: false

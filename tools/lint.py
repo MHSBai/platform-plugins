@@ -17,6 +17,9 @@ Rules (identifier, scope):
   L12 provenance-header   Apache 4(b) modification notice on every file in PROVENANCE.md
   L13 structure           allowed components only; remote connectors only; pack layout; license files
   L14 generated-drift     outputs of tools/gen_manifest.py current with the manifest
+  L15 fragment-schema     every fragment.yaml against the vendored Stage 3 fragment schema, plus
+                          template references, intake block ids, sensitive tags, citation
+                          placeholders and CO-DESIGN.md on hidden packs
   L16 connector-release   release only: each connector bundled by a general availability
                           plugin resolves inside the recorded edge, presents a certificate
                           valid for its host and answers an authenticated MCP initialize
@@ -39,6 +42,7 @@ in development and an error at release.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -81,6 +85,9 @@ FORBIDDEN_PLUGIN_PATHS = ("hooks", "agents", "bin", "commands", "monitors", "out
                           "themes", "workflows", ".lsp.json", "settings.json", "CLAUDE.md")
 
 NOT_ADOPTED = "NOT ADOPTED"
+PENDING_ADOPTION = "PENDING ADOPTION"
+PLACEHOLDERS = (NOT_ADOPTED, PENDING_ADOPTION)
+CITATION_PLACEHOLDER = "CITATION PENDING"
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
@@ -514,7 +521,14 @@ def rule_trigger_collision(ctx: Context) -> list[Finding]:
     return findings
 
 
-def _adoption_problems(record: Any, tier: str, release: bool) -> list[tuple[str, str]]:
+def _adoption_problems(record: Any, plugin: Any, release: bool) -> list[tuple[str, str]]:
+    """Problems with one repository adoption record (template frontmatter or adoption.yaml).
+
+    NOT ADOPTED is permitted in pilot and hidden packs that are not held; PENDING ADOPTION
+    only in a general availability pack held at pilot (decision 0004). A synthetic record
+    is a warning in development and an error at release (decision 0002). A real record
+    in a hidden pack is an error: hidden fragments ship as drafts marked not adopted.
+    """
     if not isinstance(record, dict):
         return [("error", "adoption record (adopted_by, date, version) is missing")]
     problems: list[tuple[str, str]] = []
@@ -524,12 +538,21 @@ def _adoption_problems(record: Any, tier: str, release: bool) -> list[tuple[str,
             problems.append(("error", f"adoption.{key} is missing"))
     if problems:
         return problems
-    placeholder = [key for key, value in values.items() if str(value).strip() == NOT_ADOPTED]
+    stated = {str(value).strip() for value in values.values()}
+    placeholder = stated & set(PLACEHOLDERS)
     if placeholder:
-        if tier not in {"pilot", "hidden"}:
+        if len(stated) != 1:
+            return [("error", "adoption placeholder must fill adopted_by, date and version alike")]
+        label = placeholder.pop()
+        if label == PENDING_ADOPTION and not plugin.held:
+            problems.append(("error", f"'{PENDING_ADOPTION}' is permitted only in a general availability "
+                                      "pack held at pilot (manifest catalog_tier ga)"))
+        if label == NOT_ADOPTED and (plugin.held or plugin.tier not in {"pilot", "hidden"}):
             problems.append(("error", f"'{NOT_ADOPTED}' is permitted only in pilot and hidden packs "
-                                      f"(tier {tier})"))
+                                      f"(tier {plugin.tier}); a held pack uses '{PENDING_ADOPTION}'"))
         return problems
+    if plugin.tier == "hidden":
+        problems.append(("error", "hidden packs ship as drafts marked not adopted"))
     if not DATE_RE.match(str(values["date"])):
         problems.append(("error", "adoption.date must be YYYY-MM-DD"))
     if not VERSION_RE.match(str(values["version"])):
@@ -540,6 +563,13 @@ def _adoption_problems(record: Any, tier: str, release: bool) -> list[tuple[str,
     return problems
 
 
+def load_yaml_file(path: Path) -> tuple[Any, str | None]:
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8")), None
+    except (OSError, yaml.YAMLError) as exc:
+        return None, str(exc)
+
+
 def rule_adoption(ctx: Context) -> list[Finding]:
     findings = []
     for plugin in ctx.manifest.plugins:
@@ -547,16 +577,21 @@ def rule_adoption(ctx: Context) -> list[Finding]:
         targets: list[tuple[Path, Any]] = []
         fragment = base / "fragment" / "fragment.yaml"
         if fragment.exists():
-            try:
-                data = yaml.safe_load(fragment.read_text(encoding="utf-8")) or {}
-            except yaml.YAMLError as exc:
-                findings.append(Finding("L11", ctx.rel(fragment), f"does not parse: {exc}"))
+            data, err = load_yaml_file(fragment)
+            if err:
+                findings.append(Finding("L11", ctx.rel(fragment), f"does not parse: {err}"))
                 data = {}
-            targets.append((fragment, data.get("adoption") if isinstance(data, dict) else None))
-            if isinstance(data, dict) and data.get("release_tier") != plugin.tier:
+            data = data if isinstance(data, dict) else {}
+            if data.get("release_tier") != plugin.fragment_tier:
                 findings.append(Finding("L11", ctx.rel(fragment),
                                         f"release_tier '{data.get('release_tier')}' differs from manifest "
-                                        f"'{plugin.tier}'"))
+                                        f"'{plugin.fragment_tier}'"))
+            record_path = base / "fragment" / "adoption.yaml"
+            record, rerr = load_yaml_file(record_path) if record_path.exists() else (None, None)
+            if rerr:
+                findings.append(Finding("L11", ctx.rel(record_path), f"does not parse: {rerr}"))
+            targets.append((record_path, record))
+            findings.extend(_fragment_record_agreement(ctx, fragment, data, record))
         templates_dir = base / "templates"
         if templates_dir.exists():
             for path in sorted(templates_dir.rglob("*")):
@@ -569,9 +604,28 @@ def rule_adoption(ctx: Context) -> list[Finding]:
                 front, _, err = split_frontmatter(path.read_text(encoding="utf-8"))
                 targets.append((path, (front or {}).get("adoption") if not err else None))
         for path, record in targets:
-            for severity, message in _adoption_problems(record, plugin.tier, ctx.release):
+            for severity, message in _adoption_problems(record, plugin, ctx.release):
                 findings.append(Finding("L11", ctx.rel(path), message, severity))
     return findings
+
+
+def _fragment_record_agreement(ctx: Context, fragment: Path, data: dict[str, Any],
+                               record: Any) -> list[Finding]:
+    """The fragment's schema adoption (null when absent) must agree with adoption.yaml."""
+    if not isinstance(record, dict):
+        return []
+    inner = data.get("adoption") if isinstance(data.get("adoption"), dict) else {}
+    placeholder = str(record.get("adopted_by", "")).strip() in PLACEHOLDERS
+    if placeholder:
+        if inner.get("adopted_by") is not None or inner.get("adopted_on") is not None:
+            return [Finding("L11", ctx.rel(fragment), "adoption.yaml is a placeholder but the fragment "
+                                                      "records an adopter")]
+        return []
+    expected = (record.get("adopted_by"), str(record.get("date")), str(record.get("version")))
+    actual = (inner.get("adopted_by"), str(inner.get("adopted_on")), str(inner.get("version")))
+    if expected != actual:
+        return [Finding("L11", ctx.rel(fragment), "fragment adoption differs from adoption.yaml")]
+    return []
 
 
 def provenance_entries(root: Path) -> list[dict[str, str]]:
@@ -666,8 +720,9 @@ def rule_structure(ctx: Context) -> list[Finding]:
         if plugin.kind == "practice":
             if (base / "skills").exists():
                 findings.append(Finding("L13", f"{rel}/skills", "practice packs contain no skills"))
-            if not (base / "fragment" / "fragment.yaml").exists():
-                findings.append(Finding("L13", rel, "fragment/fragment.yaml is missing"))
+            for required in ("fragment.yaml", "adoption.yaml"):
+                if not (base / "fragment" / required).exists():
+                    findings.append(Finding("L13", rel, f"fragment/{required} is missing"))
             templates = base / "templates"
             if not templates.is_dir() or not any(p.is_file() for p in templates.rglob("*")):
                 findings.append(Finding("L13", rel, "templates/ with adoption placeholders is missing"))
@@ -677,6 +732,94 @@ def rule_structure(ctx: Context) -> list[Finding]:
 def rule_generated_drift(ctx: Context) -> list[Finding]:
     return [Finding("L14", line.split(": ", 1)[-1], line.split(":", 1)[0] + "; run tools/gen_manifest.py")
             for line in gen_manifest.check(ctx.root, ctx.manifest)]
+
+
+def _vendored_schema_findings() -> list[Finding]:
+    """The vendored fragment schema must match the hash recorded beside it (decision 0004)."""
+    record_path = SCHEMA_DIR / "fragment.schema.source.json"
+    schema_path = SCHEMA_DIR / "fragment.schema.json"
+    where = "tools/schemas/fragment.schema.source.json"
+    record, err = load_json(record_path)
+    if err or not isinstance(record, dict) or not record.get("sha256") or not record.get("source_commit"):
+        return [Finding("L15", where, "vendored schema source record (source_commit, sha256) is missing")]
+    try:
+        actual = hashlib.sha256(schema_path.read_bytes()).hexdigest()
+    except OSError as exc:
+        return [Finding("L15", "tools/schemas/fragment.schema.json", f"cannot be read: {exc}")]
+    if actual != record["sha256"]:
+        return [Finding("L15", "tools/schemas/fragment.schema.json",
+                        f"sha256 {actual} differs from the recorded {record['sha256']}; re-vendor from "
+                        "the service repository and update the source record")]
+    return []
+
+
+def rule_fragment_schema(ctx: Context) -> list[Finding]:
+    """Stage 3 fragment schema, and the references a fragment makes into its own pack."""
+    findings = _vendored_schema_findings()
+    seen_areas: dict[str, str] = {}
+    for plugin in ctx.manifest.by_kind("practice"):
+        base = ctx.plugins_dir / plugin.name
+        path = base / "fragment" / "fragment.yaml"
+        if not path.exists():
+            continue
+        rel = ctx.rel(path)
+        data, err = load_yaml_file(path)
+        if err or not isinstance(data, dict):
+            findings.append(Finding("L15", rel, f"does not parse as a mapping: {err or type(data).__name__}"))
+            continue
+        problems = schema_errors("fragment.schema.json", data)
+        findings.extend(Finding("L15", rel, msg) for msg in problems)
+        if problems:
+            continue
+        area = data["practice_area"]
+        if data["fragment_id"] != area:
+            findings.append(Finding("L15", rel, "fragment_id must equal practice_area"))
+        if area in seen_areas:
+            findings.append(Finding("L15", rel, f"practice_area '{area}' also used by {seen_areas[area]}"))
+        seen_areas[area] = plugin.name
+        template_ids: set[str] = set()
+        for tpath in sorted((base / "templates").glob("*.md")):
+            front, _, terr = split_frontmatter(tpath.read_text(encoding="utf-8"))
+            if not terr and front and front.get("template_id"):
+                template_ids.add(str(front["template_id"]))
+        referenced = set(data["communication_templates"])
+        for tid in sorted(referenced - template_ids):
+            findings.append(Finding("L15", rel, f"communication template '{tid}' has no template file"))
+        for tid in sorted(template_ids - referenced):
+            findings.append(Finding("L15", rel, f"template '{tid}' is not referenced by the fragment"))
+        question_ids = {q["id"] for q in data["intake_questions"]}
+        tags = {(t["field"], t["tag"]) for t in data["sensitive_field_tags"]}
+        for q in data["intake_questions"]:
+            if q["sensitive_tag"] and (f"intake.{q['id']}", q["sensitive_tag"]) not in tags:
+                findings.append(Finding("L15", rel, f"sensitive question '{q['id']}' lacks a "
+                                                    "sensitive_field_tags entry with the same tag"))
+        adopted = bool((data.get("adoption") or {}).get("adopted_by"))
+        for cat in data["deadline_categories"]:
+            if cat["kind"] == "statutory" and not (cat["adopter"] or {}).get("adopted_by") \
+                    and not str(cat["citation"]).startswith(CITATION_PLACEHOLDER):
+                findings.append(Finding("L15", rel, f"statutory category '{cat['id']}' has no adopter, so its "
+                                                    f"citation must begin '{CITATION_PLACEHOLDER}'"))
+            if cat["kind"] == "statutory" and adopted and not (cat["adopter"] or {}).get("adopted_by"):
+                findings.append(Finding("L15", rel, f"statutory category '{cat['id']}' in an adopted fragment "
+                                                    "has no adopter", "warning"))
+        blocks = base / "fragment" / "intake-blocks.yaml"
+        if blocks.exists():
+            bdata, berr = load_yaml_file(blocks)
+            pack = (bdata or {}).get("pack") if isinstance(bdata, dict) else None
+            if berr or not isinstance(pack, dict):
+                findings.append(Finding("L15", ctx.rel(blocks), "intake blocks have no pack mapping"))
+            else:
+                if pack.get("fragment_id") != data["fragment_id"]:
+                    findings.append(Finding("L15", ctx.rel(blocks), "pack.fragment_id differs from the fragment"))
+                mapped = set((pack.get("question_map") or {}).keys())
+                for qid in sorted(question_ids - mapped):
+                    findings.append(Finding("L15", ctx.rel(blocks), f"question '{qid}' is not mapped"))
+                for qid in sorted(mapped - question_ids):
+                    findings.append(Finding("L15", ctx.rel(blocks), f"mapped question '{qid}' is not in "
+                                                                    "the fragment"))
+        if plugin.tier == "hidden" and not (base / "CO-DESIGN.md").exists():
+            findings.append(Finding("L15", ctx.rel(base), "hidden pack lacks CO-DESIGN.md"))
+    return findings
 
 
 CONNECTOR_LISTING_FIELDS = ("privacyPolicyUrl", "termsOfServiceUrl")
@@ -752,6 +895,7 @@ RULES: list[tuple[str, Callable[[Context], list[Finding]]]] = [
     ("L12", rule_provenance_header),
     ("L13", rule_structure),
     ("L14", rule_generated_drift),
+    ("L15", rule_fragment_schema),
     ("L16", rule_connector_release),
     ("L17", rule_plugin_licenses),
 ]

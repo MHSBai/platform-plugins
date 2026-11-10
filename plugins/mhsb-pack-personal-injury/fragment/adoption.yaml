@@ -1,0 +1,11 @@
+# Repository adoption record for the personal injury fragment (lint rule L11).
+# The fragment schema records an absent adoption as null; this file carries the literal
+# placeholder that the lint permits for the pack's tier. An attorney adoption replaces all
+# three values with the adopter's name, the date (YYYY-MM-DD) and the fragment version, and
+# the same values are written into fragment.yaml adoption at that sitting.
+# Catalog tier ga. Held at pilot in catalog/manifest.yaml until an attorney adopter is recorded (Stage 11); the fragment keeps release_tier ga and its adoption fields null.
+fragment_id: personal_injury
+fragment_version: 1.0.0
+adopted_by: PENDING ADOPTION
+date: PENDING ADOPTION
+version: PENDING ADOPTION

@@ -49,7 +49,18 @@ class Plugin:
     description: str
     commands: tuple[Command, ...]
     practice: str | None = None
+    catalog_tier: str | None = None
     offered_without_subscription: bool = False
+
+    @property
+    def held(self) -> bool:
+        """A general availability pack held at pilot until its attorney adoption is recorded."""
+        return self.catalog_tier == "ga" and self.tier == "pilot"
+
+    @property
+    def fragment_tier(self) -> str:
+        """The release_tier its fragment declares: the catalog tier when held, else the tier."""
+        return self.catalog_tier or self.tier
 
 
 @dataclass(frozen=True)
@@ -188,6 +199,10 @@ def parse_manifest(raw: dict[str, Any]) -> Manifest:
             raise ManifestError(f"{where}: tier '{tier}' not in {TIERS}")
         if license_key not in licenses:
             raise ManifestError(f"{where}: license '{license_key}' not declared")
+        catalog_tier = entry.get("catalog_tier")
+        if catalog_tier is not None and (kind != "practice" or catalog_tier != "ga" or tier != "pilot"):
+            raise ManifestError(f"{where}: catalog_tier is permitted only as ga on a practice pack "
+                                "held at tier pilot")
         if mcp is not None and mcp not in raw["connectors"]:
             raise ManifestError(f"{where}: connector '{mcp}' not declared")
         commands: list[Command] = []
@@ -212,6 +227,7 @@ def parse_manifest(raw: dict[str, Any]) -> Manifest:
             license_id=licenses[license_key], category=str(entry.get("category", "")),
             mcp=mcp, description=" ".join(str(_require(entry, "description", where)).split()),
             commands=tuple(commands), practice=entry.get("practice"),
+            catalog_tier=catalog_tier,
             offered_without_subscription=_flag(entry, "offered_without_subscription", where),
         ))
     return manifest

@@ -1,5 +1,5 @@
 ---
-template_id: criminal-defense.status-update
+template_id: crim_status_update
 title: Status update
 pack: mhsb-pack-criminal-defense
 adoption:

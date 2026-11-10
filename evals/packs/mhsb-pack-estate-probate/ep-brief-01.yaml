@@ -1,0 +1,28 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: ep-brief-01
+pack: mhsb-pack-estate-probate
+skill: brief
+description: Questionnaire status view anchored on the questionnaire sent date.
+input:
+  view: questionnaire_status
+  anchor_field: Questionnaire Sent Date
+  as_of: '2026-11-03'
+  matters:
+  - id: SYN-EP-1
+    fields:
+      Questionnaire Sent Date: '2026-10-20'
+  - id: SYN-EP-2
+    fields:
+      Questionnaire Sent Date: '2026-10-31'
+expect:
+  rows:
+  - matter: SYN-EP-1
+    Questionnaire Sent Date: '2026-10-20'
+    days: 14
+  - matter: SYN-EP-2
+    Questionnaire Sent Date: '2026-10-31'
+    days: 3
+  data_gaps: []
+  coverage: 'coverage: 2 of 2 matters retrieved for Questionnaire status; 0 not retrieved because Questionnaire
+    Sent Date is empty'

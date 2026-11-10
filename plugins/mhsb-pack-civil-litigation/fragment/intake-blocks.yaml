@@ -32,7 +32,7 @@
 # address, party, date and document blocks and maps them onto those question ids.
 # Every block is a draft until the firm's attorney adopts the fragment.
 schema_version: 0.1.0
-schema_status: placeholder; validated against the fragment schema in the service repository
+schema_status: question ids checked against fragment.yaml by lint rule L15 (Stage 9)
 source_pattern: reusable question blocks (identity, contact, address, parties, dates, documents)
 semantics:
   unknown_is_not_permitted: true
@@ -241,7 +241,7 @@ blocks:
       required: false
       sensitive: false
 pack:
-  fragment_id: civil-litigation
+  fragment_id: civil_litigation
   block_use:
     prospective_client: [party_identity, contact, address]
     parties: other_parties

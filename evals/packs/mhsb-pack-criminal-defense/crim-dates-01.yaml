@@ -1,0 +1,37 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: crim-dates-01
+pack: mhsb-pack-criminal-defense
+skill: dates
+description: 'Catalog 3.4 defines no statutory category: court dates and cutoffs are entered and govern.
+  The case checks a firm-set row, that no category is statutory, and that no speedy-trial or other marker
+  is computed.'
+input:
+  as_of: '2026-11-03'
+  mapping:
+    court_date: Court Date
+    discovery_motion_cutoff: Motion Cutoff
+  record:
+    Court Date:
+      value: '2026-11-18'
+      source: court notice
+      owner: paralegal
+    Motion Cutoff:
+      value: null
+      source: scheduling order not yet entered
+      owner: attorney
+expect:
+  rows:
+    court_date:
+      kind: firm_set
+      status: established
+      governing_date: '2026-11-18'
+      cross_check: null
+      counsel_review: false
+    discovery_motion_cutoff:
+      kind: firm_set
+      status: not_established
+      governing_date: null
+      cross_check: null
+  statutory_categories: []
+  computed_markers: []

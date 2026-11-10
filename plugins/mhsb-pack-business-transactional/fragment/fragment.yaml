@@ -1,99 +1,87 @@
-# Fragment for business and transactional. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: business-transactional
-practice: business and transactional
+# Practice-area pack fragment: business and transactional (Catalog v2.1 Section 3.2).
+# Data only. Merged into the Firm Profile and overridden by the firm's answers.
+# Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Each deadline category is statutory, with a citation placeholder
+# that the adopting attorney confirms, or firm-set. Flags are attorney-review flags and
+# never decline. Sensitive fields are excluded from scoring.
+# Intake question ids match the AssemblyLine-derived blocks in intake-blocks.yaml.
+# Adoption: adoption.yaml (PENDING ADOPTION). Catalog tier ga; held at pilot in the
+# manifest until an attorney adoption is recorded (Stage 11).
+fragment_id: business_transactional
+practice_area: business_transactional
+version: 1.0.0
 release_tier: ga
-status: complete
-adoption:
-  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
-  date: '2026-11-03'
-  version: 0.1.0
-  synthetic: true
+adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
 intake_questions:
-- id: owners_percentages
-  prompt: Owners and ownership percentages
-  type: text
-- id: goals
-  prompt: Goals
-  type: text
-- id: state
-  prompt: State of formation or operation
-  type: choice
-- id: capital_debt
-  prompt: Capital and debt
-  type: text
-- id: regulated_profession
-  prompt: Regulated profession
-  type: boolean
-- id: client_identity
-  prompt: Who is the client
-  type: text
+- {id: client_identity, prompt: "Who the client is: the entity, a founder, or another person", answer_type: choice, choices: [entity, founder, other person, not yet decided], required: true, sensitive_tag: null}
+- {id: owners_percentages, prompt: "Owners and their stated ownership percentages", answer_type: text, required: true, sensitive_tag: null}
+- {id: goals, prompt: "What the owners want the engagement to achieve", answer_type: text, required: true, sensitive_tag: null}
+- {id: state, prompt: "State of formation or intended formation", answer_type: text, required: true, sensitive_tag: null}
+- {id: capital_debt, prompt: "Capital contributed and debt the business carries", answer_type: text, required: false, sensitive_tag: financial}
+- {id: regulated_profession, prompt: "Whether the business practises a licensed or regulated profession", answer_type: choice, choices: ["yes", "no", unknown], required: true, sensitive_tag: null}
 attorney_review_flags:
-- possible_conflict_across_founders
+- possible_conflict
 - outside_jurisdiction
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
 document_list:
-- formation filings
-- EIN
-- operating or shareholder agreements
-- prior minutes
-- contracts
+- {id: formation_filings, name: "Formation filings", required: true}
+- {id: ein_letter, name: "EIN confirmation", required: false}
+- {id: governing_agreements, name: "Operating or shareholder agreements", required: true}
+- {id: prior_minutes, name: "Prior minutes and consents", required: false}
+- {id: material_contracts, name: "Material contracts", required: false}
 stage_map:
-- inquiry
-- conflict check
-- engagement naming the entity
-- formation
-- governance documents
-- annual compliance
+- {fragment_stage: Inquiry, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Conflict check, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Engagement naming the entity, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Formation, canonical: stage_matter_10_open}
+- {fragment_stage: Governance documents, canonical: stage_matter_20_active}
+- {fragment_stage: Annual compliance, canonical: stage_matter_20_active}
 fee_model:
-  model: hybrid
-  notes: Flat for formation and standard documents; hourly, subscription or fractional-counsel retainers;
-    flat-fee items with budgeted hours.
+  types: [flat, hourly, subscription, fractional, hybrid]
+  notes: "Flat fees for formation and standard documents; hourly, subscription or fractional-counsel retainers; hybrid matters combine flat-fee items with budgeted hours."
 deadline_categories:
-- id: tax_elections
-  label: Tax elections
+- id: tax_election
+  name: "Tax elections"
   kind: statutory
-  citation: null
-  adopter: null
-- id: annual_reports_franchise_tax
-  label: Annual reports and franchise tax, by state
+  entered_date_governs: true
+  citation: "CITATION PENDING: tax election provision, to be confirmed and recorded by the adopting attorney; MHSB supplies no citation"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
+- id: annual_report_franchise_tax
+  name: "Annual reports and franchise tax, by state"
   kind: statutory
-  citation: null
-  adopter: null
-- id: annual_meetings
-  label: Annual meetings
+  entered_date_governs: true
+  citation: "CITATION PENDING: annual report and franchise tax provisions of the state of formation, to be confirmed and recorded by the adopting attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
+- id: annual_meeting
+  name: "Annual meetings"
   kind: firm_set
-- id: assumed_name_filings
-  label: Assumed-name filings
-  kind: firm_set
-- id: beneficial_ownership
-  label: Beneficial-ownership reporting where it applies
-  kind: statutory
+  entered_date_governs: true
   citation: null
   adopter: null
+- id: assumed_name_filing
+  name: "Assumed-name filings and renewals"
+  kind: firm_set
+  entered_date_governs: true
+  citation: null
+  adopter: null
+- id: beneficial_ownership_reporting
+  name: "Beneficial-ownership reporting, where it applies"
+  kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: beneficial-ownership reporting provision, if any applies to the entity, to be confirmed and recorded by the adopting attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 1.0.0}
 communication_templates:
-- engagement-letter
-- compliance-reminder
-- document-request
+- bt_engagement_letter
+- bt_compliance_reminder
+- bt_document_request
 consent_flags:
-- id: entity_as_client
-  label: Entity as client, explained to constituents
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
-sensitive_field_tags: []
-sensitive_field_semantics: excluded from any scoring
+- {id: entity_as_client, label: "Engagement letter names the entity as the client", evidence: [engagement_letter_clause, signed_form], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
+- {id: constituent_role_explained, label: "The firm's role explained to each constituent", evidence: [engagement_letter_clause, recorded_verbal], verifier_required: true, permitted_channels: [email, phone, letter], expiry_days: null, when_unknown: not_permitted}
+sensitive_field_tags:
+- {field: intake.capital_debt, tag: financial, excluded_from_scoring: true}
 brief_views:
-- entity_roster_next_compliance
-- budget_vs_actual
+- {id: entity_roster, name: "Entity roster with the next compliance item"}
+- {id: budget_vs_actual, name: "Budget versus actual"}
 reports:
 - timekeeper_hours
-- production
+- production_by_billing_method
 - flat_fee_budget_vs_actual

@@ -1,5 +1,5 @@
 ---
-template_id: workers-compensation.hearing-reminder
+template_id: wc_hearing_reminder
 title: Hearing reminder
 pack: mhsb-pack-workers-compensation
 adoption:

@@ -1,12 +1,11 @@
 ---
-template_id: personal-injury.contact-capture
+template_id: pi_contact_capture
 title: Contact capture
 pack: mhsb-pack-personal-injury
 adoption:
-  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
-  date: '2026-11-03'
-  version: 0.1.0
-  synthetic: true
+  adopted_by: PENDING ADOPTION
+  date: PENDING ADOPTION
+  version: PENDING ADOPTION
 ---
 
 # Contact capture

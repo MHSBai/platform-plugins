@@ -1,0 +1,45 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: civ-dates-01
+pack: mhsb-pack-civil-litigation
+skill: dates
+description: One statutory category (citation placeholder, counsel review) and one firm-set category;
+  the entered date governs and a disagreeing cross-check is listed, not resolved; an unmapped category
+  derives nothing.
+input:
+  as_of: '2026-11-03'
+  firm_tz: America/New_York
+  mapping:
+    answer_deadline: Answer Due
+    discovery_cutoff: Discovery Cutoff
+  record:
+    Answer Due:
+      value: '2026-11-24'
+      source: entered by staff from the notice
+      owner: paralegal
+    Discovery Cutoff:
+      value: '2027-05-01'
+      source: entered by the responsible attorney
+      owner: attorney
+  computed:
+    discovery_cutoff: '2027-04-30'
+expect:
+  rows:
+    answer_deadline:
+      kind: statutory
+      citation_status: pending adopter confirmation
+      counsel_review: true
+      status: established
+      governing_date: '2026-11-24'
+      disagreement: false
+    discovery_cutoff:
+      kind: firm_set
+      citation_status: not applicable
+      counsel_review: false
+      status: established
+      governing_date: '2027-05-01'
+      cross_check: '2027-04-30'
+      disagreement: true
+    appeal_window:
+      status: unmapped
+      governing_date: null

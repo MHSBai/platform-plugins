@@ -1,5 +1,5 @@
 ---
-template_id: civil-litigation.litigation-hold-notice
+template_id: civ_litigation_hold_notice
 title: Litigation hold notice
 pack: mhsb-pack-civil-litigation
 adoption:

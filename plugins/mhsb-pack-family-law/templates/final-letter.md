@@ -1,5 +1,5 @@
 ---
-template_id: family-law.final-letter
+template_id: fam_final_letter
 title: Final letter
 pack: mhsb-pack-family-law
 adoption:

@@ -1,5 +1,5 @@
 ---
-template_id: civil-litigation.monthly-statement-cover
+template_id: civ_monthly_statement_cover
 title: Monthly statement cover
 pack: mhsb-pack-civil-litigation
 adoption:

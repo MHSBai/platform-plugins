@@ -1,107 +1,83 @@
-# Fragment for landlord-tenant and consumer. Data only; merged into the Firm Profile and overridden by
-# the firm's answers. Statutory categories carry no citation here: the firm's attorney
-# records the citation and adopter at the adoption sitting. Synthetic content only.
-schema_version: 0.1.0
-schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
-fragment_id: landlord-tenant-consumer
-practice: landlord-tenant and consumer
+# Practice-area pack fragment: landlord-tenant and consumer (Catalog v2.1 Section 3.12).
+# HIDDEN DRAFT. Not for use by any firm until an attorney in the practice co-designs it;
+# see CO-DESIGN.md.
+# Data only. Shape: the Stage 3 fragment schema (tools/schemas/fragment.schema.json).
+# No legal conclusions. Eviction answer windows and consumer suit and dispute windows are
+# statutory by state and never firm-set; each carries a citation placeholder. Flags are
+# attorney-review flags and never decline. Sensitive fields are excluded from scoring.
+# Adoption: adoption.yaml (NOT ADOPTED). Tier hidden.
+fragment_id: landlord_tenant_consumer
+practice_area: landlord_tenant_consumer
+version: 0.1.0
 release_tier: hidden
-status: hidden draft
-adoption:
-  adopted_by: NOT ADOPTED
-  date: NOT ADOPTED
-  version: NOT ADOPTED
+adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
 intake_questions:
-- id: side
-  prompt: Side
-  type: choice
-- id: property
-  prompt: Property
-  type: text
-- id: lease
-  prompt: Lease
-  type: text
-- id: notices_dates
-  prompt: Notices and dates
-  type: text
-- id: rent_ledger
-  prompt: Rent ledger
-  type: text
-- id: answer_hearing_date
-  prompt: Answer or hearing date
-  type: date
-- id: habitability
-  prompt: Habitability
-  type: text
-- id: subsidy_status
-  prompt: Subsidy status
-  type: text
-- id: consumer_collector
-  prompt: 'Consumer matters: collector, debt, dates, validation notice'
-  type: text
+- {id: side, prompt: "Which side the person is on", answer_type: choice, choices: [tenant, landlord, consumer, other], required: true, sensitive_tag: null}
+- {id: property, prompt: "Property address", answer_type: address, required: false, sensitive_tag: null}
+- {id: lease, prompt: "Whether a written lease exists", answer_type: choice, choices: ["yes", "no", unknown], required: false, sensitive_tag: null}
+- {id: notices_dates, prompt: "Notices received or served, each with its date", answer_type: text, required: false, sensitive_tag: null}
+- {id: rent_ledger, prompt: "Rent ledger or amounts claimed", answer_type: text, required: false, sensitive_tag: financial}
+- {id: answer_hearing_date, prompt: "Answer or hearing date, as written on the court papers", answer_type: date, required: false, sensitive_tag: null}
+- {id: habitability, prompt: "Habitability conditions, in the person's words", answer_type: text, required: false, sensitive_tag: null}
+- {id: subsidy_status, prompt: "Whether the tenancy is subsidized", answer_type: choice, choices: ["yes", "no", unknown], required: false, sensitive_tag: financial}
+- {id: collector, prompt: "Collector or creditor named", answer_type: text, required: false, sensitive_tag: null}
+- {id: debt, prompt: "Debt claimed", answer_type: currency, required: false, sensitive_tag: financial}
+- {id: debt_dates, prompt: "Dates of the debt and of collection contacts", answer_type: text, required: false, sensitive_tag: null}
+- {id: validation_notice, prompt: "Whether a validation notice was received, and its date", answer_type: text, required: false, sensitive_tag: null}
 attorney_review_flags:
 - answer_deadline_question
-- conflict_recurring_landlord_clients
+- conflict_match
 - fee_shifting_question
-attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
 document_list:
-- lease
-- notices
-- ledger
-- texts
-- photos
-- court papers
-- collection letters
-- call logs
-- voicemails
-- credit reports
+- {id: lease, name: "Lease", required: false}
+- {id: notices, name: "Notices", required: true}
+- {id: ledger, name: "Rent ledger", required: false}
+- {id: texts_photos, name: "Texts and photographs", required: false}
+- {id: court_papers, name: "Court papers", required: true}
+- {id: collection_letters, name: "Collection letters", required: false}
+- {id: call_logs_voicemails, name: "Call logs and voicemails", required: false}
+- {id: credit_reports, name: "Credit reports", required: false}
 stage_map:
-- urgent inquiry
-- same-day screen
-- limited-scope or flat-fee agreement
-- answer or filing
-- hearing or mediation
-- judgment or stipulation
-- close
+- {fragment_stage: Urgent inquiry, canonical: stage_intake_01_new_lead}
+- {fragment_stage: Same-day screen, canonical: stage_intake_04_consult_completed}
+- {fragment_stage: Limited-scope or flat-fee agreement, canonical: stage_intake_05_retainer_sent}
+- {fragment_stage: Answer or filing, canonical: stage_matter_10_open}
+- {fragment_stage: Hearing or mediation, canonical: stage_matter_20_active}
+- {fragment_stage: Judgment or stipulation, canonical: stage_matter_30_resolution}
+- {fragment_stage: Close, canonical: stage_matter_40_closing}
 fee_model:
-  model: flat
-  notes: Flat per stage; limited scope; fee shifting where available.
+  types: [flat]
+  notes: "Flat fee per stage; limited-scope agreements; fee shifting where the co-designing attorney confirms it is available."
 deadline_categories:
-- id: eviction_answer_windows
-  label: Eviction answer windows, by state
+- id: eviction_answer_window
+  name: "Eviction answer windows, by state"
   kind: statutory
-  citation: null
-  adopter: null
-- id: consumer_suit_dispute_windows
-  label: Consumer suit and dispute windows, by state
+  entered_date_governs: true
+  citation: "CITATION PENDING: eviction answer provision of the state, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
+- id: consumer_suit_window
+  name: "Consumer suit windows"
   kind: statutory
-  citation: null
-  adopter: null
+  entered_date_governs: true
+  citation: "CITATION PENDING: consumer suit provisions, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
+- id: consumer_dispute_window
+  name: "Consumer dispute windows"
+  kind: statutory
+  entered_date_governs: true
+  citation: "CITATION PENDING: consumer dispute provisions, to be confirmed and recorded by the co-designing attorney"
+  adopter: {adopted_by: null, adopted_on: null, version: 0.1.0}
 communication_templates:
-- hearing-reminder
-- document-checklist
-- limited-scope-disclosure
-- closing-letter
+- ltc_hearing_reminder
+- ltc_document_checklist
+- ltc_limited_scope_disclosure
+- ltc_closing_letter
 consent_flags:
-- id: limited_scope_signed
-  label: Limited scope in the signed agreement
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-- id: tribunal_disclosure
-  label: Tribunal disclosure rules
-  evidence: null
-  verifier: null
-  permitted_channels: []
-  expiry: null
-  default: unknown
-consent_flags_semantics: unknown is never permitted
-phi_flag_default: false
+- {id: limited_scope_in_agreement, label: "Limited scope stated in the signed agreement", evidence: [signed_form], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
+- {id: tribunal_disclosure, label: "Tribunal disclosure of limited-scope representation, as the forum requires", evidence: [engagement_letter_clause, platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- subsidy_status
-- credit
-sensitive_field_semantics: excluded from any scoring
+- {field: intake.rent_ledger, tag: financial, excluded_from_scoring: true}
+- {field: intake.subsidy_status, tag: financial, excluded_from_scoring: true}
+- {field: intake.debt, tag: financial, excluded_from_scoring: true}
 brief_views: []
 reports: []

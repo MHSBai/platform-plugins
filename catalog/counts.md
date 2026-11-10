@@ -22,8 +22,8 @@ Lint cap: 24. Design figure: 22.
 | mhsb-lawmatics | platform | pilot | 2 |
 | mhsb-clio | platform | pilot | 3 |
 | mhsb-mycase | platform | ga | 0 |
-| mhsb-pack-personal-injury | practice | ga | 0 |
-| mhsb-pack-business-transactional | practice | ga | 0 |
+| mhsb-pack-personal-injury | practice | pilot | 0 |
+| mhsb-pack-business-transactional | practice | pilot | 0 |
 | mhsb-pack-estate-probate | practice | pilot | 0 |
 | mhsb-pack-criminal-defense | practice | pilot | 0 |
 | mhsb-pack-civil-litigation | practice | pilot | 0 |

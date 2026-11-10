@@ -1,5 +1,5 @@
 ---
-template_id: estate-probate.engagement-receipt
+template_id: ep_engagement_receipt
 title: Engagement receipt
 pack: mhsb-pack-estate-probate
 adoption:

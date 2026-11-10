@@ -208,9 +208,12 @@ def catalog_markdown(manifest: Manifest) -> str:
             triggers = "; ".join(f"\"{t}\"" for t in c.triggers)
             lines.append(f"| /{c.name} | {c.register} | {c.connector} | {c.promise} | {triggers} |")
         lines.append("")
-    lines += ["## Practice packs", "", "| Pack | Practice | Tier |", "|---|---|---|"]
+    lines += ["## Practice packs", "",
+              "A pack whose catalog tier is ga and whose tier is pilot is held unlisted until an attorney "
+              "adoption is recorded (decision 0004).", "",
+              "| Pack | Practice | Tier | Catalog tier |", "|---|---|---|---|"]
     for p in manifest.by_kind("practice"):
-        lines.append(f"| {p.name} | {p.practice} | {p.tier} |")
+        lines.append(f"| {p.name} | {p.practice} | {p.tier} | {p.fragment_tier} |")
     lines += ["", "## Supported combinations", ""]
     for rule in manifest.raw["combinations"]:
         lines.append(f"* `{rule['id']}`: {' '.join(str(rule['description']).split())}")

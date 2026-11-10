@@ -1,5 +1,5 @@
 ---
-template_id: real-estate.closing-document-request
+template_id: re_closing_document_request
 title: Closing document request
 pack: mhsb-pack-real-estate
 adoption:

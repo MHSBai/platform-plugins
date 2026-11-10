@@ -1,5 +1,5 @@
 ---
-template_id: estate-probate.closing-letter
+template_id: ep_closing_letter
 title: Closing letter
 pack: mhsb-pack-estate-probate
 adoption:

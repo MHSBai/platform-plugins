@@ -1,0 +1,25 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: re-brief-01
+pack: mhsb-pack-real-estate
+skill: brief
+description: Contingency dates view.
+input:
+  view: contingency_dates
+  anchor_field: Contingency Date
+  as_of: '2026-11-03'
+  matters:
+  - id: SYN-RE-1
+    fields:
+      Contingency Date: '2026-11-10'
+  - id: SYN-RE-2
+    fields: {}
+expect:
+  rows:
+  - matter: SYN-RE-1
+    Contingency Date: '2026-11-10'
+    days: -7
+  data_gaps:
+  - SYN-RE-2
+  coverage: 'coverage: 1 of 2 matters retrieved for Contingency dates; 1 not retrieved because Contingency
+    Date is empty'

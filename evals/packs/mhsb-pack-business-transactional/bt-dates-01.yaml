@@ -1,0 +1,44 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: bt-dates-01
+pack: mhsb-pack-business-transactional
+skill: dates
+description: One statutory category (citation placeholder, counsel review) and one firm-set category;
+  the entered date governs and a disagreeing cross-check is listed, not resolved; an unmapped category
+  derives nothing.
+input:
+  as_of: '2026-11-03'
+  firm_tz: America/New_York
+  mapping:
+    annual_report_franchise_tax: Annual Report Due
+    annual_meeting: Annual Meeting Date
+  record:
+    Annual Report Due:
+      value: '2027-04-15'
+      source: entered by staff from the notice
+      owner: paralegal
+    Annual Meeting Date:
+      value: '2027-03-01'
+      source: entered by the responsible attorney
+      owner: attorney
+  computed: {}
+expect:
+  rows:
+    annual_report_franchise_tax:
+      kind: statutory
+      citation_status: pending adopter confirmation
+      counsel_review: true
+      status: established
+      governing_date: '2027-04-15'
+      disagreement: false
+    annual_meeting:
+      kind: firm_set
+      citation_status: not applicable
+      counsel_review: false
+      status: established
+      governing_date: '2027-03-01'
+      cross_check: null
+      disagreement: false
+    tax_election:
+      status: unmapped
+      governing_date: null

@@ -1,5 +1,5 @@
 ---
-template_id: estate-probate.signing-logistics
+template_id: ep_signing_logistics
 title: Signing logistics
 pack: mhsb-pack-estate-probate
 adoption:

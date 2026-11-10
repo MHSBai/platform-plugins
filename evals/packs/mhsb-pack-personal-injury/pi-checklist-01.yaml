@@ -1,0 +1,25 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: pi-checklist-01
+pack: mhsb-pack-personal-injury
+skill: checklist
+description: 'Documents present versus the fragment''s list: required items missing are listed and readiness
+  is false.'
+input:
+  documents_present:
+  - incident_report
+  - photos
+  - insurance_declarations
+expect:
+  present:
+  - incident_report
+  - insurance_declarations
+  - photos
+  missing_required:
+  - provider_list_bills
+  - records_authorization
+  missing_optional:
+  - property_damage_estimates
+  - wage_loss_proof
+  not_in_list: []
+  ready: false

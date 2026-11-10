@@ -97,6 +97,11 @@ connector_edge:
 # draft until an attorney in the practice co-designs it.
 tiers: [ga, pilot, hidden]
 
+# catalog_tier, optional on a practice pack: the tier Catalog v2.1 assigns when it
+# differs from the release tier above. Only ga held at pilot is permitted: the pack
+# ships unlisted, its fragment keeps release_tier ga, and its adoption record reads
+# PENDING ADOPTION until an attorney adoption is recorded (Stage 11, decision 0004).
+
 # Installation combinations. The generator enumerates every combination these
 # rules produce and the lint checks each one.
 combinations:
@@ -396,7 +401,8 @@ plugins:
 
   - name: mhsb-pack-personal-injury
     kind: practice
-    tier: ga
+    tier: pilot
+    catalog_tier: ga
     license: source_available
     category: practice-area
     mcp: null
@@ -408,7 +414,8 @@ plugins:
     commands: []
   - name: mhsb-pack-business-transactional
     kind: practice
-    tier: ga
+    tier: pilot
+    catalog_tier: ga
     license: source_available
     category: practice-area
     mcp: null

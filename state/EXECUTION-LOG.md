@@ -317,3 +317,124 @@ license_gate.py --clones   clones present and re-hashed: 0 of 17; 0 failure(s) (
 license_gate.py --upstream upstream LICENSE files compared: 17; 0 failure(s)
 lint.py                    16 rules, 0 error(s), 12 warning(s)
 ```
+
+## PP-9, Stage 9: twelve pack fragments and pack evals
+
+### Step 0. Resume check and base (2026-11-03)
+
+Command: `git fetch origin --prune; git branch -r`; pull requests listed through the GitHub tools.
+
+Output: platform-plugins `main` holds only `080d165`; Stage 1 (MHSBai/platform-plugins#1, `cloud/pp1-repository-marketplace`) and Stage 2 (MHSBai/platform-plugins#2, `cloud/pp2-harvest`) are open and unmerged. No PP-9 entry existed in this log. Branch `cloud/pp9-pack-fragments` was created from `cloud/pp2-harvest` (head b6832e9), the most recent open `cloud/pp*` branch. The session harness named `roo/inspiring-cannon-bz57zy`; the task's branch name was used, as in Stages 1 to 3.
+
+Stage 3 gate: mhsb-firm-service `main` has no schema; the open Stage 3 branch `cloud/pp3-firm-profile-v2` (head bfcddee, MHSBai/mhsb-firm-service#1) holds `firm_profile/schemas/fragment.schema.json`. The prompt names `schemas/fragment.schema.json`; the file exists under `firm_profile/schemas/`, so the gate "Stage 3 missing" did not trigger. Recorded in decision 0004.
+
+### Step 1. Reading
+
+Design v2.1 Sections 4, 5, 7; Catalog v2.1 Sections 2, 3 and 7; the fragment schema; the Stage 3 report registry and cross rules (`firm_profile/catalog.py`, `rules.py`); the seven element checklists; the canonical dictionary (stage identifiers); the Lawmatics Product Catalog (PI, EP, CRIM, IMM and BK pipeline stage names). Catalog 7 lists "the per-platform date-field inventory (a gate on Stage 9)"; no inventory exists in either repository. The fragments name date categories only and map no platform field; the eval cases supply a synthetic mapping. Recorded in HANDOFF.md as an open item, not treated as a stop because the prompt sets no gate on it.
+
+### Step 2. Fragments (checkpoint: twelve fragments validate)
+
+Twelve `fragment/fragment.yaml` files rewritten to the Stage 3 schema; twelve `fragment/adoption.yaml` records; template identifiers renamed to the schema pattern; PI and business templates moved from synthetic records to `PENDING ADOPTION`; AssemblyLine intake blocks (PI, civil, business) keep their 4(b) headers and map one-to-one onto the fragment question ids. Six `CO-DESIGN.md` files on the hidden packs. Manifest: PI and business at `tier: pilot`, `catalog_tier: ga` (decision 0004). Schema vendored as `tools/schemas/fragment.schema.json` (SHA-256 9d537e09...ff2ac, identical to the service copy).
+
+Command: `python tools/validate_fragments_service.py --service ../mhsb-firm-service` (service at bfcddee)
+
+```
+PASS schema, rules PASS: plugins/mhsb-pack-bankruptcy-consumer/fragment/fragment.yaml
+PASS schema, rules HELD (XR-GA-ADOPTION, XR-STATUTORY): plugins/mhsb-pack-business-transactional/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-civil-litigation/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-criminal-defense/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-employment-plaintiff/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-estate-probate/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-family-law/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-immigration/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-landlord-tenant-consumer/fragment/fragment.yaml
+PASS schema, rules HELD (XR-GA-ADOPTION, XR-STATUTORY): plugins/mhsb-pack-personal-injury/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-real-estate/fragment/fragment.yaml
+PASS schema, rules PASS: plugins/mhsb-pack-workers-compensation/fragment/fragment.yaml
+fragments: 12, schema and rule failures: 0
+```
+
+HELD: the two GA fragments carry no adopter, so the Stage 3 cross rules `XR-GA-ADOPTION` and `XR-STATUTORY` fire as designed until Stage 11 records an adoption. Schema validation passes for all twelve.
+
+### Step 3. Pack evals (checkpoint: GA and pilot evals green)
+
+`evals/packs/`: 4 cases for each of the 6 GA and pilot fragments (dates with a statutory and a firm-set category, intake-triage with sensitive-variant re-scoring, checklist, brief pack view), one extra PI dates case, and 3 family law outreach-gate cases. Criminal defense and real estate have no statutory category in the Catalog; their dates cases assert its absence (decision 0004).
+
+Command: `python tools/pack_evals.py`
+
+```
+pack evals: 28 cases, 28 passed, 0 failed
+```
+
+### Step 4. Checkpoint run
+
+```
+$ python tools/validate_fragments_service.py --service ../mhsb-firm-service
+fragments: 12, schema and rule failures: 0
+exit 0
+$ python tools/pack_evals.py | tail -1
+pack evals: 28 cases, 28 passed, 0 failed
+exit 0
+$ ls plugins/mhsb-pack-*/CO-DESIGN.md | wc -l
+6
+$ python tools/gen_manifest.py --check
+generated files current
+exit 0
+$ diff <(git show HEAD:catalog/counts.md | sed -n 1,17p) <(sed -n 1,17p catalog/counts.md)
+combination counts table unchanged
+$ python tools/gen_manifest.py --counts | sed -n 7,16p
+| Combination | Platform | Variants | Breakdown | Commands (min) | Commands (max) |
+|---|---|---|---|---|---|
+| core-only | none | 1 | 8 | 8 | 8 |
+| connected | mhsb-lawmatics | 298 | 8 + 11 + 2 + 0 | 21 | 21 |
+| connected | mhsb-clio | 298 | 8 + 11 + 3 + 0 | 22 | 22 |
+| connected | mhsb-mycase | 298 | 8 + 11 + 0 + 0 | 19 | 19 |
+
+Supported combinations enumerated: 895.
+Maximum commands in any combination: 22.
+Lint cap: 24. Design figure: 22.
+$ python tools/lint.py | tail -1
+lint: 15 rules, 0 error(s), 0 warning(s)
+exit 0
+$ python tools/lint.py --release | tail -1
+lint: 15 rules, 0 error(s), 0 warning(s)
+$ python tools/license_gate.py
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ python -m pytest -q | tail -1
+97 passed in 64.77s (0:01:04)
+$ grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv . | wc -l
+identifiers: 17
+hits (case-insensitive, word): 0
+hits (MAN, RW case-sensitive, word): 0
+$ dash check U+2014 U+2013 U+2012 in changed and new files
+0
+```
+
+Marketplace load check, rerun because the listing lost the two held packs: `bash tools/verify_marketplace.sh` passed `claude plugin validate . --strict`, installed the five listed plugins in a throwaway configuration, and refused the hidden family law pack.
+
+The plugin tier rows of `catalog/counts.md` changed for the two held packs (ga to pilot); the combination counts table above it is unchanged.
+
+### Step 5. Review XREVIEW-PP-STACK-A findings PP3-L1 and PP3-L2 (2026-11-10)
+
+PP3-L1: `tools/schemas/fragment.schema.source.json` records the source commit and sha256 of the vendored schema; L15 now fails on a hash difference (test `test_l15_vendored_schema_hash_drift`). Re-vendoring from the merged Stage 3 commit waits for that pull request; HANDOFF.md PP-9 item 8.
+
+PP3-L2: `tools/verify_marketplace.sh` now attempts to install every manifest plugin whose tier is not ga and fails if any installs.
+
+```
+$ bash tools/verify_marketplace.sh
+Validation passed
+OK: 12 of 12 non-ga packs are not installable from the marketplace (personal injury, business and transactional, estate planning and probate, criminal defense, civil litigation, real estate, family law, immigration, employment plaintiff, bankruptcy consumer, workers' compensation, landlord-tenant and consumer)
+exit 0
+$ python -m pytest -q
+98 passed
+$ python tools/lint.py
+lint: 15 rules, 0 error(s), 0 warning(s)
+$ python tools/pack_evals.py
+pack evals: 28 cases, 28 passed, 0 failed
+$ python tools/validate_fragments_service.py --service ../mhsb-firm-service
+fragments: 12, schema and rule failures: 0
+```
+
+### Step 6. Fix session FIX-PP-STACK-A, 2026-11-10 (PP3-L1 and PP3-L2 verified; fixes from Stages 1 and 2 merged)
+
+`cloud/pp2-harvest`, carrying the PP1 and PP2 fixes, was merged into this branch. In the `tools/verify_marketplace.sh` conflict the Stage 1 loop was kept: it covers every plugin whose tier is not ga (the three connector plugins, the two held packs, the four pilot packs and the six hidden packs) and requires the exact "not found in marketplace" refusal (PP3-L2). The 919c3a9 loop required only a failed install. PP3-L1: the vendored schema hash `9d537e09...` equals the file at service commit `bfcddee`; L15 compares it with `tools/schemas/fragment.schema.source.json`. The Stage 3 pull request in the service repository is still open on 2026-11-10, so re-vendoring stays in HANDOFF (PP-9 item 8).

@@ -1,5 +1,5 @@
 ---
-template_id: family-law.urgent-routing
+template_id: fam_urgent_routing
 title: Urgent routing
 pack: mhsb-pack-family-law
 adoption:

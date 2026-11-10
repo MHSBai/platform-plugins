@@ -1,0 +1,11 @@
+# Repository adoption record for the estate planning probate fragment (lint rule L11).
+# The fragment schema records an absent adoption as null; this file carries the literal
+# placeholder that the lint permits for the pack's tier. An attorney adoption replaces all
+# three values with the adopter's name, the date (YYYY-MM-DD) and the fragment version, and
+# the same values are written into fragment.yaml adoption at that sitting.
+# Tier pilot. The fragment keeps its adoption fields null until an attorney adopts it.
+fragment_id: estate_planning_probate
+fragment_version: 1.0.0
+adopted_by: NOT ADOPTED
+date: NOT ADOPTED
+version: NOT ADOPTED

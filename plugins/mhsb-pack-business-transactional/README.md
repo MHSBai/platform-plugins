@@ -2,15 +2,13 @@
 
 Business and transactional practice fragment: intake questions, attorney-review flags, document list, stage map, deadline categories, template references and report entries. Data only; adds no commands.
 
-Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
+Release tier: pilot, held from general availability (catalog tier ga) until an attorney adoption is recorded; see `fragment/adoption.yaml` and docs/decisions/0004. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
 
 Contains no commands. The fragment in `fragment/fragment.yaml` is merged into the Firm Profile and is overridden by the firm's own answers. Templates in `templates/` carry adoption records; the generator fills variables only.
 
 ## Installation
 
-/plugin install mhsb-pack-business-transactional --marketplace MHSBai/platform-plugins
-
-From a shell, after `claude plugin marketplace add MHSBai/platform-plugins#<tag>`: `claude plugin install mhsb-pack-business-transactional@mhsb-platform-plugins`.
+This plugin is not listed in the marketplace while it is held at pilot. MHSB installs it for a named firm; it returns to the listing when the adoption record names the attorney adopter (Stage 11).
 
 ## Scope
 

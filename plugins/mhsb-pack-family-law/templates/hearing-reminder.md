@@ -1,5 +1,5 @@
 ---
-template_id: family-law.hearing-reminder
+template_id: fam_hearing_reminder
 title: Hearing reminder
 pack: mhsb-pack-family-law
 adoption:

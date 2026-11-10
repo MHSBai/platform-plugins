@@ -1,5 +1,5 @@
 ---
-template_id: civil-litigation.event-update
+template_id: civ_event_update
 title: Update after a key event
 pack: mhsb-pack-civil-litigation
 adoption:

@@ -1,12 +1,11 @@
 ---
-template_id: personal-injury.treatment-check-in
+template_id: pi_treatment_check_in
 title: Treatment check-in
 pack: mhsb-pack-personal-injury
 adoption:
-  adopted_by: Synthetic Adopter (fixture, not an attorney adoption)
-  date: '2026-11-03'
-  version: 0.1.0
-  synthetic: true
+  adopted_by: PENDING ADOPTION
+  date: PENDING ADOPTION
+  version: PENDING ADOPTION
 ---
 
 # Treatment check-in

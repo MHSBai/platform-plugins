@@ -1,0 +1,26 @@
+# Pack eval case (Stage 9). Synthetic data only: no client, firm or matter is real.
+# Run: python tools/pack_evals.py. Expected values are stated by hand.
+id: crim-brief-01
+pack: mhsb-pack-criminal-defense
+skill: brief
+description: Next court dates view; a matter without a court date is a data gap.
+input:
+  view: next_court_dates
+  anchor_field: Court Date
+  as_of: '2026-11-03'
+  matters:
+  - id: SYN-CR-1
+    fields:
+      Court Date: '2026-11-04'
+  - id: SYN-CR-2
+    fields:
+      Court Date: ''
+expect:
+  rows:
+  - matter: SYN-CR-1
+    Court Date: '2026-11-04'
+    days: -1
+  data_gaps:
+  - SYN-CR-2
+  coverage: 'coverage: 1 of 2 matters retrieved for Next court dates; 1 not retrieved because Court Date
+    is empty'

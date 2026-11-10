@@ -1,0 +1,549 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mhsbsolutions.com/firm-profile/2.0.0/fragment.schema.json",
+  "title": "MHSB practice-area pack fragment",
+  "description": "Data merged into a Firm Profile and overridden by the firm's answers (Catalog v2.1 Section 3). Attorney-review flags never decline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fragment_id",
+    "practice_area",
+    "version",
+    "release_tier",
+    "adoption",
+    "intake_questions",
+    "attorney_review_flags",
+    "document_list",
+    "stage_map",
+    "fee_model",
+    "deadline_categories",
+    "communication_templates",
+    "consent_flags",
+    "sensitive_field_tags",
+    "brief_views",
+    "reports"
+  ],
+  "properties": {
+    "fragment_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "practice_area": {
+      "enum": [
+        "personal_injury",
+        "business_transactional",
+        "estate_planning_probate",
+        "criminal_defense",
+        "civil_litigation",
+        "real_estate",
+        "family_law",
+        "immigration",
+        "employment_plaintiff",
+        "bankruptcy_consumer",
+        "workers_compensation",
+        "landlord_tenant_consumer"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "release_tier": {
+      "enum": [
+        "ga",
+        "pilot",
+        "hidden"
+      ]
+    },
+    "adoption": {
+      "$ref": "#/$defs/adoption"
+    },
+    "intake_questions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/question"
+      },
+      "minItems": 1
+    },
+    "attorney_review_flags": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "possible_limitation_issue",
+          "outside_case_types",
+          "liability_or_evidence_question",
+          "conflict_match",
+          "possible_conflict",
+          "prior_counsel_of_record",
+          "outside_service_area",
+          "outside_jurisdiction",
+          "collectability_question",
+          "dual_representation_question",
+          "agency_deadline_question",
+          "employer_threshold_question",
+          "prior_filing_question",
+          "notice_or_claim_deadline_question",
+          "answer_deadline_question",
+          "fee_shifting_question",
+          "eligibility_question"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "document_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "required"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "stage_map": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fragment_stage": {
+            "type": "string",
+            "minLength": 1
+          },
+          "canonical": {
+            "enum": [
+              "stage_intake_01_new_lead",
+              "stage_intake_02_contact_attempted",
+              "stage_intake_03_consult_scheduled",
+              "stage_intake_04_consult_completed",
+              "stage_intake_05_retainer_sent",
+              "stage_intake_06_retained",
+              "stage_intake_90_nurture",
+              "stage_intake_99_closed",
+              "stage_matter_10_open",
+              "stage_matter_20_active",
+              "stage_matter_30_resolution",
+              "stage_matter_40_closing",
+              "stage_matter_99_closed"
+            ]
+          }
+        },
+        "required": [
+          "fragment_stage",
+          "canonical"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "fee_model": {
+      "type": "object",
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "contingency",
+              "flat",
+              "hourly",
+              "subscription",
+              "fractional",
+              "hybrid"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "types",
+        "notes"
+      ],
+      "additionalProperties": false
+    },
+    "deadline_categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "statutory",
+              "firm_set"
+            ]
+          },
+          "entered_date_governs": {
+            "const": true
+          },
+          "citation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "adopter": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/adoption"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "entered_date_governs",
+          "citation",
+          "adopter"
+        ],
+        "additionalProperties": false,
+        "if": {
+          "properties": {
+            "kind": {
+              "const": "statutory"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "citation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "adopter": {
+              "$ref": "#/$defs/adoption"
+            }
+          }
+        }
+      }
+    },
+    "communication_templates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "uniqueItems": true
+    },
+    "consent_flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "signed_form",
+                "engagement_letter_clause",
+                "recorded_verbal",
+                "platform_field"
+              ]
+            },
+            "minItems": 1
+          },
+          "verifier_required": {
+            "const": true
+          },
+          "permitted_channels": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "email",
+                "sms",
+                "phone",
+                "portal",
+                "letter"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "expiry_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "when_unknown": {
+            "const": "not_permitted"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "evidence",
+          "verifier_required",
+          "permitted_channels",
+          "expiry_days",
+          "when_unknown"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "sensitive_field_tags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tag": {
+            "$ref": "#/$defs/sensitive_tag"
+          },
+          "excluded_from_scoring": {
+            "const": true
+          }
+        },
+        "required": [
+          "field",
+          "tag",
+          "excluded_from_scoring"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "brief_views": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "reports": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "caseload",
+          "days_in_stage",
+          "flat_fee_budget_vs_actual",
+          "follow_up_sla",
+          "incident_aging",
+          "intake_source",
+          "intake_summary",
+          "kpi_pack",
+          "missing_data",
+          "opened_closed",
+          "production_by_billing_method",
+          "questionnaire_completion",
+          "settlements",
+          "signed_vs_sent",
+          "sol_tracker",
+          "timekeeper_hours",
+          "treatment_status"
+        ]
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "adoption": {
+      "type": "object",
+      "properties": {
+        "adopted_by": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "adopted_on": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      },
+      "required": [
+        "adopted_by",
+        "adopted_on",
+        "version"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "adopted_by": {
+            "type": "string"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "adopted_on": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "answer_type": {
+          "enum": [
+            "text",
+            "date",
+            "number",
+            "boolean",
+            "choice",
+            "multi_choice",
+            "currency",
+            "person",
+            "address"
+          ]
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "sensitive_tag": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sensitive_tag"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "answer_type",
+        "required",
+        "sensitive_tag"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "answer_type": {
+            "enum": [
+              "choice",
+              "multi_choice"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "choices"
+        ],
+        "properties": {
+          "choices": {
+            "minItems": 2
+          }
+        }
+      }
+    },
+    "sensitive_tag": {
+      "enum": [
+        "health",
+        "treatment",
+        "insurance_limits",
+        "citizenship",
+        "immigration_status",
+        "prior_record",
+        "criminal_history",
+        "national_origin",
+        "protected_class",
+        "financial"
+      ]
+    }
+  }
+}

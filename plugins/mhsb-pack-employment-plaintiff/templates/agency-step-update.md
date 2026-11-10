@@ -1,5 +1,5 @@
 ---
-template_id: employment-plaintiff.agency-step-update
+template_id: emp_agency_step_update
 title: Agency-step update
 pack: mhsb-pack-employment-plaintiff
 adoption:
