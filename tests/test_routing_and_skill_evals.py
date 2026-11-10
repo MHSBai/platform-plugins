@@ -231,3 +231,37 @@ def test_budget_above_cap_is_clamped(repo: Path, monkeypatch: pytest.MonkeyPatch
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     assert model_evals.main(["--root", str(repo), "--budget", "100", "--no-log"]) == 0
     assert "clamped" in capsys.readouterr().out
+
+
+# --------------------------------------------------------------------------- routing reads descriptions (PP4-M1)
+
+
+def _add_quoted_phrase(repo: Path, plugin: str, skill: str, phrase: str) -> None:
+    path = repo / "plugins" / plugin / "skills" / skill / "SKILL.md"
+    text = path.read_text(encoding="utf-8")
+    marker = "Use when a user asks, for example: "
+    assert marker in text
+    path.write_text(text.replace(marker, f'{marker}"{phrase}"; ', 1), encoding="utf-8")
+
+
+def test_routing_reads_the_description_not_metadata(repo: Path) -> None:
+    # A phrase quoted in the /dates description that also occurs in a /brief routing
+    # phrase makes routing ambiguous, although no manifest trigger changed.
+    _add_quoted_phrase(repo, "mhsb-operations", "dates", "anything")
+    assert routing_check.run(repo) == 1
+
+
+def test_manifest_trigger_absent_from_description_fails(repo: Path) -> None:
+    path = repo / "catalog" / "manifest.yaml"
+    text = path.read_text(encoding="utf-8")
+    text = text.replace("          - court dates\n", "          - court dates\n          - calendar rules\n", 1)
+    path.write_text(text, encoding="utf-8")
+    manifest = routing_check.load_manifest(repo)
+    missing = routing_check.missing_triggers(manifest, routing_check.description_phrases(repo, manifest))
+    assert missing == ["MISSING mhsb-operations:dates trigger 'calendar rules' is not quoted in the description"]
+    assert routing_check.run(repo) == 1
+
+
+def test_every_manifest_trigger_is_quoted_in_its_description() -> None:
+    manifest = routing_check.load_manifest(ROOT)
+    assert routing_check.missing_triggers(manifest, routing_check.description_phrases(ROOT, manifest)) == []

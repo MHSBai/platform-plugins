@@ -559,3 +559,22 @@ def test_l17_altered_plugin_license_copy(repo: Path) -> None:
 def test_l17_missing_notice_excerpt(repo: Path) -> None:
     (repo / "plugins/mhsb-pack-civil-litigation/NOTICE.md").unlink(missing_ok=True)
     assert "L17" in rules_failed(repo)
+
+
+# --------------------------------------------------------------------- L03 triggers in descriptions (PP4-M1)
+
+
+def test_l03_description_must_quote_each_trigger(repo: Path) -> None:
+    path = skill(repo, "mhsb-clio", "production")
+    text = path.read_text(encoding="utf-8")
+    assert '"how much did we bill"' in text
+    path.write_text(text.replace('"how much did we bill"', '"how much was billed"', 1), encoding="utf-8")
+    assert "L03" in rules_failed(repo)
+
+
+def test_l03_metadata_triggers_rejected(repo: Path) -> None:
+    path = skill(repo, "mhsb-clio", "production")
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace("metadata:\n", "metadata:\n  triggers:\n  - how much did we bill\n", 1),
+                    encoding="utf-8")
+    assert "L03" in rules_failed(repo)

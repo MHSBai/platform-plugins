@@ -76,7 +76,7 @@ EMOJI_RE = re.compile(
 FK_LIMITS = {"operational": 9.0, "document": 12.0}
 
 ALLOWED_SKILL_KEYS = {"name", "description", "metadata", "license", "compatibility", "allowed-tools"}
-REQUIRED_SKILL_METADATA = ("register", "connector", "pack", "triggers")
+REQUIRED_SKILL_METADATA = ("register", "connector", "pack")
 
 FORBIDDEN_PLUGIN_PATHS = ("hooks", "agents", "bin", "commands", "monitors", "output-styles",
                           "themes", "workflows", ".lsp.json", "settings.json", "CLAUDE.md")
@@ -389,8 +389,13 @@ def rule_skill_frontmatter(ctx: Context) -> list[Finding]:
             findings.append(Finding("L03", rel, "metadata.register differs from the manifest"))
         if meta.get("connector") != command.connector:
             findings.append(Finding("L03", rel, "metadata.connector differs from the manifest"))
-        if list(meta.get("triggers") or []) != list(command.triggers):
-            findings.append(Finding("L03", rel, "metadata.triggers differ from the manifest"))
+        if "triggers" in meta:
+            findings.append(Finding("L03", rel, "metadata.triggers is not read by Claude Code; trigger "
+                                                "phrases belong in the description"))
+        quoted = {normalize_phrase(q) for q in re.findall(r'"([^"]+)"', str(desc or ""))}
+        for trigger in command.triggers:
+            if normalize_phrase(trigger) not in quoted:
+                findings.append(Finding("L03", rel, f"description does not quote trigger phrase '{trigger}'"))
     for plugin_name, name in sorted(set(expected) - found):
         findings.append(Finding("L03", f"{ctx.manifest.plugin_root}/{plugin_name}/skills/{name}/SKILL.md",
                                 "manifest command has no SKILL.md"))

@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 """Deterministic routing check over evals/routing/phrases.yaml.
 
-For every supported combination in catalog/manifest.yaml and every phrase in the routing
-suite, the check finds the installed skills whose trigger set matches the phrase. A trigger
-matches when its words appear as a contiguous run in the phrase after normalization
-(lower case, contractions expanded, punctuation removed). The check fails when:
+Claude Code selects a skill from its name and description; it does not read
+metadata. This check therefore routes against the description text in each
+SKILL.md: the phrases a description quotes (its "for example" requests, which
+include every trigger phrase the manifest declares for that command) are the
+skill's trigger set. A quoted phrase matches when its words appear as a
+contiguous run in the routing phrase after normalization (lower case,
+contractions expanded, punctuation removed). For every supported combination in
+catalog/manifest.yaml and every phrase in the routing suite, the check fails when:
 
-* a phrase matches the trigger sets of two or more installed skills (ambiguous routing);
+* a manifest trigger phrase is not quoted in that skill's description;
+* a phrase matches the descriptions of two or more installed skills (ambiguous routing);
 * the resolved skill differs from the expected skill for that command set. A phrase that
-  matches no installed trigger set resolves to /start, which names the plugin that
+  matches no installed description resolves to /start, which names the plugin that
   provides the command (start/SKILL.md, Procedure step 8);
 * a phrase, command set or skill named in the suite does not exist, or the suite does not
   hold exactly sixty phrases.
 
-The model eval (tools/model_evals.py --routing) tests the same phrases against the skill
-descriptions with a model; this check tests the trigger sets alone and calls no model.
+The model eval (tools/model_evals.py --routing) tests the same phrases against the same
+descriptions with a model; this check calls no model and shows description-phrase
+disjointness, not model behaviour.
 
 Usage:
     python tools/routing_check.py [--root PATH] [--verbose]
@@ -37,7 +43,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from manifest_lib import Combination, Manifest, load_manifest  # noqa: E402
 
+DEFAULT_ROOT = Path(__file__).resolve().parent.parent
 SUITE = Path("evals/routing/phrases.yaml")
+QUOTED = re.compile(r'"([^"]+)"')
 SUITE_SIZE = 60
 FALLBACK = "start"
 COMMAND_SETS = ("core-only", "lawmatics", "clio", "mycase")
@@ -115,24 +123,58 @@ def command_set(manifest: Manifest, combo: Combination) -> str:
     return platforms[0].removeprefix("mhsb-")
 
 
-def route(manifest: Manifest, combo: Combination, phrase: str) -> list[str]:
+def skill_description(root: Path, manifest: Manifest, plugin: str, name: str) -> str:
+    """The description Claude Code reads from a skill's SKILL.md frontmatter."""
+    path = root / manifest.plugin_root / plugin / "skills" / name / "SKILL.md"
+    text = path.read_text(encoding="utf-8")
+    end = text.find("\n---\n", 4)
+    if not text.startswith("---\n") or end == -1:
+        raise SuiteError(f"{path.relative_to(root)}: no frontmatter")
+    front = yaml.safe_load(text[4:end]) or {}
+    return " ".join(str(front.get("description", "")).split())
+
+
+def description_phrases(root: Path, manifest: Manifest) -> dict[str, tuple[str, ...]]:
+    """Quoted request phrases per skill, keyed '<plugin>:<command>'."""
+    return {f"{c.plugin}:{c.name}": tuple(QUOTED.findall(skill_description(root, manifest, c.plugin, c.name)))
+            for c in manifest.all_commands()}
+
+
+def route(manifest: Manifest, combo: Combination, phrase: str,
+          phrases: dict[str, tuple[str, ...]] | None = None) -> list[str]:
+    """Installed skills whose description quotes a phrase contained in the request."""
+    if phrases is None:
+        phrases = description_phrases(DEFAULT_ROOT, manifest)
     tokens = normalize(phrase)
     matched = []
     for command in manifest.commands_in(combo):
-        if any(contains_run(tokens, normalize(t)) for t in command.triggers):
+        if any(contains_run(tokens, normalize(t)) for t in phrases[f"{command.plugin}:{command.name}"]):
             matched.append(command.name)
     return matched
+
+
+def missing_triggers(manifest: Manifest, phrases: dict[str, tuple[str, ...]]) -> list[str]:
+    """Manifest trigger phrases that the skill's description does not quote."""
+    out = []
+    for command in manifest.all_commands():
+        quoted = {tuple(normalize(q)) for q in phrases[f"{command.plugin}:{command.name}"]}
+        for trigger in command.triggers:
+            if tuple(normalize(trigger)) not in quoted:
+                out.append(f"MISSING {command.plugin}:{command.name} trigger '{trigger}' is not quoted "
+                           "in the description")
+    return out
 
 
 def run(root: Path, verbose: bool = False) -> int:
     manifest = load_manifest(root)
     try:
         phrases = load_suite(root, manifest)
-    except SuiteError as exc:
+        described = description_phrases(root, manifest)
+    except (SuiteError, OSError, yaml.YAMLError) as exc:
         print(f"LOAD ERROR {exc}")
         return 2
     combos = manifest.combinations()
-    failures: list[str] = []
+    failures: list[str] = missing_triggers(manifest, described)
     seen: set[tuple[str, str, str]] = set()
     checks = 0
     for combo in combos:
@@ -142,7 +184,7 @@ def run(root: Path, verbose: bool = False) -> int:
             return 2
         for p in phrases:
             checks += 1
-            matched = route(manifest, combo, p.text)
+            matched = route(manifest, combo, p.text, described)
             resolved = matched[0] if len(matched) == 1 else (FALLBACK if not matched else None)
             key = (p.pid, cset, ",".join(matched))
             if len(matched) > 1:
@@ -158,7 +200,7 @@ def run(root: Path, verbose: bool = False) -> int:
     for line in failures:
         print(line)
     sets = sorted({command_set(manifest, c) for c in combos})
-    print(f"routing check (trigger-list disjointness): {len(phrases)} phrases, {len(combos)} combinations, {len(sets)} command sets, "
+    print(f"routing check (description-phrase disjointness): {len(phrases)} phrases, {len(combos)} combinations, {len(sets)} command sets, "
           f"{checks} checks, {len(failures)} failure(s)")
     return 1 if failures else 0
 
