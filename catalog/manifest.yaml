@@ -18,7 +18,7 @@ marketplace:
     url: https://mhsbsolutions.com
 
 defaults:
-  version: 0.2.0
+  version: 0.1.0
   author:
     name: MHSB Solutions
     url: https://mhsbsolutions.com

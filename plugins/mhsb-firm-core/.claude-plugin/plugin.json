@@ -1,6 +1,6 @@
 {
   "name": "mhsb-firm-core",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Free core plugin for law firm staff: orientation, a pre-paste confidentiality check, plain-language explanation, follow-up drafting, meeting notes, an AI policy draft for attorney adoption, role-based training and a support request. Operates without a connector.",
   "author": {
     "name": "MHSB Solutions",

@@ -2,7 +2,7 @@
 
 MyCase vocabulary and field mapping for use over the vendor's own connector. Adds no commands. MHSB service-side controls do not apply to records retrieved through the vendor connector.
 
-Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.2.0.
+Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
 
 Contains no commands and bundles no connector. The firm uses the vendor's own connector; MHSB label resolution, masking, role mode, audit and scheduled reports do not apply to records retrieved through it.
 

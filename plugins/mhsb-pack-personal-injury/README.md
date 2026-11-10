@@ -2,7 +2,7 @@
 
 Personal injury practice fragment: intake questions, attorney-review flags, document list, stage map, deadline categories, template references and report entries. Data only; adds no commands.
 
-Release tier: pilot, held from general availability (catalog tier ga) until an attorney adoption is recorded; see `fragment/adoption.yaml` and docs/decisions/0004. License: `LicenseRef-MHSB-Source-Available`. Version: 0.2.0.
+Release tier: pilot, held from general availability (catalog tier ga) until an attorney adoption is recorded; see `fragment/adoption.yaml` and docs/decisions/0004. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
 
 Contains no commands. The fragment in `fragment/fragment.yaml` is merged into the Firm Profile and is overridden by the firm's own answers. Templates in `templates/` carry adoption records; the generator fills variables only.
 

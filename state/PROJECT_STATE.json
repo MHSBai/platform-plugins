@@ -9,7 +9,7 @@
       "name": "lint green across all skills",
       "command": "python tools/lint.py && python tools/lint.py --release && python tools/skill_evals.py",
       "status": "pass",
-      "evidence": "15 rules, 0 errors, 0 warnings (also --release); 24 skills, 144 reference cases, 144 passed; reading grades 3.1 to 4.9"
+      "evidence": "17 rules, 0 errors, 0 warnings (also --release); 24 skills, 144 reference cases, 144 passed; reading grades under textstat: bodies 4.7 to 6.0, description promises 3.2 to 7.0 (FIX2-PP-STACK-A)"
     },
     {
       "id": "C2",
@@ -22,8 +22,8 @@
       "id": "C3",
       "name": "model routing and skill evals",
       "command": "python tools/model_evals.py",
-      "status": "pending",
-      "evidence": "ANTHROPIC_API_KEY EMPTY; 0 requests, USD 0.00; runner, models (claude-sonnet-5-5, claude-opus-5-5) and USD 40 cap in place"
+      "status": "fail",
+      "evidence": "run 2026-11-10T19:53:46Z, input digest 95afc38ec1b4 equal to the tree: routing 238 of 240, skills 120 of 144 (mhsb-firm-core 40 of 48; 6 injection cases fail, 2 in mhsb-firm-core); USD 6.36 of a USD 12 cap; --check-release blocks the release; every plugin held at 0.1.0 (decision 0005, Section 12)"
     },
     {
       "id": "C4",
@@ -35,9 +35,9 @@
     {
       "id": "C5",
       "name": "CHANGELOG updated",
-      "command": "sed -n '/## 0.2.0/,/## Included/p' CHANGELOG.md",
+      "command": "sed -n '/## Unreleased/,/## Included/p' CHANGELOG.md",
       "status": "pass",
-      "evidence": "0.2.0 entry for staff; versions 0.2.0 in manifest, plugin.json and READMEs"
+      "evidence": "0.2.0 entry for staff, under Unreleased since FIX2-PP-STACK-A; versions held at 0.1.0 in manifest, plugin.json and READMEs until the model evals pass (HANDOFF PP-8 item 1)"
     },
     {
       "id": "C6",

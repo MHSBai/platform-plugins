@@ -2,7 +2,7 @@
 
 Free core plugin for law firm staff: orientation, a pre-paste confidentiality check, plain-language explanation, follow-up drafting, meeting notes, an AI policy draft for attorney adoption, role-based training and a support request. Operates without a connector.
 
-Release tier: ga. License: `Apache-2.0`. Version: 0.2.0.
+Release tier: ga. License: `Apache-2.0`. Version: 0.1.0.
 
 Operates without a connector. Two commands, /follow-up and /meeting-notes, use the firm connector when one is present.
 

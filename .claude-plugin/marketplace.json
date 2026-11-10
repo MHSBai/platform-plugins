@@ -1,7 +1,7 @@
 {
   "name": "mhsb-platform-plugins",
   "description": "Claude plugins for solo and small United States law firms on Lawmatics, Clio or MyCase, maintained by MHSB Solutions. Read-only in version 1.",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "owner": {
     "name": "MHSB Solutions",
     "url": "https://mhsbsolutions.com"
