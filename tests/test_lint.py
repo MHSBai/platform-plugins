@@ -508,6 +508,15 @@ def test_l15_intake_block_map_drift(repo: Path) -> None:
     assert "L15" in rules_failed(repo)
 
 
+def test_l15_vendored_schema_hash_drift(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    schemas = repo / "tools" / "schemas"
+    monkeypatch.setattr(lint, "SCHEMA_DIR", schemas)
+    assert "L15" not in rules_failed(repo)
+    path = schemas / "fragment.schema.json"
+    path.write_text(path.read_text(encoding="utf-8").replace('"eligibility_question"\n', '"eligibility_question",\n          "extra_flag"\n', 1), encoding="utf-8")
+    assert "L15" in rules_failed(repo)
+
+
 def test_l15_hidden_pack_needs_co_design(repo: Path) -> None:
     (repo / "plugins/mhsb-pack-family-law/CO-DESIGN.md").unlink()
     assert "L15" in rules_failed(repo)

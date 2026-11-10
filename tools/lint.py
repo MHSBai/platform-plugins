@@ -31,6 +31,7 @@ in development and an error at release.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -712,9 +713,28 @@ def rule_generated_drift(ctx: Context) -> list[Finding]:
             for line in gen_manifest.check(ctx.root, ctx.manifest)]
 
 
+def _vendored_schema_findings() -> list[Finding]:
+    """The vendored fragment schema must match the hash recorded beside it (decision 0004)."""
+    record_path = SCHEMA_DIR / "fragment.schema.source.json"
+    schema_path = SCHEMA_DIR / "fragment.schema.json"
+    where = "tools/schemas/fragment.schema.source.json"
+    record, err = load_json(record_path)
+    if err or not isinstance(record, dict) or not record.get("sha256") or not record.get("source_commit"):
+        return [Finding("L15", where, "vendored schema source record (source_commit, sha256) is missing")]
+    try:
+        actual = hashlib.sha256(schema_path.read_bytes()).hexdigest()
+    except OSError as exc:
+        return [Finding("L15", "tools/schemas/fragment.schema.json", f"cannot be read: {exc}")]
+    if actual != record["sha256"]:
+        return [Finding("L15", "tools/schemas/fragment.schema.json",
+                        f"sha256 {actual} differs from the recorded {record['sha256']}; re-vendor from "
+                        "the service repository and update the source record")]
+    return []
+
+
 def rule_fragment_schema(ctx: Context) -> list[Finding]:
     """Stage 3 fragment schema, and the references a fragment makes into its own pack."""
-    findings = []
+    findings = _vendored_schema_findings()
     seen_areas: dict[str, str] = {}
     for plugin in ctx.manifest.by_kind("practice"):
         base = ctx.plugins_dir / plugin.name

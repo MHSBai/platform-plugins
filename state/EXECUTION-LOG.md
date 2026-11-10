@@ -319,3 +319,24 @@ $ dash check U+2014 U+2013 U+2012 in changed and new files
 Marketplace load check, rerun because the listing lost the two held packs: `bash tools/verify_marketplace.sh` passed `claude plugin validate . --strict`, installed the five listed plugins in a throwaway configuration, and refused the hidden family law pack.
 
 The plugin tier rows of `catalog/counts.md` changed for the two held packs (ga to pilot); the combination counts table above it is unchanged.
+
+### Step 5. Review XREVIEW-PP-STACK-A findings PP3-L1 and PP3-L2 (2026-11-10)
+
+PP3-L1: `tools/schemas/fragment.schema.source.json` records the source commit and sha256 of the vendored schema; L15 now fails on a hash difference (test `test_l15_vendored_schema_hash_drift`). Re-vendoring from the merged Stage 3 commit waits for that pull request; HANDOFF.md PP-9 item 8.
+
+PP3-L2: `tools/verify_marketplace.sh` now attempts to install every manifest plugin whose tier is not ga and fails if any installs.
+
+```
+$ bash tools/verify_marketplace.sh
+Validation passed
+OK: 12 of 12 non-ga packs are not installable from the marketplace (personal injury, business and transactional, estate planning and probate, criminal defense, civil litigation, real estate, family law, immigration, employment plaintiff, bankruptcy consumer, workers' compensation, landlord-tenant and consumer)
+exit 0
+$ python -m pytest -q
+98 passed
+$ python tools/lint.py
+lint: 15 rules, 0 error(s), 0 warning(s)
+$ python tools/pack_evals.py
+pack evals: 28 cases, 28 passed, 0 failed
+$ python tools/validate_fragments_service.py --service ../mhsb-firm-service
+fragments: 12, schema and rule failures: 0
+```

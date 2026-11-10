@@ -1,0 +1,10 @@
+{
+  "file": "tools/schemas/fragment.schema.json",
+  "source_repository": "MHSBai/mhsb-firm-service",
+  "source_path": "firm_profile/schemas/fragment.schema.json",
+  "source_commit": "bfcddee951c4952c97408cdc7ec3c4495aaf9cfa",
+  "source_branch": "cloud/pp3-firm-profile-v2",
+  "source_merged": false,
+  "sha256": "9d537e09fd164f7cbd7206cb7043fd0e1b59f8d9d4225479d9099423f7aff2ac",
+  "note": "Re-vendor from the merged Stage 3 commit once its pull request merges; update source_commit, source_branch, source_merged and sha256 together. Lint rule L15 fails when the vendored file's hash differs from sha256."
+}
