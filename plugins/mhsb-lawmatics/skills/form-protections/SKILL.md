@@ -1,10 +1,9 @@
 ---
 name: form-protections
-description: 'Public Lawmatics forms without protection against automated submits, confirmation triggers
-  that a fake booking could reach, and submit paths open without sign-in, each with a recommended change
-  and a click path for a person to follow. Use when a user asks, for example: "are our intake forms protected";
-  "can someone submit a fake booking"; "could a bot fill out our contact form"; "public form exposure";
-  "bot fill out".'
+description: 'Finds Lawmatics public forms with no guard against automated submits. It lists booking triggers
+  a fake booking could reach, and submit paths open without sign-in. Each finding has a fix and the clicks
+  for a person to make it. Use when a user asks, for example: "are our intake forms protected"; "can someone
+  submit a fake booking"; "could a bot fill out our contact form"; "public form exposure"; "bot fill out".'
 metadata:
   register: operational
   connector: platform

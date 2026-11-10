@@ -1,10 +1,10 @@
 ---
 name: ai-training
-description: 'A role lesson on AI use at the firm in four parts: what to ask, what never to paste, how
-  to check an answer before use, and how to record and bill the time under the firm''s adopted policy;
-  ends with three practice tasks. Use when a user asks, for example: "train my staff on ai"; "how should
-  paralegals use claude"; "show the new paralegal how to use this safely"; "how do i bill time when Claude
-  helped with a draft"; "ai training for the team"; "how to use this safely"; "how do i bill time".'
+description: 'A short lesson on AI use for one role. It covers what to ask, what never to paste, how to
+  check an answer, and how to record and bill the time. It follows the firm''s policy and ends with three
+  practice tasks. Use when a user asks, for example: "train my staff on ai"; "how should paralegals use
+  claude"; "show the new paralegal how to use this safely"; "how do i bill time when Claude helped with
+  a draft"; "ai training for the team"; "how to use this safely"; "how do i bill time".'
 metadata:
   register: operational
   connector: none

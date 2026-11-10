@@ -1,11 +1,11 @@
 ---
 name: dates
-description: 'Dates from mapped fields only, in the firm''s time zone; the entered date governs; computed
-  dates are a cross-check; disagreements listed, never resolved; each category marked statutory or firm-set;
-  "date not established" with source and owner. Use when a user asks, for example: "what deadlines are
-  coming up"; "how many days since the accident"; "when does the statute run"; "any court dates next week";
-  "statute of limitations date"; "list the court dates"; "how many days since"; "does the statute run";
-  "court dates".'
+description: 'Dates from mapped fields only, in the firm''s time zone. The entered date governs. A computed
+  date is only a check. Disagreements are listed, never settled. Each kind of date is marked statutory
+  or firm-set. A missing date reads "date not established", with its source and owner. Use when a user
+  asks, for example: "what deadlines are coming up"; "how many days since the accident"; "when does the
+  statute run"; "any court dates next week"; "statute of limitations date"; "list the court dates"; "how
+  many days since"; "does the statute run"; "court dates".'
 metadata:
   register: operational
   connector: firm

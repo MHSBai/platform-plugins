@@ -1,10 +1,10 @@
 ---
 name: check-setup
-description: 'Setup check: sign-in to the firm connector, plan attestation, enabled packs and role mode,
-  profile version and hash, plugin and service versions with a warning when the plugin is behind, and
-  the scheduled reports with their last run. Use when a user asks, for example: "check my setup"; "am
-  I signed in"; "why can''t I see billing"; "did the Monday report go out"; "which version am i running";
-  "is the connector working"; "why cannot i see"; "did the monday report"; "hooked up".'
+description: 'Checks the setup. It shows sign-in, the plan on file, packs and role mode, profile version
+  and hash, and the plugin and service versions. It warns when the plugin is behind. It lists each scheduled
+  report and its last run. Use when a user asks, for example: "check my setup"; "am I signed in"; "why
+  can''t I see billing"; "did the Monday report go out"; "which version am i running"; "is the connector
+  working"; "why cannot i see"; "did the monday report"; "hooked up".'
 metadata:
   register: operational
   connector: firm

@@ -1,11 +1,11 @@
 ---
 name: consult-prep
-description: 'One page from the record before a consultation or hearing: known facts with their source
-  fields, missing information, questions from the practice pack fragment, a conflict reminder, and the
-  fee and disclosure conversations. Use when a user asks, for example: "prepare me for the consultation";
-  "get me ready for my two o''clock"; "what do I need to ask"; "hearing tomorrow, what should I know";
-  "consult prep"; "get ready for the hearing"; "one page before the meeting with the prospect"; "get me
-  ready for"; "what should i know".'
+description: 'One page from the record before a consultation or hearing. It lists known facts with their
+  source fields, missing facts, and the pack''s questions. It adds a conflict reminder and the fee and
+  disclosure talks. Use when a user asks, for example: "prepare me for the consultation"; "get me ready
+  for my two o''clock"; "what do I need to ask"; "hearing tomorrow, what should I know"; "consult prep";
+  "get ready for the hearing"; "one page before the meeting with the prospect"; "get me ready for"; "what
+  should i know".'
 metadata:
   register: document
   connector: firm

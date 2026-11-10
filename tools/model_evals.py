@@ -26,7 +26,8 @@ as pending with that reason and exits 0, so deterministic CI is not blocked.
 
 Usage:
     python tools/model_evals.py [--routing] [--skills] [--budget USD] [--dry-run] [--no-log]
-    python tools/model_evals.py --check-release   (release gate: status ran, every task, 100 percent)
+    python tools/model_evals.py --check-release   (release gate: status ran, every task, 100 percent,
+                                                  and an input digest equal to the current tree)
 
 Requires the `anthropic` Python package only when a key is SET.
 """
@@ -34,6 +35,7 @@ Requires the `anthropic` Python package only when a key is SET.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -231,6 +233,26 @@ def run_skills(client: Any, root: Path, cfg: dict[str, Any], spend: Spend) -> di
             "skills_covered": len(skills_seen), "results": results}
 
 
+DIGEST_GLOBS = (
+    "plugins/*/skills/*/SKILL.md",
+    "evals/routing/phrases.yaml",
+    "evals/skills/*.yaml",
+    "evals/model-config.yaml",
+    "catalog/manifest.yaml",
+)
+
+
+def input_digest(root: Path) -> str:
+    """sha256 over every file a model eval run reads, by sorted repository path and content."""
+    h = hashlib.sha256()
+    paths = sorted({p for pattern in DIGEST_GLOBS for p in root.glob(pattern) if p.is_file()})
+    for path in paths:
+        rel = path.relative_to(root).as_posix().encode("utf-8")
+        data = path.read_bytes()
+        h.update(len(rel).to_bytes(4, "big") + rel + len(data).to_bytes(8, "big") + data)
+    return h.hexdigest()
+
+
 def release_problems(root: Path) -> list[str]:
     """Design Section 12 pass bar for a release: both suites ran in full and passed in full."""
     path = root / RESULTS
@@ -239,6 +261,11 @@ def release_problems(root: Path) -> list[str]:
     except (OSError, json.JSONDecodeError) as exc:
         return [f"{RESULTS}: {exc}"]
     problems = []
+    recorded = record.get("input_digest")
+    current = input_digest(root)
+    if recorded != current:
+        problems.append(f"input digest {str(recorded)[:12]} does not match the tree {current[:12]}; "
+                        "re-run the model evals on the current text")
     if record.get("status") != "ran":
         problems.append(f"model evals status is {record.get('status')!r}, not 'ran'")
     totals = {"routing": len(routing_tasks(root)), "skills": len(skill_tasks(root))}
@@ -302,7 +329,8 @@ def main(argv: list[str] | None = None) -> int:
     status = key_status()
     print(f"ANTHROPIC_API_KEY: {status}")
     record: dict[str, Any] = {"run_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                              "key": status, "suites": suites, "models": cfg["models"]}
+                              "key": status, "suites": suites, "models": cfg["models"],
+                              "input_digest": input_digest(root)}
     if args.dry_run:
         print(f"routing tasks: {len(routing_tasks(root))}; skill tasks: {len(skill_tasks(root))}; cap USD {cap:.2f}")
         return 0

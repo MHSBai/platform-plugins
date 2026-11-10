@@ -1,11 +1,10 @@
 ---
 name: before-i-paste
-description: 'Category-based check before content is pasted. The user names the kind of content; the check
-  compares that category with the firm''s adopted policy and approved data categories and answers paste,
-  do not paste, or paste after listed steps. It never asks to see the content and never reads it first.
-  Use when a user asks, for example: "can i paste this"; "is it safe to paste"; "check before i paste";
-  "is it okay to put a medical record in here"; "may i share this document with claude"; "can i paste";
-  "is it okay to put".'
+description: 'A check before anything is pasted. The user names only the kind of content. The check compares
+  that kind with the firm''s policy. The answer is paste, do not paste, or paste after the listed steps.
+  It never asks to see the content. Use when a user asks, for example: "can i paste this"; "is it safe
+  to paste"; "check before i paste"; "is it okay to put a medical record in here"; "may i share this document
+  with claude"; "can i paste"; "is it okay to put".'
 metadata:
   register: operational
   connector: none

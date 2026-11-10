@@ -1,9 +1,9 @@
 ---
 name: timekeeper-hours
-description: 'Hourly, flat-fee and total hours per timekeeper from Clio time entries, in the firm''s time
-  zone; team totals by default, a named person only where the role mode allows. Use when a user asks,
-  for example: "hours per timekeeper"; "team hours this month"; "how many hours did the paralegals put
-  in last month"; "how many hours did each attorney record"; "how many hours did".'
+description: 'Hours per timekeeper from Clio time entries: hourly, flat-fee and total. It shows team totals
+  by default. It names a person only when the role mode allows it. Use when a user asks, for example:
+  "hours per timekeeper"; "team hours this month"; "how many hours did the paralegals put in last month";
+  "how many hours did each attorney record"; "how many hours did".'
 metadata:
   register: operational
   connector: platform

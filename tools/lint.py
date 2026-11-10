@@ -8,7 +8,8 @@ Rules (identifier, scope):
   L03 skill-frontmatter   every SKILL.md: allowed keys, required metadata, agreement with the manifest
   L04 dashes              U+2014, U+2013 and U+2012 in any text file
   L05 banned-phrases      marketing phrases, exclamation marks, emoji and listed words in user-facing text
-  L06 reading-level       Flesch-Kincaid grade per SKILL.md body: 9 operational, 12 document
+  L06 reading-level       Flesch-Kincaid grade per SKILL.md body and per description (trigger
+                          sentence removed): 9 operational, 12 document; sentences end at . ? !
   L07 coverage            "coverage" and "not retrieved" in every connected skill body
   L08 command-cap         command count above the cap in any supported combination
   L09 duplicate-commands  duplicate command names within any supported combination
@@ -200,7 +201,7 @@ def prose_for_reading(body: str) -> str:
 
 
 def flesch_kincaid_grade(text: str) -> float:
-    sentences = [s for s in re.split(r"[.?:;]+(?:\s|$)", text) if re.search(r"[A-Za-z]", s)]
+    sentences = [s for s in re.split(r"[.?!]+(?:\s|$)", text) if re.search(r"[A-Za-z]", s)]
     words = re.findall(r"[A-Za-z][A-Za-z'\-]*", text)
     if not sentences or not words:
         return 0.0
@@ -466,7 +467,23 @@ def rule_reading_level(ctx: Context) -> list[Finding]:
         if grade > limit:
             findings.append(Finding("L06", ctx.rel(path),
                                     f"Flesch-Kincaid grade {grade:.1f} exceeds {limit:.0f} for {register}"))
+        promise = description_promise(str(data.get("description", "")))
+        if promise:
+            grade = flesch_kincaid_grade(promise)
+            if grade > limit:
+                findings.append(Finding("L06", ctx.rel(path),
+                                        f"description Flesch-Kincaid grade {grade:.1f} exceeds {limit:.0f} "
+                                        f"for {register}"))
     return findings
+
+
+TRIGGER_SENTENCE = "Use when a user asks"
+
+
+def description_promise(description: str) -> str:
+    """The description without its trigger sentence: the text staff read in the command menu."""
+    text = " ".join(description.split())
+    return text.split(TRIGGER_SENTENCE, 1)[0].strip()
 
 
 def rule_coverage(ctx: Context) -> list[Finding]:

@@ -58,3 +58,11 @@ Claude Code selects a skill from its `name` and `description` and does not act o
 
 The model evals recorded in `evals/results/model-evals.json` (run 2026-11-10: routing 223 of 240, skills 46 of 144) used the descriptions as they stood before this change. They must be re-run on the current descriptions, and both suites must reach 100 percent, before version 0.2.0 is tagged (Section 9).
 
+
+## 11. Review XREVIEW2-PP-STACK-A dispositions (2026-11-10)
+
+PP4-N1. Each model eval record now carries `input_digest`: sha256 over every `SKILL.md`, `evals/routing/phrases.yaml`, the skill eval files, `evals/model-config.yaml` and `catalog/manifest.yaml`, taken by sorted path and content. `--check-release` refuses a record whose digest is absent or differs from the tree. The API-1 record has no digest, and its text has since changed, so it cannot pass the gate.
+
+PP4-N2. L06 now ends sentences only at `.`, `?` and `!`. It also grades each description with its "Use when a user asks" trigger sentence removed, against the same bound as the body (9 operational, 12 document). The 24 description promises were rewritten as short sentences. The trigger sentences are unchanged, so routing is unaffected. Grades on the lint estimator: bodies 4.0 to 5.8, descriptions 3.1 to 7.1. A cross-check with textstat could not run in the cloud session, because its pronunciation dictionary download is refused by the proxy.
+
+PP4-N3. Open, for the owner. Merging this branch makes main list `mhsb-firm-core` 0.2.0 while the only model evidence is a failed run. The two options are (a) a model eval run on the current text that meets the Section 12 bar, or (b) an owner decision that main is a development branch not offered to firms, stated in the README and the marketplace description until a signed tag exists.

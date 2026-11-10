@@ -1,11 +1,11 @@
 ---
 name: follow-up
-description: 'The next message in the firm''s voice, with one next step and its date; from the record
-  when the firm connector is present, from pasted context otherwise; every client thread with no reply
-  for more than two business days is flagged; the approver is named above the draft and a person sends
-  it. Use when a user asks, for example: "draft a follow-up"; "write back to the client"; "what should
-  i say to the client who called twice"; "which clients are waiting on a reply"; "what should i send next";
-  "reply to this client email"; "write back to"; "what should i say to"; "waiting on a reply".'
+description: 'Drafts the next message in the firm''s voice, with one next step and its date. It uses the
+  record when the firm connector is on, or pasted text if not. It flags client threads with no reply for
+  over two business days. The approver is named above the draft, and a person sends it. Use when a user
+  asks, for example: "draft a follow-up"; "write back to the client"; "what should i say to the client
+  who called twice"; "which clients are waiting on a reply"; "what should i send next"; "reply to this
+  client email"; "write back to"; "what should i say to"; "waiting on a reply".'
 metadata:
   register: operational
   connector: none

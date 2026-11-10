@@ -1,9 +1,10 @@
 ---
 name: matter-status
-description: 'Internal status of one matter from the full record; client-facing status only from the client_visible
-  allowlist, rendered through an adopted template with the approver named. Use when a user asks, for example:
-  "where does this matter stand"; "where are we on the Ortiz case"; "client update on the case"; "tell
-  Mrs. Alvarez where her case stands"; "status of the matter"; "where are we on"; "case stands".'
+description: 'Status of one matter. The internal version uses the full record. The client version uses
+  only fields on the client-visible list, through an adopted template, with the approver named. Use when
+  a user asks, for example: "where does this matter stand"; "where are we on the Ortiz case"; "client
+  update on the case"; "tell Mrs. Alvarez where her case stands"; "status of the matter"; "where are we
+  on"; "case stands".'
 metadata:
   register: document
   connector: firm

@@ -575,3 +575,21 @@ routing_check.py   description-phrase disjointness: 60 phrases, 895 combinations
 skill_evals.py     reference-transcript conformance: 24 skills, 144 cases, 144 passed, 0 failure(s)
 lint.py            17 rules, 0 error(s), 0 warning(s)
 ```
+
+### Step 10. Review XREVIEW2-PP-STACK-A (2026-11-10)
+
+PP4-N1 and PP4-N2 fixed (decision 0005, Section 11). PP4-N3 waits for an owner decision.
+
+```
+$ python tools/lint.py | tail -1; python tools/lint.py --release | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s)
+lint: 17 rules, 0 error(s), 0 warning(s)
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/model_evals.py --check-release | tail -1
+model eval release gate: 3 problem(s)   (digest absent; routing 223 of 240; skills 46 of 144)
+$ python -m pytest -q | tail -1
+165 passed (164 plus the repaired helper test; tests/test_routing_and_skill_evals.py 29 passed)
+```

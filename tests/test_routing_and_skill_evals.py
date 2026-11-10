@@ -205,7 +205,9 @@ def test_release_gate_refuses_pending_and_partial_runs(repo: Path) -> None:
     assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
     routing_total = len(model_evals.routing_tasks(repo))
     skill_total = len(model_evals.skill_tasks(repo))
-    partial = {"status": "ran", "routing": {"cases": routing_total, "passed": routing_total},
+    digest = model_evals.input_digest(repo)
+    partial = {"status": "ran", "input_digest": digest,
+               "routing": {"cases": routing_total, "passed": routing_total},
                "skills": {"cases": 24, "passed": 24}}
     results.write_text(json.dumps(partial), encoding="utf-8")
     assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
@@ -239,9 +241,14 @@ def test_budget_above_cap_is_clamped(repo: Path, monkeypatch: pytest.MonkeyPatch
 def _add_quoted_phrase(repo: Path, plugin: str, skill: str, phrase: str) -> None:
     path = repo / "plugins" / plugin / "skills" / skill / "SKILL.md"
     text = path.read_text(encoding="utf-8")
+    end = text.index("\n---\n", 4)
+    front = yaml.safe_load(text[4:end])
     marker = "Use when a user asks, for example: "
-    assert marker in text
-    path.write_text(text.replace(marker, f'{marker}"{phrase}"; ', 1), encoding="utf-8")
+    description = " ".join(str(front["description"]).split())
+    assert marker in description
+    front["description"] = description.replace(marker, f'{marker}"{phrase}"; ', 1)
+    head = yaml.safe_dump(front, sort_keys=False, allow_unicode=True, width=100)
+    path.write_text(f"---\n{head}---\n{text[end + 5:]}", encoding="utf-8")
 
 
 def test_routing_reads_the_description_not_metadata(repo: Path) -> None:
@@ -265,3 +272,32 @@ def test_manifest_trigger_absent_from_description_fails(repo: Path) -> None:
 def test_every_manifest_trigger_is_quoted_in_its_description() -> None:
     manifest = routing_check.load_manifest(ROOT)
     assert routing_check.missing_triggers(manifest, routing_check.description_phrases(ROOT, manifest)) == []
+
+
+def test_release_gate_refuses_a_record_from_other_text(repo: Path) -> None:
+    results = repo / "evals" / "results" / "model-evals.json"
+    results.parent.mkdir(parents=True, exist_ok=True)
+    routing_total = len(model_evals.routing_tasks(repo))
+    skill_total = len(model_evals.skill_tasks(repo))
+    record = {"status": "ran", "input_digest": model_evals.input_digest(repo),
+              "routing": {"cases": routing_total, "passed": routing_total},
+              "skills": {"cases": skill_total, "passed": skill_total}}
+    results.write_text(json.dumps(record), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 0
+    skill = repo / "plugins" / "mhsb-operations" / "skills" / "dates" / "SKILL.md"
+    skill.write_text(skill.read_text(encoding="utf-8") + "\nChanged.\n", encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+    del record["input_digest"]
+    results.write_text(json.dumps(record), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+
+
+def test_l06_grades_descriptions_without_the_trigger_sentence() -> None:
+    import lint
+
+    long_promise = ("Comprehensive multidimensional organizational documentation, encompassing "
+                    "interdisciplinary administrative responsibilities, institutional accountability "
+                    "considerations and jurisdictional verification requirements.")
+    assert lint.description_promise(long_promise + ' Use when a user asks, for example: "x".') == long_promise
+    assert lint.flesch_kincaid_grade(long_promise) > 12
+    assert lint.flesch_kincaid_grade("Lists the dates. It shows the owner.") < 9
