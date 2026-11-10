@@ -23,6 +23,9 @@ defaults:
     name: MHSB Solutions
     url: https://mhsbsolutions.com
   homepage: https://github.com/MHSBai/platform-plugins
+  # connector_listing: privacy_policy_url and terms_of_service_url, emitted
+  # into plugin.json of every connector plugin. Not set until both documents
+  # are published; lint rule L16 requires them for a ga connector plugin.
   repository: https://github.com/MHSBai/platform-plugins
   plugin_root: plugins
 
@@ -31,7 +34,9 @@ licenses:
   source_available: LicenseRef-MHSB-Source-Available
 
 # Remote MCP endpoints bundled by connector-carrying plugins. Fixed URLs, no
-# user configuration, no local servers.
+# user configuration, no local servers. A plugin that bundles a connector is
+# listed (tier ga) only after tools/release_check.py passes for its URL; lint
+# rule L16 enforces this under --release.
 connectors:
   firm: https://mcp.mhsbsolutions.com/firm
   lawmatics: https://mcp.mhsbsolutions.com/lawmatics
@@ -149,7 +154,8 @@ plugins:
 
   - name: mhsb-operations
     kind: operations
-    tier: ga
+    # Held at pilot until its connector passes tools/release_check.py (HANDOFF.md).
+    tier: pilot
     license: source_available
     category: operations
     mcp: firm
@@ -259,7 +265,8 @@ plugins:
 
   - name: mhsb-lawmatics
     kind: platform
-    tier: ga
+    # Held at pilot until its connector passes tools/release_check.py (HANDOFF.md).
+    tier: pilot
     license: source_available
     category: platform
     mcp: lawmatics
@@ -287,7 +294,8 @@ plugins:
 
   - name: mhsb-clio
     kind: platform
-    tier: ga
+    # Held at pilot until its connector passes tools/release_check.py (HANDOFF.md).
+    tier: pilot
     license: source_available
     category: platform
     mcp: clio
@@ -325,6 +333,9 @@ plugins:
     kind: platform
     tier: ga
     license: source_available
+    # MyCase firms buy the buildout and run this plugin without a Connected
+    # subscription; the generated license notice carries the buildout grant.
+    offered_without_subscription: true
     category: platform
     mcp: null
     description: >-

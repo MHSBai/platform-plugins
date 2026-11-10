@@ -423,3 +423,9 @@ def test_l04_skips_harvest_clones_but_lints_ledger(repo: Path) -> None:
     ledger = repo / "harvest" / "LEDGER.yaml"
     ledger.write_text(ledger.read_text(encoding="utf-8") + f"# note {EN}\n", encoding="utf-8")
     assert "L04" in rules_failed(repo)
+
+
+def test_generated_keywords_unique() -> None:
+    for path in sorted((ROOT / "plugins").glob("*/.claude-plugin/plugin.json")):
+        keywords = json.loads(path.read_text(encoding="utf-8"))["keywords"]
+        assert len(keywords) == len(set(keywords)), path

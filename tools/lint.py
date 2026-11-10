@@ -17,6 +17,10 @@ Rules (identifier, scope):
   L12 provenance-header   Apache 4(b) modification notice on every file in PROVENANCE.md
   L13 structure           allowed components only; remote connectors only; pack layout; license files
   L14 generated-drift     outputs of tools/gen_manifest.py current with the manifest
+  L16 connector-release   release only: each connector bundled by a general availability
+                          plugin resolves, presents a certificate valid for its host and
+                          answers MCP (tools/release_check.py); the plugin declares
+                          privacyPolicyUrl and termsOfServiceUrl
 
 Usage:
     python tools/lint.py [--root PATH] [--release]
@@ -41,6 +45,7 @@ from jsonschema import Draft202012Validator
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import gen_manifest  # noqa: E402
+import release_check  # noqa: E402
 from manifest_lib import Manifest, ManifestError, load_manifest  # noqa: E402
 
 SCHEMA_DIR = Path(__file__).resolve().parent / "schemas"
@@ -658,6 +663,31 @@ def rule_generated_drift(ctx: Context) -> list[Finding]:
             for line in gen_manifest.check(ctx.root, ctx.manifest)]
 
 
+CONNECTOR_LISTING_FIELDS = ("privacyPolicyUrl", "termsOfServiceUrl")
+
+
+def rule_connector_release(ctx: Context) -> list[Finding]:
+    """Release only: a general availability connector plugin needs a live endpoint."""
+    if not ctx.release:
+        return []
+    findings = []
+    ga = [p for p in ctx.manifest.plugins if p.mcp is not None and p.tier == "ga"]
+    for plugin in ga:
+        path = ctx.plugins_dir / plugin.name / ".claude-plugin" / "plugin.json"
+        data, _ = load_json(path)
+        for key in CONNECTOR_LISTING_FIELDS:
+            if not isinstance(data, dict) or not data.get(key):
+                findings.append(Finding("L16", ctx.rel(path), f"connector plugin at tier ga lacks {key}"))
+    results = release_check.run(ctx.manifest, keys={p.mcp for p in ga}) if ga else {}
+    for plugin in ga:
+        result = results[plugin.mcp]
+        if not result.ok:
+            findings.append(Finding("L16", f"{ctx.manifest.plugin_root}/{plugin.name}/.mcp.json",
+                                    f"connector plugin at tier ga fails the release check: "
+                                    f"{result.render()}"))
+    return findings
+
+
 RULES: list[tuple[str, Callable[[Context], list[Finding]]]] = [
     ("L01", rule_plugin_schema),
     ("L02", rule_marketplace_schema),
@@ -673,6 +703,7 @@ RULES: list[tuple[str, Callable[[Context], list[Finding]]]] = [
     ("L12", rule_provenance_header),
     ("L13", rule_structure),
     ("L14", rule_generated_drift),
+    ("L16", rule_connector_release),
 ]
 
 
