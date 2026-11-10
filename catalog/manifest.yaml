@@ -36,11 +36,61 @@ licenses:
 # Remote MCP endpoints bundled by connector-carrying plugins. Fixed URLs, no
 # user configuration, no local servers. A plugin that bundles a connector is
 # listed (tier ga) only after tools/release_check.py passes for its URL; lint
-# rule L16 enforces this under --release.
+# rule L16 enforces this under --release, which CI runs on every event.
 connectors:
   firm: https://mcp.mhsbsolutions.com/firm
   lawmatics: https://mcp.mhsbsolutions.com/lawmatics
   clio: https://mcp.mhsbsolutions.com/clio
+
+# Expected identity of each connector endpoint (PP1-N1). tools/release_check.py
+# passes a connector only when an authenticated MCP initialize returns this
+# serverInfo name and version. Source: MHSBai/mhsb-firm-service, the FastMCP
+# server name "MHSB <server> connector" (service/servers/__init__.py) and the
+# service version (service/__init__.py). The version is the service release the
+# connector plugins are released against; change it with that release.
+connector_identity:
+  firm:
+    server_name: MHSB firm connector
+    server_version: 0.4.0
+  lawmatics:
+    server_name: MHSB lawmatics connector
+    server_version: 0.4.0
+  clio:
+    server_name: MHSB clio connector
+    server_version: 0.4.0
+
+# Expected edge of the connector host (PP1-N1). Design v2.1 Section 9: the
+# service sits behind a Cloudflare Tunnel on one Cloudflare zone, so every
+# address the host resolves to must lie in Cloudflare's published ranges
+# (https://www.cloudflare.com/ips-v4 and /ips-v6, fetched 2026-11-10).
+# canonical_name, when set, is the name the host must resolve through; it stays
+# null while the hostname is proxied by Cloudflare, because a proxied record
+# publishes no canonical name.
+connector_edge:
+  canonical_name: null
+  addresses:
+    - 173.245.48.0/20
+    - 103.21.244.0/22
+    - 103.22.200.0/22
+    - 103.31.4.0/22
+    - 141.101.64.0/18
+    - 108.162.192.0/18
+    - 190.93.240.0/20
+    - 188.114.96.0/20
+    - 197.234.240.0/22
+    - 198.41.128.0/17
+    - 162.158.0.0/15
+    - 104.16.0.0/13
+    - 104.24.0.0/14
+    - 172.64.0.0/13
+    - 131.0.72.0/22
+    - 2400:cb00::/32
+    - 2606:4700::/32
+    - 2803:f800::/32
+    - 2405:b500::/32
+    - 2405:8100::/32
+    - 2a06:98c0::/29
+    - 2c0f:f248::/32
 
 # Release tiers: ga is listed in the marketplace; pilot is present in the
 # repository and installed by MHSB for a named firm; hidden is present as a
