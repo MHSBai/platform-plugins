@@ -529,7 +529,7 @@ The private identifier list (17 identifiers: pilot firm codes, full firm names, 
 
 Command: `git push -u origin cloud/pp8-skills-evals`. Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/4 ("Stage 8: skills to final text, routing suite and evals"), base `cloud/pp9-pack-fragments`. Not merged. Outcome: DONE PP-8, with model evals pending (no key).
 
-### Step 8. Model evals run 2026-11-10 (run API-1, pop-os, Console API credit)
+### Step 8. Model evals run 2026-11-10 (run API-1, MHSB workstation, Console API credit)
 
 Preflight: `GET /v1/models` lists claude-sonnet-5-5 and claude-opus-5-5 with lifecycle active; the prices in `evals/model-config.yaml` equal the standard first-party rates on https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-11-10); no configuration change. Environment: Python 3.12.3, anthropic 2.7.0, PyYAML 6.0.3.
 
