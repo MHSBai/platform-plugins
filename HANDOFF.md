@@ -4,12 +4,12 @@ Items that need the repository owner, or a later stage, after PP-1 (Stage 1: rep
 
 ## 1. Protect main
 
-Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`. `agent-scan` is left out of the required contexts until the Snyk token exists (item 2): on a pull request without the token the job is skipped, and branch protection would count a skipped required check as passed. Item 2 adds it.
+Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`. `release-gate` runs `python tools/lint.py --release` on every pull request and every push to main (PP1-N2), so it is required with `lint` and `tests`. At the heads of #1 and #2 it fails with the twelve L11 synthetic-adoption errors that #3 clears (PP1-M2); this is the condition that #1 to #3 merge in one sitting. `agent-scan` is added by item 2 once the Snyk token exists; until then it fails on every event, because no scan runs.
 
 ```bash
 gh api -X PUT repos/MHSBai/platform-plugins/branches/main/protection -H "Accept: application/vnd.github+json" --input - <<'JSON'
 {
-  "required_status_checks": {"strict": true, "contexts": ["lint", "tests"]},
+  "required_status_checks": {"strict": true, "contexts": ["lint", "tests", "release-gate"]},
   "enforce_admins": true,
   "required_pull_request_reviews": {"dismiss_stale_reviews": true, "require_code_owner_reviews": false, "required_approving_review_count": 1},
   "restrictions": null,
@@ -35,7 +35,12 @@ With one approving review required, the second identity (item 3) approves pull r
 
 ## 2. Snyk token for agent-scan
 
-The `agent-scan-token` job prints `SNYK_TOKEN: SET` or `SNYK_TOKEN: EMPTY`, never the value. With the secret empty, `agent-scan` is skipped on pull requests (the `agent-scan-token` job states the reason in a notice) and fails with an error on every push to main and every `v*` tag. Whenever `agent-scan` concludes success, the scan ran. The command below prompts for the value; it is not echoed.
+The `agent-scan` job prints `SNYK_TOKEN: SET` or `SNYK_TOKEN: EMPTY`, never the value. The job has no job-level condition, so it is never skipped, and it concludes success only when the "Scan skills" step ran and passed (PP1-N3). When no scan runs, its last step fails with the reason:
+
+- a pull request from a fork: GitHub passes no secrets to a workflow triggered from a fork, so the token is absent even after it is set. The check stays red until a maintainer pushes the branch to a branch of this repository, where the scan runs;
+- a pull request, a push to main or a `v*` tag while the secret is empty.
+
+A skipped job counts as passed for a required check; because this job is never skipped, a required `agent-scan` cannot pass without a scan. The command below prompts for the value; it is not echoed.
 
 ```bash
 gh secret set SNYK_TOKEN --repo MHSBai/platform-plugins
@@ -49,7 +54,7 @@ gh api -X POST repos/MHSBai/platform-plugins/branches/main/protection/required_s
 JSON
 ```
 
-Until then, a push to main or a `v*` tag with the token empty fails `agent-scan` by design.
+Until then, every run of `agent-scan` fails by design, and so does every fork pull request afterwards.
 
 ## 3. Release identity and tag ruleset
 
@@ -112,18 +117,24 @@ Requires DNS and hosting administration, which no session performs. On 2026-11-1
 
 1. Bind the connector host to MHSB-operated infrastructure (Design v2.1 Section 9: the service behind the Cloudflare tunnel), or remove the DNS record until the service is live.
 2. Publish the privacy policy and terms of service that cover the connector service, and set `defaults.connector_listing.privacy_policy_url` and `terms_of_service_url` in `catalog/manifest.yaml`.
-3. Run the release check from any machine with network access:
+3. Run the release check from any machine with network access, with a proxy token for each connector obtained by signing in to the service with a test tenant. Each token is read from `MHSB_RELEASE_CHECK_TOKEN_FIRM`, `MHSB_RELEASE_CHECK_TOKEN_LAWMATICS` or `MHSB_RELEASE_CHECK_TOKEN_CLIO` and is never printed:
 
    ```bash
    python tools/release_check.py
    ```
 
-   Each connector must report `PASS`: the host resolves, the certificate is valid for the host, and the endpoint answers the MCP `initialize` request (an initialize result, or HTTP 401 with a Bearer challenge naming the protected resource metadata).
-4. Only then set `tier: ga` for the plugins whose connector passed, run `python tools/gen_manifest.py`, and confirm `python tools/lint.py --release` (rule L16) before the release pull request.
+   Each connector must report `PASS`. The check establishes that the endpoint is MHSB's (PP1-N1): every address the host resolves to lies in `connector_edge.addresses` in `catalog/manifest.yaml` (Cloudflare's published ranges, Design v2.1 Section 9), and `connector_edge.canonical_name` matches when it is set; the certificate is valid for the host; and an authenticated MCP `initialize` returns the `serverInfo` name and version recorded in `connector_identity`. An HTTP 401 never passes. On 2026-11-10 the host resolves outside the recorded edge, so all three connectors fail at the edge step.
+4. When the service version changes, update `connector_identity` to the version being released, and refresh `connector_edge.addresses` from https://www.cloudflare.com/ips if Cloudflare changes its ranges.
+5. Only then set `tier: ga` for the plugins whose connector passed, run `python tools/gen_manifest.py`, and confirm `python tools/lint.py --release` (rule L16) before the release pull request. CI runs the same command in the `release-gate` job on every pull request and every push to main.
 
 ## 9. License text for counsel
 
 [counsel review] `plugins/mhsb-mycase/LICENSE-SOURCE-AVAILABLE.md`, clause 1 (use "under an MHSB AI Policy and Training buildout agreement" by a firm without an MHSB subscription) and clause 3 (that buildout agreement governs such use), generated from `catalog/templates/license-source-available.md` with `offered_without_subscription: true` in `catalog/manifest.yaml`. The wording is the minimum that aligns the notice with the offer to MyCase firms (Design v2.1 Section 3, buildout without a Connected subscription) and with the README License section. Counsel settles the final text; a change is made in the template and regenerated with `python tools/gen_manifest.py`.
+
+Questions for counsel (PP1-N4; the text is unchanged until counsel answers):
+
+1. Design v2.1 Sections 3 and 14 describe the buildout as a one-time engagement with thirty days of support. Clause 1 permits use only under a buildout agreement "in force". Does the grant lapse once the buildout is complete and its support period ends, and should the clause instead permit continued use by a firm that has completed a buildout?
+2. A firm that buys the Essentials package may not hold an agreement titled "AI Policy and Training buildout agreement". Should clause 1 name the agreement by its function, or list the packages (including Essentials) under which the grant applies?
 
 ## PP-2 (Stage 2) items
 
