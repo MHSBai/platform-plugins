@@ -1,6 +1,6 @@
 # Handoff
 
-Items that need Richard Berman, or a later stage, after PP-1 (Stage 1: repository, marketplace, manifest and lint). The cloud session did not attempt any of the repository-administration commands below.
+Items that need the repository owner, or a later stage, after PP-1 (Stage 1: repository, marketplace, manifest and lint). The cloud session did not attempt any of the repository-administration commands below.
 
 ## 1. Protect main
 
