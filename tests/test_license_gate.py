@@ -122,3 +122,29 @@ def test_main_exit_codes(repo: Path, capsys: pytest.CaptureFixture[str]) -> None
     (repo / "harvest" / "LEDGER.yaml").unlink()
     assert license_gate.main(["--root", str(repo)]) == 1
     assert "FAIL G1" in capsys.readouterr().out
+
+
+def test_g7_plugin_without_license_copy(repo: Path) -> None:
+    (repo / "plugins" / "mhsb-operations" / "LICENSES" / "Apache-2.0-anthropics-claude-for-legal.txt").unlink()
+    failures, _, _ = license_gate.run(repo)
+    assert [(f.code, f.path) for f in failures] == [("G7", "plugins/mhsb-operations")]
+
+
+def test_clones_mode_on_clean_checkout_reports_and_passes(
+    repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert "G6" not in codes(repo, clones=True)
+    assert "clones present and re-hashed: 0 of" in capsys.readouterr().out
+
+
+def test_upstream_mode_with_fake_fetcher(repo: Path) -> None:
+    ledger = yaml.safe_load((repo / "harvest" / "LEDGER.yaml").read_text(encoding="utf-8"))
+    by_url: dict[str, bytes | None] = {}
+    for entry in ledger["repositories"]:
+        url = f"https://raw.githubusercontent.com/{entry['repository']}/{entry['commit']}/LICENSE"
+        by_url[url] = None if entry["license_sha256"] is None else b"x"
+    failures, _, _ = license_gate.run(repo, upstream=True, fetch=by_url.__getitem__)
+    assert {f.code for f in failures} == {"G6"}
+    assert len(failures) == 16
+    # A missing upstream file where the ledger records none is not a failure.
+    assert all(f.path != "anthropics/skills" for f in failures)

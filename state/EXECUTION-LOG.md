@@ -223,3 +223,34 @@ harvest/LEDGER.yaml
 ```
 
 agent-scan: wired by Stage 1 in `.github/workflows/ci.yml` (job `agent-scan`, public repository only, SNYK_TOKEN reported as SET or EMPTY); unchanged in this stage. Its first GitHub run is on the pull request.
+
+### Step 6. Incident record completed (review PP2-L2, 2026-11-10)
+
+What was captured at the time of the Step 2 incident is limited to the tail of the pytest output; the full collection list was not saved and the collection is not reproduced, because reproducing it would run harvested code again. Captured lines:
+
+```
+ERROR harvest/lasso-security_mcp-gateway/repo/tests/test_security_scanner.py
+ERROR harvest/lasso-security_mcp-gateway/repo/tests/xetrack_tracing_test.py
+ERROR harvest/snyk_agent-scan/repo/tests - ModuleNotFoundError: No module nam...
+!!!!!!!!!!!!!!!!!!! Interrupted: 34 errors during collection !!!!!!!!!!!!!!!!!!!
+34 errors in 1.53s
+```
+
+Directories that held bytecode caches newer than the ledger before the caches were deleted (`find harvest -name __pycache__ -newer harvest/LEDGER.yaml`): each marks Python code that was compiled for import, and therefore at least partly executed:
+
+```
+harvest/RosenAdvertising_clio-mcp/repo/tests/__pycache__
+harvest/LegalMate_hyacinth/repo/test/__pycache__
+harvest/SuffolkLITLab_docassemble-AssemblyLine/repo/docassemble/AssemblyLine/__pycache__
+harvest/RosenAdvertising_mycase-mcp/repo/tests/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/security_scanner/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/tracing/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/guardrails/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/__pycache__
+harvest/lasso-security_mcp-gateway/repo/tests/__pycache__
+```
+
+Packages installed in the virtual environment that ran pytest (`.venv/bin/pip freeze`, unchanged since): attrs 26.1.0, iniconfig 2.3.1, jsonschema 4.26.0, jsonschema-specifications 2025.9.1, packaging 26.3, pluggy 1.7.0, pytest 8.3.4, PyYAML 6.0.3, referencing 0.37.0, rpds-py 2026.9.1, typing_extensions 4.16.0. No harvested package was installed; imports of the clones' own packages resolved only through pytest's rootdir insertion into `sys.path`.
+
+Correction to Step 2: besides module-level code, pytest hooks defined in any `conftest.py` that imported successfully (for example `pytest_addoption` and `pytest_collection_modifyitems` in snyk/agent-scan's) run during collection. The snyk/agent-scan error line shows a `ModuleNotFoundError` for that test directory, which indicates its conftest failed to import, but whether any of its hooks registered before the error cannot be established from the captured output. RosenAdvertising/clio-mcp's conftest rewrites `HOME` for its own process and imports its package; its `tests/live_smoke_test.py` and `tests/smoke_test.py` match the default pattern and put the clone root on `sys.path`. The bytecode caches for that test directory show its modules were compiled. None of the conftest files read as data contains module-level network or credential access. No secret was present in the session. The remediation (Step 2) stands.
