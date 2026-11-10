@@ -428,7 +428,20 @@ The private identifier list (17 identifiers: pilot firm codes, full firm names, 
 
 Command: `git push -u origin cloud/pp8-skills-evals`. Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/4 ("Stage 8: skills to final text, routing suite and evals"), base `cloud/pp9-pack-fragments`. Not merged. Outcome: DONE PP-8, with model evals pending (no key).
 
-### Step 8. Review XREVIEW-PP-STACK-A (2026-11-10)
+### Step 8. Model evals run 2026-11-10 (run API-1, pop-os, Console API credit)
+
+Preflight: `GET /v1/models` lists claude-sonnet-5-5 and claude-opus-5-5 with lifecycle active; the prices in `evals/model-config.yaml` equal the standard first-party rates on https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-11-10); no configuration change. Environment: Python 3.12.3, anthropic 2.7.0, PyYAML 6.0.3.
+
+Command: `python -u tools/model_evals.py --budget 20`, with the key sourced from the local environment file in a subshell. A first attempt (`python tools/model_evals.py`) was stopped by the session's 10-minute command timeout before it wrote any record; its requests are unrecorded and form a prefix of the same task list, so its spend is below that of the full run below. The cap of the second attempt was lowered from USD 40 to USD 20 so that the two attempts together remain under USD 40.
+
+Model eval run 2026-11-10T16:20:52Z: key SET; status ran.
+routing: model claude-sonnet-5-5; 223 of 240 passed.
+skills: model claude-opus-5-5; 46 of 144 passed.
+Tokens: input 1019126, output 125426; requests 384; estimated cost USD 5.46 of cap 20.00.
+
+Decoy write tool calls: 0 of 144 skill cases. Routing failures: 12 of 17 are in the core-only command set, where the expected answer is `start`. Skill failures are mostly exact-text rules (required phrases, exact refusal and injection notices); per-case detail is in `evals/results/model-evals.json`. Estimated spend for both attempts: at most about USD 10.91 (USD 5.46 measured, plus an unrecorded first attempt below USD 5.46).
+
+### Step 9. Review XREVIEW-PP-STACK-A (2026-11-10)
 
 Findings PP4-M1, PP4-L1, PP4-L2 and PP4-L3 fixed on this branch (decision 0005, Section 9). The inherited findings PP1-H1, PP1-M1, PP1-M3 and PP2-M1 belong to the Stage 1 and Stage 2 pull requests.
 
@@ -442,12 +455,12 @@ skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed
 $ python tools/gen_manifest.py --check
 generated files current
 $ python tools/model_evals.py --check-release; echo $?
-RELEASE BLOCKED model evals status is 'pending', not 'ran'
-(four coverage and pass-rate lines)
-model eval release gate: 5 problem(s)
+RELEASE BLOCKED routing: 223 of 240 passed; a release needs 100 percent
+RELEASE BLOCKED skills: 46 of 144 passed; a release needs 100 percent
+model eval release gate: 2 problem(s)
 1
 $ python -m pytest -q | tail -1
 121 passed in 173.09s (0:02:53)
 ```
 
-The release gate fails as intended while the model evals are pending; it does not run on pull requests.
+Run against the Step 8 record (merged from the remote branch before this push). The gate blocks a 0.2.0 tag on both pass rates; it does not run on pull requests.
