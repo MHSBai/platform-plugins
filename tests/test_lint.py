@@ -612,3 +612,17 @@ def test_l03_metadata_triggers_rejected(repo: Path) -> None:
     path.write_text(text.replace("metadata:\n", "metadata:\n  triggers:\n  - how much did we bill\n", 1),
                     encoding="utf-8")
     assert "L03" in rules_failed(repo)
+
+
+def test_l13_readme_tier_must_match_manifest(repo: Path) -> None:
+    path = repo / "plugins/mhsb-clio/README.md"
+    path.write_text(path.read_text(encoding="utf-8").replace("Release tier: pilot.", "Release tier: ga."),
+                    encoding="utf-8")
+    assert "L13" in rules_failed(repo)
+
+
+def test_l13_install_line_in_unlisted_plugin(repo: Path) -> None:
+    path = repo / "plugins/mhsb-pack-real-estate/README.md"
+    path.write_text(path.read_text(encoding="utf-8") + "\n/plugin install mhsb-pack-real-estate\n",
+                    encoding="utf-8")
+    assert "L13" in rules_failed(repo)
