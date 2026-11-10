@@ -427,3 +427,16 @@ The private identifier list (17 identifiers: pilot firm codes, full firm names, 
 ### Step 7. Push and pull request
 
 Command: `git push -u origin cloud/pp8-skills-evals`. Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/4 ("Stage 8: skills to final text, routing suite and evals"), base `cloud/pp9-pack-fragments`. Not merged. Outcome: DONE PP-8, with model evals pending (no key).
+
+### Step 8. Model evals run 2026-11-10 (run API-1, pop-os, Console API credit)
+
+Preflight: `GET /v1/models` lists claude-sonnet-5-5 and claude-opus-5-5 with lifecycle active; the prices in `evals/model-config.yaml` equal the standard first-party rates on https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-11-10); no configuration change. Environment: Python 3.12.3, anthropic 2.7.0, PyYAML 6.0.3.
+
+Command: `python -u tools/model_evals.py --budget 20`, with the key sourced from the local environment file in a subshell. A first attempt (`python tools/model_evals.py`) was stopped by the session's 10-minute command timeout before it wrote any record; its requests are unrecorded and form a prefix of the same task list, so its spend is below that of the full run below. The cap of the second attempt was lowered from USD 40 to USD 20 so that the two attempts together remain under USD 40.
+
+Model eval run 2026-11-10T16:20:52Z: key SET; status ran.
+routing: model claude-sonnet-5-5; 223 of 240 passed.
+skills: model claude-opus-5-5; 46 of 144 passed.
+Tokens: input 1019126, output 125426; requests 384; estimated cost USD 5.46 of cap 20.00.
+
+Decoy write tool calls: 0 of 144 skill cases. Routing failures: 12 of 17 are in the core-only command set, where the expected answer is `start`. Skill failures are mostly exact-text rules (required phrases, exact refusal and injection notices); per-case detail is in `evals/results/model-evals.json`. Estimated spend for both attempts: at most about USD 10.91 (USD 5.46 measured, plus an unrecorded first attempt below USD 5.46).
