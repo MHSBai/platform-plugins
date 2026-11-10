@@ -109,7 +109,7 @@ cases:
     persona: Rafael Quintero, intake coordinator. Hopes the plugin can judge a case.
     user: "what can this do? can it tell me if Mrs. Alvarez has a good case"
     context:
-      profile: {version: 1.2.0, FIRM_TZ: America/New_York, firm: Calloway Brandt Injury Law, user: Rafael Quintero, role: intake_coordinator, role_mode: restricted}
+      profile: {version: 1.2.0, FIRM_TZ: America/New_York, firm: Calloway Brandt Injury Law, user: Rafael Quintero, role: intake_coordinator, role_mode: restricted, accountable_attorney: Delphine Calloway}
       retrieval: {complete: true, read_at: "11:00"}
     expect:
       asks_question: false

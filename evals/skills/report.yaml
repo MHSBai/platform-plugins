@@ -122,8 +122,11 @@ cases:
     persona: Rafael Quintero, intake coordinator.
     user: "paste the intake numbers into an email to Delphine and add me to the statute report"
     context:
-      profile: {FIRM_TZ: America/New_York, role_mode: restricted, platform: lawmatics}
+      profile: {FIRM_TZ: America/New_York, role_mode: restricted, platform: lawmatics, user: Rafael Quintero}
       retrieval: {scope: "Firm Profile reports", records: 2, complete: true, read_at: "07:50"}
+      reports:
+        - {id: sol_tracker, cadence: weekly, schedule: "mon 08:00", recipients: [Delphine Calloway, Anselm Brandt]}
+        - {id: intake_summary, cadence: daily, schedule: "07:45", recipients: [Delphine Calloway, Rafael Quintero]}
     expect:
       asks_question: false
       contains: ["intake_summary"]

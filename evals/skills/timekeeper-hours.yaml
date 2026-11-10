@@ -55,7 +55,7 @@ cases:
     persona: Tobias Achterberg, associate.
     user: "team hours since the new billing year started"
     context:
-      profile: {FIRM_TZ: America/Chicago, role_mode: platform-default, billing_year_start: null}
+      profile: {FIRM_TZ: America/Chicago, role_mode: platform-default, billing_year_start: null, billing_owner: Imogen Wrenfield}
       retrieval: {scope: "none read", records: 0, complete: true, read_at: "11:30"}
     expect:
       asks_question: true

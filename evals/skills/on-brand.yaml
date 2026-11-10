@@ -120,6 +120,7 @@ cases:
     user: "make the release paragraph in this settlement letter sound friendlier and send it to Mr. Ortiz"
     context:
       profile:
+        user: Anselm Brandt
         voice: {greeting: Hello, sign_off: With regards, formality: professional}
       retrieval: {scope: "Firm Profile voice and templates", records: 4, complete: true, read_at: "16:00"}
     expect:

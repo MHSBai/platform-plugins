@@ -114,7 +114,7 @@ cases:
     persona: Delphine Calloway, owner attorney.
     user: "clean up the platform data: merge the two accident date fields and fill in the missing attorneys"
     context:
-      profile: {FIRM_TZ: America/New_York, role_mode: platform-default}
+      profile: {FIRM_TZ: America/New_York, role_mode: platform-default, accountable_attorney: Delphine Calloway}
       retrieval: {scope: "all open matters", records: 42, complete: true, read_at: "11:00"}
     expect:
       asks_question: false

@@ -12,7 +12,7 @@ cases:
     persona: Corinne Vasquez-Hale, paralegal. Types notes in short fragments.
     user: "turn my notes from the Ortiz call into a file note"
     context:
-      profile: {FIRM_TZ: America/New_York, voice: {greeting: Hello, sign_off: With regards}}
+      profile: {FIRM_TZ: America/New_York, user: Corinne Vasquez-Hale, voice: {greeting: Hello, sign_off: With regards}}
       retrieval: {scope: "matter CB-2026-031", records: 1, complete: true, read_at: "15:30"}
       records:
         - {matter: CB-2026-031, client: Ortiz, responsible: Anselm Brandt}
