@@ -416,3 +416,7 @@ pack evals: 28 cases, 28 passed, 0 failed
 $ python tools/validate_fragments_service.py --service ../mhsb-firm-service
 fragments: 12, schema and rule failures: 0
 ```
+
+### Step 6. Fix session FIX-PP-STACK-A, 2026-11-10 (PP3-L1 and PP3-L2 verified; fixes from Stages 1 and 2 merged)
+
+`cloud/pp2-harvest`, carrying the PP1 and PP2 fixes, was merged into this branch. In the `tools/verify_marketplace.sh` conflict the Stage 1 loop was kept: it covers every plugin whose tier is not ga (the three connector plugins, the two held packs, the four pilot packs and the six hidden packs) and requires the exact "not found in marketplace" refusal (PP3-L2). The 919c3a9 loop required only a failed install. PP3-L1: the vendored schema hash `9d537e09...` equals the file at service commit `bfcddee`; L15 compares it with `tools/schemas/fragment.schema.source.json`. The Stage 3 pull request in the service repository is still open on 2026-11-10, so re-vendoring stays in HANDOFF (PP-9 item 8).
