@@ -2,6 +2,10 @@
 
 Each entry describes what changed for the people who use the plugins at a firm. Version numbers follow the plugin versions in the marketplace.
 
+## Unreleased (Stage 2, 2026-11-03)
+
+The commands now draw on rewritten material from permissively licensed sources: intake screening, deadline reporting rules, letter rules and the approval step, matter status variants, contact records, brief views, report covers, the setup runbook, the start routing, and the AI policy base. The personal injury, civil litigation and business packs gain reusable intake question blocks and, for the first two, chronology, briefing and preservation notes. Each adapted file names its source and license at its top. Nothing changes in what the plugins never do.
+
 ## 0.1.0 (2026-11-03)
 
 First structure of the plugin line. Nothing in this release reads or changes a firm's records yet, because the MHSB connectors that the commands use are built in later stages.

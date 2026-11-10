@@ -73,3 +73,12 @@ This command does not do the following. It says so and stops.
 - Deleting, bulk edits or any write to the platform.
 - A template without an adoption record.
 - Wording that is not in the adopted template. Only variables are filled.
+
+## References
+
+Read these files in this skill's `references/` folder when the step needs them. Each one names its source and license at its top.
+
+- `references/approval-queue.md`: Approval queue.
+- `references/client-letter-rules.md`: Client letter rules.
+- `references/signature-checklist.md`: Signature checklist: readiness before a person sends for signature.
+- `references/templated-response.md`: Templated response: when an adopted template may be used.

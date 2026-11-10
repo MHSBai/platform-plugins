@@ -214,3 +214,106 @@ release_check            3 connector(s), 3 edge failures, 0 blocking (all pilot)
 verify_marketplace.sh    13 unlisted plugins refused with "not found in marketplace"
 claude plugin validate . --strict   passed
 ```
+
+## PP-2, Stage 2: harvest, provenance and adapted sources
+
+### Step 0. Resume check and stacking (2026-11-03)
+
+Command: `git ls-remote --heads origin; git log --oneline origin/main`
+
+Output: `main` holds only `080d165 docs: repository purpose`; the Stage 1 branch `cloud/pp1-repository-marketplace` (head 48bc51a) holds the skeleton and its pull request is open, not merged. No PP-2 entry existed in this log. Branch `cloud/pp2-harvest` was created from `cloud/pp1-repository-marketplace`. The session harness named a different branch (`roo/wizardly-mendel-c744jl`); the task's branch name was used, as in Stage 1 and Stage 3.
+
+### Step 1. Clone the seventeen repositories
+
+Command: `git -c core.hooksPath=/dev/null clone --no-checkout https://github.com/OWNER/REPO harvest/OWNER_REPO/repo`, then `checkout` with hooks disabled; one empty directory per repository.
+
+Output: all seventeen cloned; none unreachable. Heads recorded in `harvest/LEDGER.yaml`. No build tool, install script or package manager was run in any clone; license files were hashed and classified with a scratchpad script run under `python3 -I`.
+
+### Step 2. Incident: pytest collection imported clone modules
+
+The first `python -m pytest -q` after the clones existed had no `testpaths` setting, so pytest discovery walked into `harvest/` and imported test modules and three `conftest.py` files from the clones (RosenAdvertising clio-mcp and lawmatics-mcp, snyk agent-scan) before stopping with 34 collection errors. Module-level code of those files and of the packages they import therefore ran once inside this container's pytest process. No fixture or test body ran (collection was interrupted); the module-level code inspected sets environment variables for its own process and defines fixtures; the process exited. No secret is held in the repository or was set for the session. Remedy: `pytest.ini` pins discovery to `tests/` with `norecursedirs = harvest`; the `__pycache__` directories produced in the clones were deleted; `git status --ignored` in each clone is clean. This breached the instruction never to run code from a clone and is recorded here for that reason.
+
+### Step 3. Ledger, license gate, adapted files (checkpoints: ledger complete, license gate green, headers)
+
+Commit 6735a61. 32 adapted files (14 from claude-for-legal, 13 from knowledge-work-plugins, 2 from frblaw/ai-policy-templates, 3 from AssemblyLine), each with the modification notice and a PROVENANCE row. `tools/license_gate.py` (G1 to G6) with negative tests in `tests/test_license_gate.py`; CI step added to the lint job. The dash rule now skips the git-ignored clones and still lints `harvest/LEDGER.yaml`.
+
+### Step 4. Element checklists (checkpoint: one per restricted form)
+
+Commit 6ac3d62. Seven checklists in `catalog/element-checklists/`, written without any form open; comparison against each current edition and the similarity review are pending. Consent request drafts and the terms record are in the private repository (mhsb-firm-service `docs/consents/`), not sent.
+
+### Step 5. Checkpoint run
+
+```
+$ ledger completeness
+entries: 17 incomplete: []
+status: {'ADAPT': 4, 'BENCHMARK': 6, 'VENDOR': 5, 'EVALUATED': 1, 'TOOL': 1}
+license_status: {'ALLOWED': 16, 'ABSENT': 1}
+$ python tools/license_gate.py --clones
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ python tools/license_gate.py
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ adapted files with notice
+32
+$ PROVENANCE rows by license
+Apache-2.0: 27
+CC0-1.0: 2
+MIT: 3
+$ element checklists
+7
+$ python tools/gen_manifest.py --check
+generated files current
+exit 0
+$ python tools/lint.py
+lint: 14 rules, 0 error(s), 12 warning(s)
+$ python -m pytest -q
+70 passed in 44.85s
+$ denylist grep
+identifiers: 15
+hits: 0
+$ tracked files under harvest
+harvest/LEDGER.yaml
+```
+
+agent-scan: wired by Stage 1 in `.github/workflows/ci.yml` (job `agent-scan`, public repository only, SNYK_TOKEN reported as SET or EMPTY); unchanged in this stage. Its first GitHub run is on the pull request.
+
+### Step 6. Incident record completed (review PP2-L2, 2026-11-10)
+
+What was captured at the time of the Step 2 incident is limited to the tail of the pytest output; the full collection list was not saved and the collection is not reproduced, because reproducing it would run harvested code again. Captured lines:
+
+```
+ERROR harvest/lasso-security_mcp-gateway/repo/tests/test_security_scanner.py
+ERROR harvest/lasso-security_mcp-gateway/repo/tests/xetrack_tracing_test.py
+ERROR harvest/snyk_agent-scan/repo/tests - ModuleNotFoundError: No module nam...
+!!!!!!!!!!!!!!!!!!! Interrupted: 34 errors during collection !!!!!!!!!!!!!!!!!!!
+34 errors in 1.53s
+```
+
+Directories that held bytecode caches newer than the ledger before the caches were deleted (`find harvest -name __pycache__ -newer harvest/LEDGER.yaml`): each marks Python code that was compiled for import, and therefore at least partly executed:
+
+```
+harvest/RosenAdvertising_clio-mcp/repo/tests/__pycache__
+harvest/LegalMate_hyacinth/repo/test/__pycache__
+harvest/SuffolkLITLab_docassemble-AssemblyLine/repo/docassemble/AssemblyLine/__pycache__
+harvest/RosenAdvertising_mycase-mcp/repo/tests/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/security_scanner/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/tracing/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/guardrails/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/__pycache__
+harvest/lasso-security_mcp-gateway/repo/tests/__pycache__
+```
+
+Packages installed in the virtual environment that ran pytest (`.venv/bin/pip freeze`, unchanged since): attrs 26.1.0, iniconfig 2.3.1, jsonschema 4.26.0, jsonschema-specifications 2025.9.1, packaging 26.3, pluggy 1.7.0, pytest 8.3.4, PyYAML 6.0.3, referencing 0.37.0, rpds-py 2026.9.1, typing_extensions 4.16.0. No harvested package was installed; imports of the clones' own packages resolved only through pytest's rootdir insertion into `sys.path`.
+
+Correction to Step 2: besides module-level code, pytest hooks defined in any `conftest.py` that imported successfully (for example `pytest_addoption` and `pytest_collection_modifyitems` in snyk/agent-scan's) run during collection. The snyk/agent-scan error line shows a `ModuleNotFoundError` for that test directory, which indicates its conftest failed to import, but whether any of its hooks registered before the error cannot be established from the captured output. RosenAdvertising/clio-mcp's conftest rewrites `HOME` for its own process and imports its package; its `tests/live_smoke_test.py` and `tests/smoke_test.py` match the default pattern and put the clone root on `sys.path`. The bytecode caches for that test directory show its modules were compiled. None of the conftest files read as data contains module-level network or credential access. No secret was present in the session. The remediation (Step 2) stands.
+
+### Step 7. Fix session FIX-PP-STACK-A, 2026-11-10 (PP2-M1 completed; PP2-L1 to PP2-L6 verified)
+
+`cloud/pp1-repository-marketplace` (PP1 fixes) merged into this branch. Commit 8c351e7 had already added the per-plugin `LICENSES/` copies and gate rule G7. Under the fix contract, two parts of PP2-M1 remained: a NOTICE excerpt inside each plugin, and a rule in `tools/lint.py`. Lint rule L17 was committed first and reported five errors (no plugin shipped a NOTICE excerpt); the five `plugins/<name>/NOTICE.md` excerpts followed. A throwaway marketplace install showed `NOTICE.md` and `LICENSES/` in the plugin cache.
+
+```
+license_gate.py            17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+license_gate.py --clones   clones present and re-hashed: 0 of 17; 0 failure(s) (clean checkout)
+license_gate.py --upstream upstream LICENSE files compared: 17; 0 failure(s)
+lint.py                    16 rules, 0 error(s), 12 warning(s)
+```

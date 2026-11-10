@@ -8,13 +8,15 @@ MHSB Platform Plugins. Copyright 2026 MHSB Solutions.
 
 The plugin line adapts material from the permissively licensed sources below. Each adapted file carries the MHSB modification notice at its top (Apache License, Version 2.0, Section 4(b)) and has a row in `PROVENANCE.md` giving source, commit, license, date and change note. The adapted portions remain under their original licenses; the original copyright and license notices are retained in each file.
 
-Release 0.1.0 contains no adapted file. The ledger in `PROVENANCE.md` is empty, and rows are added in Stage 2 (harvest) as files are adapted.
+Stage 2 (harvest, 2026-11-03) added 32 adapted files: 27 from Apache-2.0 sources (anthropics/claude-for-legal, anthropics/knowledge-work-plugins), 3 from an MIT source (SuffolkLITLab/docassemble-AssemblyLine) and 2 from a CC0-1.0 source (frblaw/ai-policy-templates). The license texts are reproduced in `LICENSES/` and, for every plugin that holds an adapted file, inside that plugin's own `LICENSES/` directory, with an excerpt of this notice as the plugin's `NOTICE.md` (lint rule L17), because a marketplace install copies only the plugin directory; neither Apache-2.0 source ships a NOTICE file. The MIT copyright and permission notice is also reproduced in each MIT-derived file. Every cloned repository, with its commit, license file hash and SPDX identifier, is recorded in `harvest/LEDGER.yaml`.
+
+The adapted portions in source-available plugins remain under their original licenses; the source-available license of those plugins applies only to MHSB's own material in them.
 
 | Source | License | Planned use |
 |---|---|---|
 | anthropics/claude-for-legal (legal-clinic, litigation-legal, commercial-legal, legal-builder-hub) | Apache-2.0 | ADAPT with per-file modification notices |
 | anthropics/knowledge-work-plugins (small-business, legal, customer-support, operations) | Apache-2.0 | ADAPT with per-file modification notices |
-| anthropics/skills (skill-creator, mcp-builder, brand-guidelines) | Apache-2.0 | build tooling only |
+| anthropics/skills | no root license; per-folder Apache-2.0 for skill-creator, mcp-builder and brand-guidelines; docx, pdf, pptx and xlsx are proprietary | BENCHMARK only: nothing copied or redistributed |
 | marshall1727/clio-mcp | Apache-2.0 | catalog generator pattern; no-write lint reference |
 | WYRE-AI node-clio, clio-mcp | Apache-2.0 | typed errors, fixtures, elicitation pattern |
 | snyk/agent-scan | Apache-2.0 | CI on the public repository only; not redistributed |

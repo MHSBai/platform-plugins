@@ -135,3 +135,11 @@ Questions for counsel (PP1-N4; the text is unchanged until counsel answers):
 
 1. Design v2.1 Sections 3 and 14 describe the buildout as a one-time engagement with thirty days of support. Clause 1 permits use only under a buildout agreement "in force". Does the grant lapse once the buildout is complete and its support period ends, and should the clause instead permit continued use by a firm that has completed a buildout?
 2. A firm that buys the Essentials package may not hold an agreement titled "AI Policy and Training buildout agreement". Should clause 1 name the agreement by its function, or list the packages (including Essentials) under which the grant applies?
+
+## PP-2 (Stage 2) items
+
+1. Element checklists: compare each checklist in `catalog/element-checklists/` against the current edition of its form under the publisher's terms, and run the similarity review; confirm the five terms statuses marked "restricted or unstated".
+2. Consent requests: drafts are in mhsb-firm-service `docs/consents/consent-requests.md`; decide per form whether any wording is wanted, and send only those. Not sent from the cloud session.
+3. Adoption: the 32 adapted references and fragment sources are drafts in the repository's register; the skills point to them, but they carry no attorney adoption, and none is a template.
+4. MHSB hygiene items and the appointment-comms v3 gate on Stage 10 are recorded in mhsb-firm-service `HANDOFF.md`; they need MHSB's workstation and MHSB's private notes, which a cloud session cannot reach.
+5. Stacking: `cloud/pp2-harvest` is based on `cloud/pp1-repository-marketplace`; merge that pull request first, then rebase this branch onto `main`.
