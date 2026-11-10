@@ -611,3 +611,8 @@ model eval release gate: 3 problem(s)   (digest absent; routing 223 of 240; skil
 $ python -m pytest -q | tail -1
 165 passed (164 plus the repaired helper test; tests/test_routing_and_skill_evals.py 29 passed)
 ```
+
+Model eval run 2026-11-10T19:53:46Z: key SET; status ran.
+routing: model claude-sonnet-5-5; 238 of 240 passed.
+skills: model claude-opus-5-5; 120 of 144 passed.
+Tokens: input 1323237, output 125259; requests 384; estimated cost USD 6.36 of cap 12.00.
