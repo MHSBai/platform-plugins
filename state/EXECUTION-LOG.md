@@ -288,3 +288,14 @@ harvest/lasso-security_mcp-gateway/repo/tests/__pycache__
 Packages installed in the virtual environment that ran pytest (`.venv/bin/pip freeze`, unchanged since): attrs 26.1.0, iniconfig 2.3.1, jsonschema 4.26.0, jsonschema-specifications 2025.9.1, packaging 26.3, pluggy 1.7.0, pytest 8.3.4, PyYAML 6.0.3, referencing 0.37.0, rpds-py 2026.9.1, typing_extensions 4.16.0. No harvested package was installed; imports of the clones' own packages resolved only through pytest's rootdir insertion into `sys.path`.
 
 Correction to Step 2: besides module-level code, pytest hooks defined in any `conftest.py` that imported successfully (for example `pytest_addoption` and `pytest_collection_modifyitems` in snyk/agent-scan's) run during collection. The snyk/agent-scan error line shows a `ModuleNotFoundError` for that test directory, which indicates its conftest failed to import, but whether any of its hooks registered before the error cannot be established from the captured output. RosenAdvertising/clio-mcp's conftest rewrites `HOME` for its own process and imports its package; its `tests/live_smoke_test.py` and `tests/smoke_test.py` match the default pattern and put the clone root on `sys.path`. The bytecode caches for that test directory show its modules were compiled. None of the conftest files read as data contains module-level network or credential access. No secret was present in the session. The remediation (Step 2) stands.
+
+### Step 7. Fix session FIX-PP-STACK-A, 2026-11-10 (PP2-M1 completed; PP2-L1 to PP2-L6 verified)
+
+`cloud/pp1-repository-marketplace` (PP1 fixes) merged into this branch. Commit 8c351e7 had already added the per-plugin `LICENSES/` copies and gate rule G7. Under the fix contract, two parts of PP2-M1 remained: a NOTICE excerpt inside each plugin, and a rule in `tools/lint.py`. Lint rule L17 was committed first and reported five errors (no plugin shipped a NOTICE excerpt); the five `plugins/<name>/NOTICE.md` excerpts followed. A throwaway marketplace install showed `NOTICE.md` and `LICENSES/` in the plugin cache.
+
+```
+license_gate.py            17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+license_gate.py --clones   clones present and re-hashed: 0 of 17; 0 failure(s) (clean checkout)
+license_gate.py --upstream upstream LICENSE files compared: 17; 0 failure(s)
+lint.py                    16 rules, 0 error(s), 12 warning(s)
+```
