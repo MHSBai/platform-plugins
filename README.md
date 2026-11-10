@@ -35,4 +35,4 @@ claude plugin validate .
 
 ## License
 
-`plugins/mhsb-firm-core` is licensed under Apache-2.0. Every other plugin is source-available: readable and installable, not licensed for reuse or redistribution, and used under the MHSB Plugin Subscription Agreement. See NOTICE.md and PROVENANCE.md.
+`plugins/mhsb-firm-core` is licensed under Apache-2.0. Every other plugin is source-available: readable and installable, not licensed for reuse or redistribution, and used under the MHSB Plugin Subscription Agreement. A MyCase firm without a subscription may also use `mhsb-mycase` under an MHSB AI Policy and Training buildout agreement. Each notice is generated from `catalog/templates/license-source-available.md`. See NOTICE.md and PROVENANCE.md.

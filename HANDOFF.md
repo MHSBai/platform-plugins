@@ -120,3 +120,7 @@ Requires DNS and hosting administration, which no session performs. On 2026-11-1
 
    Each connector must report `PASS`: the host resolves, the certificate is valid for the host, and the endpoint answers the MCP `initialize` request (an initialize result, or HTTP 401 with a Bearer challenge naming the protected resource metadata).
 4. Only then set `tier: ga` for the plugins whose connector passed, run `python tools/gen_manifest.py`, and confirm `python tools/lint.py --release` (rule L16) before the release pull request.
+
+## 9. License text for counsel
+
+[counsel review] `plugins/mhsb-mycase/LICENSE-SOURCE-AVAILABLE.md`, clause 1 (use "under an MHSB AI Policy and Training buildout agreement" by a firm without an MHSB subscription) and clause 3 (that buildout agreement governs such use), generated from `catalog/templates/license-source-available.md` with `offered_without_subscription: true` in `catalog/manifest.yaml`. The wording is the minimum that aligns the notice with the offer to MyCase firms (Design v2.1 Section 3, buildout without a Connected subscription) and with the README License section. Counsel settles the final text; a change is made in the template and regenerated with `python tools/gen_manifest.py`.

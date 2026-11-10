@@ -48,6 +48,7 @@ class Plugin:
     description: str
     commands: tuple[Command, ...]
     practice: str | None = None
+    offered_without_subscription: bool = False
 
 
 @dataclass(frozen=True)
@@ -131,6 +132,13 @@ def _require(mapping: dict[str, Any], key: str, where: str) -> Any:
     return mapping[key]
 
 
+def _flag(mapping: dict[str, Any], key: str, where: str) -> bool:
+    value = mapping.get(key, False)
+    if not isinstance(value, bool):
+        raise ManifestError(f"{where}: '{key}' must be true or false")
+    return value
+
+
 def parse_manifest(raw: dict[str, Any]) -> Manifest:
     """Validate the manifest structure and return a typed view of it."""
     for key in ("schema_version", "marketplace", "defaults", "licenses", "connectors",
@@ -179,6 +187,7 @@ def parse_manifest(raw: dict[str, Any]) -> Manifest:
             license_id=licenses[license_key], category=str(entry.get("category", "")),
             mcp=mcp, description=" ".join(str(_require(entry, "description", where)).split()),
             commands=tuple(commands), practice=entry.get("practice"),
+            offered_without_subscription=_flag(entry, "offered_without_subscription", where),
         ))
     return manifest
 

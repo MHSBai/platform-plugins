@@ -333,6 +333,9 @@ plugins:
     kind: platform
     tier: ga
     license: source_available
+    # MyCase firms buy the buildout and run this plugin without a Connected
+    # subscription; the generated license notice carries the buildout grant.
+    offered_without_subscription: true
     category: platform
     mcp: null
     description: >-
