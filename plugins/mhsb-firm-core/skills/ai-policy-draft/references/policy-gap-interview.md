@@ -1,5 +1,5 @@
 <!--
-MHSB modification notice (Apache License, Version 2.0, Section 4(b)).
+MHSB modification notice.
 Modified by MHSB Solutions on 2026-11-03.
 Original: frblaw/ai-policy-templates, skill/customize-ai-policy/SKILL.md, commit 080ccd9946bcb676104c036eda7da89bc14aaf5f.
 Original license: CC0-1.0. The original copyright and license notices are retained.

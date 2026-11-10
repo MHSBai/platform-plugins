@@ -163,6 +163,40 @@ Command: `git push -u origin cloud/pp1-repository-marketplace`
 
 Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/1 ("Stage 1: repository, marketplace, manifest and lint"). Not merged. Outcome: DONE PP-1.
 
+### Step 11. Review response, 2026-11-10 (PP1-M1, PP1-L1, PP1-L3)
+
+Changes: agent-scan fails on push (main and `v*` tags) when `SNYK_TOKEN` is empty and is removed from the required contexts in HANDOFF item 1 until item 2 is done (PP1-M1); `tools/verify_marketplace.sh` asserts the "not found in marketplace" message for every pilot and hidden pack (PP1-L1); the generator deduplicates keywords (PP1-L3). The other findings are owner decisions and are listed in the pull request reply.
+
+```
+generated files current
+lint: 14 rules, 0 error(s), 12 warning(s)
+57 passed
+√ Validation passed
+OK: <each of 10 pilot and hidden packs> not found in marketplace
+verify exit=0
+```
+
+### Step 12. Fix session FIX-PP-STACK-A, 2026-11-10 (PP1-H1, PP1-M1, PP1-M3, PP1-L2, PP1-L5)
+
+Each applied finding has a reproduction commit before its fix.
+
+- PP1-H1: the connector host resolved, but the TLS handshake failed (`SSLEOFError`). `tools/release_check.py` and lint rule L16 were committed first; at that commit `lint.py --release` reported L16 for the three connector plugins. Fix: `mhsb-operations`, `mhsb-lawmatics` and `mhsb-clio` are held at tier pilot; HANDOFF item 8 records the DNS and hosting step as the condition for release.
+- PP1-L2: L16 also requires `privacyPolicyUrl` and `termsOfServiceUrl` on any ga connector plugin; the generator emits them from `defaults.connector_listing` once the documents exist.
+- PP1-M1: `tests/test_ci.py` failed on the previous workflow (the job concluded success with the scan skipped). Fix: an `agent-scan-token` job; `agent-scan` is skipped on pull requests without the token and fails on push.
+- PP1-M3: `tests/test_licenses.py` failed (notices hand-copied, no buildout grant). Fix: notices generated from one template; buildout grant for `mhsb-mycase`; HANDOFF item 9 `[counsel review]`.
+- PP1-L5: "repository owner" in HANDOFF.md and decision 0002.
+
+```
+gen_manifest --check     generated files current
+gen_manifest --counts    895 combinations, maximum 22, catalog/counts.md identical
+lint                     15 rules, 0 error(s), 12 warning(s)
+lint --release           12 error(s), all L11 synthetic adoption (decision 0002; resolved by Stage 9, PP1-M2)
+release_check            3 connector(s), 0 blocking failure(s) (no connector plugin at tier ga)
+pytest                   85 passed
+verify_marketplace.sh    4 listed plugins installed; 13 unlisted plugins refused with "not found in marketplace"
+claude plugin validate . --strict   passed; 17 of 17 plugins pass --strict
+```
+
 ## PP-2, Stage 2: harvest, provenance and adapted sources
 
 ### Step 0. Resume check and stacking (2026-11-03)
@@ -223,6 +257,48 @@ harvest/LEDGER.yaml
 ```
 
 agent-scan: wired by Stage 1 in `.github/workflows/ci.yml` (job `agent-scan`, public repository only, SNYK_TOKEN reported as SET or EMPTY); unchanged in this stage. Its first GitHub run is on the pull request.
+
+### Step 6. Incident record completed (review PP2-L2, 2026-11-10)
+
+What was captured at the time of the Step 2 incident is limited to the tail of the pytest output; the full collection list was not saved and the collection is not reproduced, because reproducing it would run harvested code again. Captured lines:
+
+```
+ERROR harvest/lasso-security_mcp-gateway/repo/tests/test_security_scanner.py
+ERROR harvest/lasso-security_mcp-gateway/repo/tests/xetrack_tracing_test.py
+ERROR harvest/snyk_agent-scan/repo/tests - ModuleNotFoundError: No module nam...
+!!!!!!!!!!!!!!!!!!! Interrupted: 34 errors during collection !!!!!!!!!!!!!!!!!!!
+34 errors in 1.53s
+```
+
+Directories that held bytecode caches newer than the ledger before the caches were deleted (`find harvest -name __pycache__ -newer harvest/LEDGER.yaml`): each marks Python code that was compiled for import, and therefore at least partly executed:
+
+```
+harvest/RosenAdvertising_clio-mcp/repo/tests/__pycache__
+harvest/LegalMate_hyacinth/repo/test/__pycache__
+harvest/SuffolkLITLab_docassemble-AssemblyLine/repo/docassemble/AssemblyLine/__pycache__
+harvest/RosenAdvertising_mycase-mcp/repo/tests/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/security_scanner/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/tracing/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/guardrails/__pycache__
+harvest/lasso-security_mcp-gateway/repo/mcp_gateway/plugins/__pycache__
+harvest/lasso-security_mcp-gateway/repo/tests/__pycache__
+```
+
+Packages installed in the virtual environment that ran pytest (`.venv/bin/pip freeze`, unchanged since): attrs 26.1.0, iniconfig 2.3.1, jsonschema 4.26.0, jsonschema-specifications 2025.9.1, packaging 26.3, pluggy 1.7.0, pytest 8.3.4, PyYAML 6.0.3, referencing 0.37.0, rpds-py 2026.9.1, typing_extensions 4.16.0. No harvested package was installed; imports of the clones' own packages resolved only through pytest's rootdir insertion into `sys.path`.
+
+Correction to Step 2: besides module-level code, pytest hooks defined in any `conftest.py` that imported successfully (for example `pytest_addoption` and `pytest_collection_modifyitems` in snyk/agent-scan's) run during collection. The snyk/agent-scan error line shows a `ModuleNotFoundError` for that test directory, which indicates its conftest failed to import, but whether any of its hooks registered before the error cannot be established from the captured output. RosenAdvertising/clio-mcp's conftest rewrites `HOME` for its own process and imports its package; its `tests/live_smoke_test.py` and `tests/smoke_test.py` match the default pattern and put the clone root on `sys.path`. The bytecode caches for that test directory show its modules were compiled. None of the conftest files read as data contains module-level network or credential access. No secret was present in the session. The remediation (Step 2) stands.
+
+### Step 7. Fix session FIX-PP-STACK-A, 2026-11-10 (PP2-M1 completed; PP2-L1 to PP2-L6 verified)
+
+`cloud/pp1-repository-marketplace` (PP1 fixes) merged into this branch. Commit 8c351e7 had already added the per-plugin `LICENSES/` copies and gate rule G7. Under the fix contract, two parts of PP2-M1 remained: a NOTICE excerpt inside each plugin, and a rule in `tools/lint.py`. Lint rule L17 was committed first and reported five errors (no plugin shipped a NOTICE excerpt); the five `plugins/<name>/NOTICE.md` excerpts followed. A throwaway marketplace install showed `NOTICE.md` and `LICENSES/` in the plugin cache.
+
+```
+license_gate.py            17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+license_gate.py --clones   clones present and re-hashed: 0 of 17; 0 failure(s) (clean checkout)
+license_gate.py --upstream upstream LICENSE files compared: 17; 0 failure(s)
+lint.py                    16 rules, 0 error(s), 12 warning(s)
+```
 
 ## PP-9, Stage 9: twelve pack fragments and pack evals
 

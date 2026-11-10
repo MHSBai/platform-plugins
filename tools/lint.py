@@ -20,6 +20,14 @@ Rules (identifier, scope):
   L15 fragment-schema     every fragment.yaml against the vendored Stage 3 fragment schema, plus
                           template references, intake block ids, sensitive tags, citation
                           placeholders and CO-DESIGN.md on hidden packs
+  L16 connector-release   release only: each connector bundled by a general availability
+                          plugin resolves, presents a certificate valid for its host and
+                          answers MCP (tools/release_check.py); the plugin declares
+                          privacyPolicyUrl and termsOfServiceUrl
+  L17 plugin-licenses     a plugin holding an adapted Apache-2.0 or MIT file ships, inside its
+                          own directory, the source's license text (LICENSES/, identical to the
+                          root copy) and NOTICE.md naming each source, because a marketplace
+                          install copies only the plugin directory
 
 Usage:
     python tools/lint.py [--root PATH] [--release]
@@ -45,6 +53,7 @@ from jsonschema import Draft202012Validator
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import gen_manifest  # noqa: E402
+import release_check  # noqa: E402
 from manifest_lib import Manifest, ManifestError, load_manifest  # noqa: E402
 
 SCHEMA_DIR = Path(__file__).resolve().parent / "schemas"
@@ -801,6 +810,64 @@ def rule_fragment_schema(ctx: Context) -> list[Finding]:
     return findings
 
 
+CONNECTOR_LISTING_FIELDS = ("privacyPolicyUrl", "termsOfServiceUrl")
+
+
+def rule_connector_release(ctx: Context) -> list[Finding]:
+    """Release only: a general availability connector plugin needs a live endpoint."""
+    if not ctx.release:
+        return []
+    findings = []
+    ga = [p for p in ctx.manifest.plugins if p.mcp is not None and p.tier == "ga"]
+    for plugin in ga:
+        path = ctx.plugins_dir / plugin.name / ".claude-plugin" / "plugin.json"
+        data, _ = load_json(path)
+        for key in CONNECTOR_LISTING_FIELDS:
+            if not isinstance(data, dict) or not data.get(key):
+                findings.append(Finding("L16", ctx.rel(path), f"connector plugin at tier ga lacks {key}"))
+    results = release_check.run(ctx.manifest, keys={p.mcp for p in ga}) if ga else {}
+    for plugin in ga:
+        result = results[plugin.mcp]
+        if not result.ok:
+            findings.append(Finding("L16", f"{ctx.manifest.plugin_root}/{plugin.name}/.mcp.json",
+                                    f"connector plugin at tier ga fails the release check: "
+                                    f"{result.render()}"))
+    return findings
+
+
+PLUGIN_LICENSE_SPDX = ("Apache-2.0", "MIT")
+
+
+def rule_plugin_licenses(ctx: Context) -> list[Finding]:
+    """Adapted third-party files travel with their license text and notice excerpt."""
+    sources: dict[str, set[tuple[str, str]]] = {}
+    for row in provenance_entries(ctx.root):
+        parts = Path(row["file"].strip("`")).parts
+        spdx = row["license"].strip()
+        if len(parts) < 3 or parts[0] != ctx.manifest.plugin_root or spdx not in PLUGIN_LICENSE_SPDX:
+            continue
+        repo = row["source"].split(",", 1)[0].strip()
+        sources.setdefault(parts[1], set()).add((repo, spdx))
+    findings = []
+    for plugin, pairs in sorted(sources.items()):
+        base = ctx.plugins_dir / plugin
+        notice = base / "NOTICE.md"
+        notice_text = notice.read_text(encoding="utf-8") if notice.is_file() else None
+        if notice_text is None:
+            findings.append(Finding("L17", ctx.rel(notice), "plugin holds adapted Apache-2.0 or MIT files "
+                                                            "but ships no NOTICE.md excerpt"))
+        for repo, spdx in sorted(pairs):
+            name = f"{spdx}-{repo.replace('/', '-')}.txt"
+            copy, root_copy = base / "LICENSES" / name, ctx.root / "LICENSES" / name
+            if not copy.is_file():
+                findings.append(Finding("L17", ctx.rel(copy), f"license text for {repo} ({spdx}) is missing"))
+            elif root_copy.is_file() and copy.read_bytes() != root_copy.read_bytes():
+                findings.append(Finding("L17", ctx.rel(copy), f"differs from LICENSES/{name}"))
+            if notice_text is not None and (repo not in notice_text or f"LICENSES/{name}" not in notice_text):
+                findings.append(Finding("L17", ctx.rel(notice), f"does not name {repo} and LICENSES/{name}"))
+    return findings
+
+
 RULES: list[tuple[str, Callable[[Context], list[Finding]]]] = [
     ("L01", rule_plugin_schema),
     ("L02", rule_marketplace_schema),
@@ -817,6 +884,8 @@ RULES: list[tuple[str, Callable[[Context], list[Finding]]]] = [
     ("L13", rule_structure),
     ("L14", rule_generated_drift),
     ("L15", rule_fragment_schema),
+    ("L16", rule_connector_release),
+    ("L17", rule_plugin_licenses),
 ]
 
 

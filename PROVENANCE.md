@@ -20,7 +20,7 @@ Change note: ONE SENTENCE DESCRIBING THE CHANGE.
 -->
 ```
 
-For an MIT source, the `Original license:` line reads `MIT` and the original MIT copyright and permission notice is reproduced directly below the notice. For a CC0-1.0 source the line reads `CC0-1.0`; no notice is required, and the attribution is kept as a record.
+For an MIT or CC0-1.0 source, the first line reads `MHSB modification notice.` without naming Apache-2.0. For an MIT source, the `Original license:` line reads `MIT` and the original MIT copyright and permission notice is reproduced directly below the notice. For a CC0-1.0 source the line reads `CC0-1.0`; no notice is required, and the attribution is kept as a record.
 
 ## Ledger
 
@@ -61,4 +61,4 @@ Columns: file (repository-relative path), source (owner/repository and path), co
 | `plugins/mhsb-pack-civil-litigation/fragment/intake-blocks.yaml` | SuffolkLITLab/docassemble-AssemblyLine, docassemble/AssemblyLine/data/questions/ql_baseline.yml | 66fbabe7ea68876c4e0c77c2ad5021626bcc0a68 | MIT | 2026-11-03 | Name, contact, address, party, date and document question blocks rewritten as plain YAML intake data mapped to this pack's fragment question ids. |
 | `plugins/mhsb-pack-business-transactional/fragment/intake-blocks.yaml` | SuffolkLITLab/docassemble-AssemblyLine, docassemble/AssemblyLine/data/questions/ql_baseline.yml | 66fbabe7ea68876c4e0c77c2ad5021626bcc0a68 | MIT | 2026-11-03 | Name, contact, address, party, date and document question blocks rewritten as plain YAML intake data mapped to this pack's fragment question ids. |
 
-Release 0.1.0 had no rows. The rows above were added in Stage 2 (harvest, 2026-11-03). Every source repository is recorded with its commit, license file hash and SPDX identifier in `harvest/LEDGER.yaml`; the license texts of the adapted sources are in `LICENSES/`. `tools/license_gate.py` fails CI when a row lacks a ledger entry, a header or an allowed license.
+Release 0.1.0 had no rows. The rows above were added in Stage 2 (harvest, 2026-11-03). Every source repository is recorded with its commit, license file hash and SPDX identifier in `harvest/LEDGER.yaml`; the license texts of the adapted sources are in `LICENSES/`. `tools/license_gate.py` fails CI when a row lacks a ledger entry, a header or an allowed license, or when the plugin holding the file does not ship the source's license text in its own `LICENSES/` directory (rule G7).

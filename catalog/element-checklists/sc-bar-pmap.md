@@ -4,6 +4,8 @@ Publisher: South Carolina Bar, Practice Management Assistance Program (PMAP).
 
 Terms status: unstated (Research Brief F4: no terms stated); written terms are to be requested before any republication (Design v2.1 Section 8).
 
+Status: not yet compared with the form. The elements are MHSB's expectation of what the form covers, not a verified inventory.
+
 Use: element checklist only. This file lists what the form covers, in MHSB's words. It contains none of the form's wording and is not a substitute for the form.
 
 Scope: General, criminal, domestic and personal injury intake; non-engagement and disengagement; engagement terms.

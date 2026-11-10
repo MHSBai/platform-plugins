@@ -4,6 +4,8 @@ Publisher: Immigrant Defense Project (IDP).
 
 Terms status: restricted or unstated (Catalog v2.1 Section 6); the current published terms were not read in this stage and are to be confirmed before any use beyond this checklist.
 
+Status: not yet compared with the form. The elements are MHSB's expectation of what the form covers, not a verified inventory.
+
 Use: element checklist only. This file lists what the form covers, in MHSB's words. It contains none of the form's wording and is not a substitute for the form.
 
 Scope: Facts needed for an attorney's review of immigration consequences.

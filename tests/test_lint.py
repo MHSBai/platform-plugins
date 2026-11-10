@@ -530,3 +530,32 @@ def test_l04_skips_harvest_clones_but_lints_ledger(repo: Path) -> None:
     ledger = repo / "harvest" / "LEDGER.yaml"
     ledger.write_text(ledger.read_text(encoding="utf-8") + f"# note {EN}\n", encoding="utf-8")
     assert "L04" in rules_failed(repo)
+
+
+def test_generated_keywords_unique() -> None:
+    for path in sorted((ROOT / "plugins").glob("*/.claude-plugin/plugin.json")):
+        keywords = json.loads(path.read_text(encoding="utf-8"))["keywords"]
+        assert len(keywords) == len(set(keywords)), path
+
+
+# --------------------------------------------------------------------- L17
+
+
+def test_l17_plugin_ships_license_and_notice() -> None:
+    assert not [f for f in lint.run(ROOT) if f.rule == "L17"]
+
+
+def test_l17_missing_plugin_license_copy(repo: Path) -> None:
+    (repo / "plugins/mhsb-operations/LICENSES/Apache-2.0-anthropics-claude-for-legal.txt").unlink()
+    assert "L17" in rules_failed(repo)
+
+
+def test_l17_altered_plugin_license_copy(repo: Path) -> None:
+    path = repo / "plugins/mhsb-pack-personal-injury/LICENSES/MIT-SuffolkLITLab-docassemble-AssemblyLine.txt"
+    path.write_text(path.read_text(encoding="utf-8") + "extra\n", encoding="utf-8")
+    assert "L17" in rules_failed(repo)
+
+
+def test_l17_missing_notice_excerpt(repo: Path) -> None:
+    (repo / "plugins/mhsb-pack-civil-litigation/NOTICE.md").unlink(missing_ok=True)
+    assert "L17" in rules_failed(repo)
