@@ -197,6 +197,24 @@ verify_marketplace.sh    4 listed plugins installed; 13 unlisted plugins refused
 claude plugin validate . --strict   passed; 17 of 17 plugins pass --strict
 ```
 
+### Step 13. Fix session FIX2-PP-STACK-A, 2026-11-10 (PP1-N1 to PP1-N4)
+
+- PP1-N1: reproduced by `tests/test_release_check.py::test_live_mcp_endpoint_passes[auth]`, which passed for a static 401 on 127.0.0.1, and by `check_url` collecting the resolved addresses without comparing them. Fix: `connector_identity` and `connector_edge` in `catalog/manifest.yaml`; the check compares every resolved address with the edge, rejects any 401 and requires an authenticated `initialize` returning the recorded `serverInfo`. Against the live host, all three connectors now fail at the edge step.
+- PP1-N2: `ci.yml` ran `lint.py --release` on `v*` tags only. Fix: a `release-gate` job on every event.
+- PP1-N3: a fork pull request skipped `agent-scan`, which a required check counts as success. Fix: the job always runs and fails with the reason whenever no scan ran.
+- PP1-N4: two questions for counsel in HANDOFF item 9; no license text changed.
+
+```
+gen_manifest --check     generated files current
+gen_manifest --counts    895 combinations, maximum 22
+lint                     15 rules, 0 error(s), 12 warning(s)
+lint --release           12 error(s), all L11 synthetic adoption (cleared by #3, PP1-M2)
+pytest                   97 passed
+release_check            3 connector(s), 3 edge failures, 0 blocking (all pilot)
+verify_marketplace.sh    13 unlisted plugins refused with "not found in marketplace"
+claude plugin validate . --strict   passed
+```
+
 ## PP-2, Stage 2: harvest, provenance and adapted sources
 
 ### Step 0. Resume check and stacking (2026-11-03)

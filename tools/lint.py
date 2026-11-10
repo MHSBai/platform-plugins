@@ -18,9 +18,12 @@ Rules (identifier, scope):
   L13 structure           allowed components only; remote connectors only; pack layout; license files
   L14 generated-drift     outputs of tools/gen_manifest.py current with the manifest
   L16 connector-release   release only: each connector bundled by a general availability
-                          plugin resolves, presents a certificate valid for its host and
-                          answers MCP (tools/release_check.py); the plugin declares
-                          privacyPolicyUrl and termsOfServiceUrl
+                          plugin resolves inside the recorded edge, presents a certificate
+                          valid for its host and answers an authenticated MCP initialize
+                          with the recorded server name and version
+                          (tools/release_check.py); the plugin declares privacyPolicyUrl
+                          and termsOfServiceUrl. CI runs --release on every pull request
+                          and every push to main.
   L17 plugin-licenses     a plugin holding an adapted Apache-2.0 or MIT file ships, inside its
                           own directory, the source's license text (LICENSES/, identical to the
                           root copy) and NOTICE.md naming each source, because a marketplace
