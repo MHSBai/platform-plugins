@@ -1,0 +1,530 @@
+# Authoritative manifest for the MHSB platform plugin line.
+#
+# Every plugin, command, pack, connector requirement, release tier, trigger
+# phrase and supported installation combination is declared here and nowhere
+# else. tools/gen_manifest.py derives .claude-plugin/marketplace.json, the
+# counts table and docs/catalog.md from this file; tools/lint.py checks the
+# repository against it. Nothing is counted by hand.
+
+schema_version: 1
+
+marketplace:
+  name: mhsb-platform-plugins
+  description: >-
+    Claude plugins for solo and small United States law firms on Lawmatics,
+    Clio or MyCase, maintained by MHSB Solutions. Read-only in version 1.
+  owner:
+    name: MHSB Solutions
+    url: https://mhsbsolutions.com
+
+defaults:
+  version: 0.1.0
+  author:
+    name: MHSB Solutions
+    url: https://mhsbsolutions.com
+  homepage: https://github.com/MHSBai/platform-plugins
+  # connector_listing: privacy_policy_url and terms_of_service_url, emitted
+  # into plugin.json of every connector plugin. Not set until both documents
+  # are published; lint rule L16 requires them for a ga connector plugin.
+  repository: https://github.com/MHSBai/platform-plugins
+  plugin_root: plugins
+
+licenses:
+  apache: Apache-2.0
+  source_available: LicenseRef-MHSB-Source-Available
+
+# Remote MCP endpoints bundled by connector-carrying plugins. Fixed URLs, no
+# user configuration, no local servers. A plugin that bundles a connector is
+# listed (tier ga) only after tools/release_check.py passes for its URL; lint
+# rule L16 enforces this under --release, which CI runs on every event.
+connectors:
+  firm: https://mcp.mhsbsolutions.com/firm
+  lawmatics: https://mcp.mhsbsolutions.com/lawmatics
+  clio: https://mcp.mhsbsolutions.com/clio
+
+# Expected identity of each connector endpoint (PP1-N1). tools/release_check.py
+# passes a connector only when an authenticated MCP initialize returns this
+# serverInfo name and version. Source: MHSBai/mhsb-firm-service, the FastMCP
+# server name "MHSB <server> connector" (service/servers/__init__.py) and the
+# service version (service/__init__.py). The version is the service release the
+# connector plugins are released against; change it with that release.
+connector_identity:
+  firm:
+    server_name: MHSB firm connector
+    server_version: 0.4.0
+  lawmatics:
+    server_name: MHSB lawmatics connector
+    server_version: 0.4.0
+  clio:
+    server_name: MHSB clio connector
+    server_version: 0.4.0
+
+# Expected edge of the connector host (PP1-N1). Design v2.1 Section 9: the
+# service sits behind a Cloudflare Tunnel on one Cloudflare zone, so every
+# address the host resolves to must lie in Cloudflare's published ranges
+# (https://www.cloudflare.com/ips-v4 and /ips-v6, fetched 2026-11-10).
+# canonical_name, when set, is the name the host must resolve through; it stays
+# null while the hostname is proxied by Cloudflare, because a proxied record
+# publishes no canonical name.
+connector_edge:
+  canonical_name: null
+  addresses:
+    - 173.245.48.0/20
+    - 103.21.244.0/22
+    - 103.22.200.0/22
+    - 103.31.4.0/22
+    - 141.101.64.0/18
+    - 108.162.192.0/18
+    - 190.93.240.0/20
+    - 188.114.96.0/20
+    - 197.234.240.0/22
+    - 198.41.128.0/17
+    - 162.158.0.0/15
+    - 104.16.0.0/13
+    - 104.24.0.0/14
+    - 172.64.0.0/13
+    - 131.0.72.0/22
+    - 2400:cb00::/32
+    - 2606:4700::/32
+    - 2803:f800::/32
+    - 2405:b500::/32
+    - 2405:8100::/32
+    - 2a06:98c0::/29
+    - 2c0f:f248::/32
+
+# Release tiers: ga is listed in the marketplace; pilot is present in the
+# repository and installed by MHSB for a named firm; hidden is present as a
+# draft until an attorney in the practice co-designs it.
+tiers: [ga, pilot, hidden]
+
+# Installation combinations. The generator enumerates every combination these
+# rules produce and the lint checks each one.
+combinations:
+  - id: core-only
+    description: Core alone, in paste mode, with no connector.
+    include: [core]
+  - id: connected
+    description: >-
+      Core plus operations plus exactly one platform plugin plus one to three
+      practice packs.
+    include: [core, operations]
+    choose:
+      - kind: platform
+        min: 1
+        max: 1
+      - kind: practice
+        min: 1
+        max: 3
+
+limits:
+  max_commands_per_combination: 24
+  design_commands_per_combination: 22
+
+plugins:
+  - name: mhsb-firm-core
+    kind: core
+    tier: ga
+    license: apache
+    category: governance
+    mcp: null
+    description: >-
+      Free core plugin for law firm staff: orientation, a pre-paste
+      confidentiality check, plain-language explanation, follow-up drafting,
+      meeting notes, an AI policy draft for attorney adoption, role-based
+      training and a support request. Operates without a connector.
+    commands:
+      - name: start
+        register: operational
+        connector: none
+        promise: Five things to do by role and practice area; what changed in this release; which packs the Firm Profile enables.
+        triggers:
+          - what can you do for me
+          - where do i begin
+          - show me my commands
+          - what changed in the plugin
+      - name: before-i-paste
+        register: operational
+        connector: none
+        promise: Category-based check before content is pasted; the check never sees the content first.
+        triggers:
+          - can i paste this
+          - is it safe to paste
+          - check before i paste
+          - may i share this document with claude
+      - name: explain-this
+        register: operational
+        connector: none
+        promise: Plain-language explanation of a passage; no legal conclusions.
+        triggers:
+          - explain this in plain language
+          - what does this mean
+          - help me understand this document
+      - name: follow-up
+        register: operational
+        connector: none
+        promise: Next message in the firm's voice with the next step and its date; from the record when a connector is present, from pasted context otherwise; flags client threads older than two business days.
+        triggers:
+          - draft a follow-up
+          - write back to the client
+          - what should i send next
+          - reply to this client email
+      - name: meeting-notes
+        register: operational
+        connector: none
+        promise: Matter note, tasks and a follow-up draft; a consent gate when the input is a transcript.
+        triggers:
+          - turn this call into notes
+          - meeting notes
+          - summarize this consultation
+          - tasks from this meeting
+      - name: ai-policy-draft
+        register: document
+        connector: none
+        promise: Decision sheet, counsel-reviewed template for the firm's state, and an adoption line.
+        triggers:
+          - draft our ai policy
+          - we need an ai use policy
+          - ai policy for the firm
+      - name: ai-training
+        register: operational
+        connector: none
+        promise: Role lessons on what to ask, what never to paste, how to verify and how to bill.
+        triggers:
+          - train my staff on ai
+          - how should paralegals use claude
+          - ai training for the team
+      - name: ask-mhsb
+        register: operational
+        connector: none
+        promise: Support request packaged for MHSB; matter content refused.
+        triggers:
+          - contact mhsb support
+          - something is broken with the plugin
+          - ask mhsb a question
+
+  - name: mhsb-operations
+    kind: operations
+    # Held at pilot until its connector passes tools/release_check.py (HANDOFF.md).
+    tier: pilot
+    license: source_available
+    category: operations
+    mcp: firm
+    description: >-
+      Read-only operations commands for subscribing firms: briefs, consultation
+      preparation, matter status, intake triage, adopted letters, dates,
+      document checklists, data hygiene, reports, register checks and setup
+      verification. Bundles the MHSB firm connector.
+    commands:
+      - name: brief
+        register: operational
+        connector: firm
+        promise: Views for today, week, stale, missing, caseload and leaks, plus pack views; every view carries the coverage statement and a data-gaps section.
+        triggers:
+          - what is due this week
+          - anything stale
+          - give me my morning brief
+          - what is missing from my matters
+          - caseload by staff
+      - name: consult-prep
+        register: document
+        connector: firm
+        promise: One page from the record with known facts, missing information, fragment questions, a conflict reminder and the fee and disclosure conversations; also used for hearing preparation.
+        triggers:
+          - prepare me for the consultation
+          - consult prep
+          - get ready for the hearing
+          - one page before the meeting with the prospect
+      - name: matter-status
+        register: document
+        connector: firm
+        promise: Internal status from the full record; client-facing status from the client_visible allowlist through an adopted template with the approver named.
+        triggers:
+          - where does this matter stand
+          - status of the matter
+          - client update on the case
+      - name: intake-triage
+        register: operational
+        connector: firm
+        promise: Scores leads against the fragment's structured criteria with sensitive fields excluded; records the conflict name-match; raises attorney-review flags rather than declines; proposes one action per lead.
+        triggers:
+          - triage new leads
+          - which leads should we call first
+          - score the intake queue
+          - check new inquiries for conflicts
+      - name: letter
+        register: document
+        connector: firm
+        promise: Renders an adopted template with variables from the record and the firm's periods; refuses an unadopted template; writes the approver into the draft.
+        triggers:
+          - draft a decline letter
+          - welcome letter for the new client
+          - document request letter
+          - prepare a closing letter
+      - name: dates
+        register: operational
+        connector: firm
+        promise: Dates from mapped fields only in the firm's time zone; the entered date governs; disagreements listed, never resolved; "date not established" with source and owner.
+        triggers:
+          - what deadlines are coming up
+          - statute of limitations date
+          - how many days since the accident
+          - list the court dates
+      - name: checklist
+        register: operational
+        connector: firm
+        promise: Documents present versus the fragment's document list per matter; readiness views driven by the fragment.
+        triggers:
+          - which documents are missing
+          - is the file ready for signing
+          - document checklist for this matter
+      - name: hygiene
+        register: operational
+        connector: firm
+        promise: Defined versus populated fields, duplicate and conflicting date fields, matters without practice area or responsible attorney, templates never used, retire lists.
+        triggers:
+          - audit our fields
+          - clean up the platform data
+          - duplicate date fields
+          - matters without a responsible attorney
+      - name: report
+        register: document
+        connector: firm
+        promise: Lists the report catalog, runs one report now with the coverage statement, or prepares service delivery setup.
+        triggers:
+          - run the incident aging report
+          - list available reports
+          - schedule the monday report
+          - set up a weekly report
+      - name: on-brand
+        register: operational
+        connector: firm
+        promise: Checks a draft against the firm's voice, register and vocabulary; no tool or AI names in client copy except the adopted AI disclosure sentence.
+        triggers:
+          - is this on brand
+          - check this draft against our voice
+          - does this sound like the firm
+      - name: check-setup
+        register: operational
+        connector: firm
+        promise: Sign-in, plan attestation, enabled packs and role mode, profile version and hash, plugin and service versions, scheduled reports and their last run.
+        triggers:
+          - check my setup
+          - am i signed in
+          - which version am i running
+          - is the connector working
+
+  - name: mhsb-lawmatics
+    kind: platform
+    # Held at pilot until its connector passes tools/release_check.py (HANDOFF.md).
+    tier: pilot
+    license: source_available
+    category: platform
+    mcp: lawmatics
+    description: >-
+      Lawmatics platform commands: public form protection review and pipeline
+      health. Bundles the MHSB Lawmatics connector. Read-only.
+    commands:
+      - name: form-protections
+        register: operational
+        connector: platform
+        promise: Public forms without protection, confirmation triggers reachable by a fake booking, and unauthenticated submit exposure.
+        triggers:
+          - are our intake forms protected
+          - public form exposure
+          - can someone submit a fake booking
+      - name: pipeline-health
+        register: operational
+        connector: platform
+        promise: Stage definitions versus use, dark automations, templates never sent, duplicate sends.
+        triggers:
+          - pipeline health
+          - which automations are dark
+          - templates never sent
+          - duplicate sends
+
+  - name: mhsb-clio
+    kind: platform
+    # Held at pilot until its connector passes tools/release_check.py (HANDOFF.md).
+    tier: pilot
+    license: source_available
+    category: platform
+    mcp: clio
+    description: >-
+      Clio platform commands: timekeeper hours, production by billing method
+      and flat-fee budget versus actual. Bundles the MHSB Clio connector.
+      Read-only.
+    commands:
+      - name: timekeeper-hours
+        register: operational
+        connector: platform
+        promise: Hourly, flat-fee and total hours per timekeeper; team totals by default.
+        triggers:
+          - hours per timekeeper
+          - how many hours did each attorney record
+          - team hours this month
+      - name: production
+        register: operational
+        connector: platform
+        promise: Billed amounts by billing method.
+        triggers:
+          - production by billing method
+          - billed amounts this month
+          - how much did we bill
+      - name: budget-vs-actual
+        register: operational
+        connector: platform
+        promise: Budgeted hours versus recorded hours by matter.
+        triggers:
+          - budget versus actual
+          - flat fee matters over budget
+          - budgeted hours versus recorded
+
+  - name: mhsb-mycase
+    kind: platform
+    tier: ga
+    license: source_available
+    # MyCase firms buy the buildout and run this plugin without a Connected
+    # subscription; the generated license notice carries the buildout grant.
+    offered_without_subscription: true
+    category: platform
+    mcp: null
+    description: >-
+      MyCase vocabulary and field mapping for use over the vendor's own
+      connector. Adds no commands. MHSB service-side controls do not apply to
+      records retrieved through the vendor connector.
+    commands: []
+
+  - name: mhsb-pack-personal-injury
+    kind: practice
+    tier: ga
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: personal injury
+    description: >-
+      Personal injury practice fragment: intake questions, attorney-review
+      flags, document list, stage map, deadline categories, template
+      references and report entries. Data only; adds no commands.
+    commands: []
+  - name: mhsb-pack-business-transactional
+    kind: practice
+    tier: ga
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: business and transactional
+    description: >-
+      Business and transactional practice fragment: intake questions,
+      attorney-review flags, document list, stage map, deadline categories,
+      template references and report entries. Data only; adds no commands.
+    commands: []
+  - name: mhsb-pack-estate-probate
+    kind: practice
+    tier: pilot
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: estate planning and probate
+    description: >-
+      Estate planning and probate practice fragment. Pilot only; installed by
+      MHSB for a named firm. Data only; adds no commands.
+    commands: []
+  - name: mhsb-pack-criminal-defense
+    kind: practice
+    tier: pilot
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: criminal defense
+    description: >-
+      Criminal defense practice fragment. Pilot only; installed by MHSB for a
+      named firm. Data only; adds no commands.
+    commands: []
+  - name: mhsb-pack-civil-litigation
+    kind: practice
+    tier: pilot
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: civil litigation, general
+    description: >-
+      General civil litigation practice fragment. Pilot only; installed by
+      MHSB for a named firm. Data only; adds no commands.
+    commands: []
+  - name: mhsb-pack-real-estate
+    kind: practice
+    tier: pilot
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: real estate
+    description: >-
+      Real estate practice fragment. Pilot only; installed by MHSB for a named
+      firm. Data only; adds no commands.
+    commands: []
+  - name: mhsb-pack-family-law
+    kind: practice
+    tier: hidden
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: family law
+    description: >-
+      Family law practice fragment, draft. Hidden until an attorney in the
+      practice co-designs it and the firm owns a safety protocol. Data only.
+    commands: []
+  - name: mhsb-pack-immigration
+    kind: practice
+    tier: hidden
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: immigration
+    description: >-
+      Immigration practice fragment, draft. Hidden until an immigration
+      attorney co-designs it. Data only.
+    commands: []
+  - name: mhsb-pack-employment-plaintiff
+    kind: practice
+    tier: hidden
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: employment, plaintiff side
+    description: >-
+      Plaintiff-side employment practice fragment, draft. Hidden until
+      co-designed by an attorney in the practice. Data only.
+    commands: []
+  - name: mhsb-pack-bankruptcy-consumer
+    kind: practice
+    tier: hidden
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: bankruptcy, consumer
+    description: >-
+      Consumer bankruptcy practice fragment, draft. Hidden until co-designed
+      by an attorney in the practice. Data only.
+    commands: []
+  - name: mhsb-pack-workers-compensation
+    kind: practice
+    tier: hidden
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: workers' compensation
+    description: >-
+      Workers' compensation practice fragment, draft. Hidden until co-designed
+      by an attorney in the practice. Data only.
+    commands: []
+  - name: mhsb-pack-landlord-tenant-consumer
+    kind: practice
+    tier: hidden
+    license: source_available
+    category: practice-area
+    mcp: null
+    practice: landlord-tenant and consumer
+    description: >-
+      Landlord-tenant and consumer practice fragment, draft. Hidden until
+      co-designed by an attorney in the practice. Data only.
+    commands: []

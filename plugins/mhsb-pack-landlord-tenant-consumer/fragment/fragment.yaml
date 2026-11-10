@@ -1,0 +1,107 @@
+# Fragment for landlord-tenant and consumer. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: landlord-tenant-consumer
+practice: landlord-tenant and consumer
+release_tier: hidden
+status: hidden draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: side
+  prompt: Side
+  type: choice
+- id: property
+  prompt: Property
+  type: text
+- id: lease
+  prompt: Lease
+  type: text
+- id: notices_dates
+  prompt: Notices and dates
+  type: text
+- id: rent_ledger
+  prompt: Rent ledger
+  type: text
+- id: answer_hearing_date
+  prompt: Answer or hearing date
+  type: date
+- id: habitability
+  prompt: Habitability
+  type: text
+- id: subsidy_status
+  prompt: Subsidy status
+  type: text
+- id: consumer_collector
+  prompt: 'Consumer matters: collector, debt, dates, validation notice'
+  type: text
+attorney_review_flags:
+- answer_deadline_question
+- conflict_recurring_landlord_clients
+- fee_shifting_question
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- lease
+- notices
+- ledger
+- texts
+- photos
+- court papers
+- collection letters
+- call logs
+- voicemails
+- credit reports
+stage_map:
+- urgent inquiry
+- same-day screen
+- limited-scope or flat-fee agreement
+- answer or filing
+- hearing or mediation
+- judgment or stipulation
+- close
+fee_model:
+  model: flat
+  notes: Flat per stage; limited scope; fee shifting where available.
+deadline_categories:
+- id: eviction_answer_windows
+  label: Eviction answer windows, by state
+  kind: statutory
+  citation: null
+  adopter: null
+- id: consumer_suit_dispute_windows
+  label: Consumer suit and dispute windows, by state
+  kind: statutory
+  citation: null
+  adopter: null
+communication_templates:
+- hearing-reminder
+- document-checklist
+- limited-scope-disclosure
+- closing-letter
+consent_flags:
+- id: limited_scope_signed
+  label: Limited scope in the signed agreement
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+- id: tribunal_disclosure
+  label: Tribunal disclosure rules
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags:
+- subsidy_status
+- credit
+sensitive_field_semantics: excluded from any scoring
+brief_views: []
+reports: []

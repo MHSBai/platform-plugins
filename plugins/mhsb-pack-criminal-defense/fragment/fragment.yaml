@@ -1,0 +1,123 @@
+# Fragment for criminal defense. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: criminal-defense
+practice: criminal defense
+release_tier: pilot
+status: pilot draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: name_as_charged
+  prompt: Name as charged
+  type: text
+- id: case_number
+  prompt: Case number
+  type: text
+- id: charges
+  prompt: Charges
+  type: text
+- id: offense_arrest_dates
+  prompt: Offense and arrest dates
+  type: date
+- id: agency
+  prompt: Arresting agency
+  type: text
+- id: release_conditions
+  prompt: Release conditions, warrants and next court date
+  type: text
+- id: co_defendants
+  prompt: Co-defendants and their counsel
+  type: text
+- id: citizenship_interpreter
+  prompt: Citizenship and interpreter need
+  type: text
+- id: supervision_status
+  prompt: Probation or parole status
+  type: text
+- id: pending_prior_charges
+  prompt: Pending and prior charges
+  type: text
+- id: authorized_locators
+  prompt: Who may be called to locate the client
+  type: text
+attorney_review_flags:
+- possible_conflict_codefendants_complainants
+- outside_jurisdiction_or_court
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- charging documents
+- bail paperwork
+- citation
+- discovery
+- prior record
+- identification
+stage_map:
+- intake pipeline
+- arraignment
+- discovery
+- motions
+- plea or trial
+- sentencing
+- close
+- expungement follow-up
+fee_model:
+  model: flat
+  notes: Refundability and trust handling as the firm states them.
+deadline_categories:
+- id: court_dates
+  label: Court dates (entered; govern)
+  kind: entered
+- id: discovery_motion_cutoffs
+  label: Discovery and motion cutoffs (entered)
+  kind: entered
+communication_templates:
+- court-date-reminder
+- authorized-family-contact
+- status-update
+consent_flags:
+- id: jail_calls_recorded
+  label: Jail calls are recorded
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+- id: third_party_presence
+  label: Third-party presence and privilege
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+- id: immigration_consequences
+  label: Immigration consequences flag
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+- id: interpreter
+  label: Interpreter
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags:
+- citizenship
+- prior_record
+- health
+sensitive_field_semantics: excluded from any scoring
+brief_views:
+- next_court_dates
+- release_conditions
+- urgent_leads
+reports:
+- speed_to_lead_conversion

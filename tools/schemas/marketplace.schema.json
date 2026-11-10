@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MHSBai/platform-plugins/tools/schemas/marketplace.schema.json",
+  "title": "marketplace.json, transcribed from the Claude Code marketplace reference (fetched 2026-11-03)",
+  "description": "Top-level fields and plugin entry fields as documented. Directory listing fields are not accepted in an entry. This lint restricts entries to relative-path sources, the only source type this repository uses.",
+  "type": "object",
+  "required": ["name", "owner", "plugins", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"type": "string"},
+    "name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+    "owner": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "email": {"type": "string"},
+        "url": {"type": "string", "pattern": "^https://"}
+      }
+    },
+    "description": {"type": "string", "minLength": 1},
+    "version": {"type": "string"},
+    "metadata": {"type": "object"},
+    "forceRemoveDeletedPlugins": {"type": "boolean"},
+    "allowCrossMarketplaceDependenciesOn": {"type": "array", "items": {"type": "string"}},
+    "renames": {"type": "object"},
+    "plugins": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/entry"}}
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": ["name", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+        "source": {"type": "string", "pattern": "^\\./", "not": {"pattern": "\\.\\."}},
+        "description": {"type": "string", "minLength": 1},
+        "version": {"type": "string"},
+        "category": {"type": "string"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "strict": {"type": "boolean"},
+        "relevance": {"type": "object"},
+        "dependencies": {"type": "array"},
+        "defaultEnabled": {"type": "boolean"},
+        "displayName": {"type": "string"},
+        "metadata": {"type": "object"},
+        "author": {"type": "object"},
+        "homepage": {"type": "string"},
+        "repository": {"type": "string"},
+        "license": {"type": "string"},
+        "keywords": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

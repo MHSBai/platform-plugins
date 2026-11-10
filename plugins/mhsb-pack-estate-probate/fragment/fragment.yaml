@@ -1,0 +1,108 @@
+# Fragment for estate planning and probate. Data only; merged into the Firm Profile and overridden by
+# the firm's answers. Statutory categories carry no citation here: the firm's attorney
+# records the citation and adopter at the adoption sitting. Synthetic content only.
+schema_version: 0.1.0
+schema_status: placeholder; the authoritative fragment schema is defined and validated in Stage 3
+fragment_id: estate-probate
+practice: estate planning and probate
+release_tier: pilot
+status: pilot draft
+adoption:
+  adopted_by: NOT ADOPTED
+  date: NOT ADOPTED
+  version: NOT ADOPTED
+intake_questions:
+- id: family_tree
+  prompt: Family tree with spellings
+  type: text
+- id: special_needs
+  prompt: Special needs
+  type: text
+- id: assets_titling
+  prompt: Assets with titling and values
+  type: text
+- id: beneficiary_designations
+  prompt: Beneficiary designations
+  type: text
+- id: existing_documents
+  prompt: Existing documents
+  type: text
+- id: fiduciary_choices
+  prompt: Fiduciary choices
+  type: text
+- id: business_interests
+  prompt: Business interests
+  type: text
+- id: capacity_observations
+  prompt: Capacity and undue-influence observations, recorded as observations
+  type: text
+attorney_review_flags:
+- possible_conflict_joint_representation
+- outside_jurisdiction
+attorney_review_flags_semantics: review flag for the attorney; never an automatic decline
+document_list:
+- statements
+- out-of-state deeds
+- trust and entity documents
+- beneficiary forms
+- prior wills and powers of attorney
+- original will (probate)
+- death certificates (probate)
+- decedent's return (probate)
+stage_map:
+- planning pipeline
+- probate open
+- inventory
+- creditor period
+- close
+fee_model:
+  model: hybrid
+  notes: Flat packages for planning; hourly for probate.
+deadline_categories:
+- id: signing_logistics
+  label: Signing logistics
+  kind: firm_set
+- id: annual_review
+  label: Annual review
+  kind: firm_set
+- id: probate_inventory_accounting
+  label: Probate inventory and accounting dates
+  kind: statutory
+  citation: null
+  adopter: null
+- id: creditor_claim_period
+  label: Creditor claim periods
+  kind: statutory
+  citation: null
+  adopter: null
+- id: estate_tax_return
+  label: Estate tax return timing
+  kind: statutory
+  citation: null
+  adopter: null
+communication_templates:
+- pre-consult-prep
+- questionnaire-drip
+- engagement-receipt
+- signing-logistics
+- annual-review-reminder
+- closing-letter
+consent_flags:
+- id: joint_representation_spouses
+  label: Joint representation of spouses, in the firm's adopted language
+  evidence: null
+  verifier: null
+  permitted_channels: []
+  expiry: null
+  default: unknown
+consent_flags_semantics: unknown is never permitted
+phi_flag_default: false
+sensitive_field_tags:
+- health
+sensitive_field_semantics: excluded from any scoring
+brief_views:
+- questionnaire_status
+- signing_readiness
+- annual_review_due
+reports:
+- questionnaire_completion_conversion

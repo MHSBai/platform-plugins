@@ -1,0 +1,52 @@
+{
+  "project": "MHSB Platform Plugins: platform-plugins repository",
+  "stage": "PP-1, Stage 1: repository, marketplace, manifest and lint",
+  "branch": "cloud/pp1-repository-marketplace",
+  "checkpoints": [
+    {
+      "id": "C1",
+      "name": "manifest generates the counts table, at most 22 commands in any combination",
+      "command": "python tools/gen_manifest.py --counts && python tools/gen_manifest.py --check",
+      "status": "pass",
+      "evidence": "895 combinations; maximum 22 commands"
+    },
+    {
+      "id": "C2",
+      "name": "lint and tests green",
+      "command": "python tools/lint.py && python -m pytest -q",
+      "status": "pass",
+      "evidence": "lint 0 errors, 12 warnings (synthetic adoption, decision 0002); 56 tests passed"
+    },
+    {
+      "id": "C3",
+      "name": "marketplace validated",
+      "command": "tools/verify_marketplace.sh",
+      "status": "pass",
+      "evidence": "claude plugin validate . --strict passed; seven listed plugins installed; hidden pack not installable"
+    },
+    {
+      "id": "C4",
+      "name": "CI present",
+      "command": "python -c \"import yaml; print(sorted(yaml.safe_load(open('.github/workflows/ci.yml'))['jobs']))\"",
+      "status": "pass",
+      "evidence": "jobs: agent-scan, lint, tests; first GitHub run pending on the pull request"
+    },
+    {
+      "id": "C5",
+      "name": "no pilot firm identifier from the specification in the repository",
+      "command": "grep -rnwF -f <private denylist> --exclude-dir=.git .",
+      "status": "pass",
+      "evidence": "10 identifiers, 0 hits"
+    }
+  ],
+  "gates": [
+    {
+      "id": "G1",
+      "name": "documentation fetch failed for all URLs",
+      "action": "stop",
+      "status": "not triggered",
+      "evidence": "five URLs returned HTTP 200 on 2026-11-03"
+    }
+  ],
+  "last_verified": "2026-11-03"
+}

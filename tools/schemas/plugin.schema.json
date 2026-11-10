@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MHSBai/platform-plugins/tools/schemas/plugin.schema.json",
+  "title": "plugin.json, transcribed from the Claude Code plugin manifest reference (fetched 2026-11-03)",
+  "description": "Top-level keys follow the Fields table of the manifest reference. The documentation strips unknown top-level keys with a warning; this lint treats them as errors. Component keys are listed so that a stray component is reported by name; rule L13 then rejects the components this line does not permit.",
+  "type": "object",
+  "required": ["name", "version", "description", "author", "license"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"type": "string"},
+    "name": {"type": "string", "minLength": 1, "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+    "displayName": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "description": {"type": "string", "minLength": 1},
+    "author": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "email": {"type": "string"},
+        "url": {"type": "string", "pattern": "^https://"}
+      }
+    },
+    "homepage": {"type": "string", "pattern": "^https?://"},
+    "repository": {"type": "string"},
+    "license": {"type": "string", "pattern": "^(?:[A-Za-z0-9.+-]+|LicenseRef-[A-Za-z0-9.-]+)$"},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "metadata": {"type": "object"},
+    "icon": {"type": "string"},
+    "documentationUrl": {"type": "string", "pattern": "^https://"},
+    "supportUrl": {"type": "string", "pattern": "^https://"},
+    "privacyPolicyUrl": {"type": "string", "pattern": "^https://"},
+    "termsOfServiceUrl": {"type": "string", "pattern": "^https://"},
+    "defaultEnabled": {"type": "boolean"},
+    "dependencies": {"type": "array"},
+    "settings": {"type": "object"},
+    "userConfig": {"type": "object"},
+    "types": {"type": "string"},
+    "channels": {"type": "array"},
+    "skills": {"$ref": "#/$defs/pathOrPaths"},
+    "commands": {"oneOf": [{"$ref": "#/$defs/pathOrPaths"}, {"type": "object"}]},
+    "agents": {"$ref": "#/$defs/pathOrPaths"},
+    "hooks": {},
+    "mcpServers": {},
+    "lspServers": {},
+    "outputStyles": {"$ref": "#/$defs/pathOrPaths"},
+    "workflows": {"$ref": "#/$defs/pathOrPaths"},
+    "experimental": {"type": "object"}
+  },
+  "$defs": {
+    "path": {"type": "string", "pattern": "^(\\./|\\.$)", "not": {"pattern": "\\.\\."}},
+    "pathOrPaths": {"oneOf": [{"$ref": "#/$defs/path"}, {"type": "array", "items": {"$ref": "#/$defs/path"}}]}
+  }
+}
