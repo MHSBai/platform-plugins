@@ -2,15 +2,11 @@
 
 Read-only operations commands for subscribing firms: briefs, consultation preparation, matter status, intake triage, adopted letters, dates, document checklists, data hygiene, reports, register checks and setup verification. Bundles the MHSB firm connector.
 
-Release tier: ga. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
+Release tier: pilot. License: `LicenseRef-MHSB-Source-Available`. Version: 0.1.0.
 
 Bundles the MHSB firm connector (`https://mcp.mhsbsolutions.com/firm`) as a remote MCP server. Every command is read-only.
 
-## Installation
-
-/plugin install mhsb-operations --marketplace MHSBai/platform-plugins
-
-From a shell, after `claude plugin marketplace add MHSBai/platform-plugins#<tag>`: `claude plugin install mhsb-operations@mhsb-platform-plugins`.
+This plugin is not listed in the marketplace. It is held at tier pilot until its connector passes `tools/release_check.py` (HANDOFF item 8). MHSB installs it for a named firm once the release conditions in the design are met.
 
 ## Commands
 

@@ -408,3 +408,17 @@ def test_generated_keywords_unique() -> None:
     for path in sorted((ROOT / "plugins").glob("*/.claude-plugin/plugin.json")):
         keywords = json.loads(path.read_text(encoding="utf-8"))["keywords"]
         assert len(keywords) == len(set(keywords)), path
+
+
+def test_l13_readme_tier_must_match_manifest(repo: Path) -> None:
+    path = repo / "plugins/mhsb-clio/README.md"
+    path.write_text(path.read_text(encoding="utf-8").replace("Release tier: pilot.", "Release tier: ga."),
+                    encoding="utf-8")
+    assert "L13" in rules_failed(repo)
+
+
+def test_l13_install_line_in_unlisted_plugin(repo: Path) -> None:
+    path = repo / "plugins/mhsb-pack-real-estate/README.md"
+    path.write_text(path.read_text(encoding="utf-8") + "\n/plugin install mhsb-pack-real-estate\n",
+                    encoding="utf-8")
+    assert "L13" in rules_failed(repo)
