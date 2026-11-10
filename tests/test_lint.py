@@ -402,3 +402,9 @@ def test_cli_exit_codes(repo: Path) -> None:
     assert lint.main(["--root", str(repo)]) == 0
     assert lint.main(["--root", str(repo), "--release"]) == 1
     assert gen_manifest.main(["--root", str(repo), "--check"]) == 0
+
+
+def test_generated_keywords_unique() -> None:
+    for path in sorted((ROOT / "plugins").glob("*/.claude-plugin/plugin.json")):
+        keywords = json.loads(path.read_text(encoding="utf-8"))["keywords"]
+        assert len(keywords) == len(set(keywords)), path

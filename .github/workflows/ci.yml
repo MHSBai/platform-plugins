@@ -46,8 +46,17 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
       - name: Token presence
+        # On main and on release tags an empty token fails the job, so a green
+        # agent-scan there always means a scan ran. On pull requests the scan is
+        # skipped with a notice; agent-scan is not a required check until the
+        # token is set (HANDOFF.md items 1 and 2).
         run: |
-          if [ -n "$SNYK_TOKEN" ]; then echo "SNYK_TOKEN: SET"; else echo "SNYK_TOKEN: EMPTY; scan skipped"; fi
+          if [ -n "$SNYK_TOKEN" ]; then echo "SNYK_TOKEN: SET"; exit 0; fi
+          echo "SNYK_TOKEN: EMPTY"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            echo "::error::agent-scan requires SNYK_TOKEN on main and on release tags"; exit 1
+          fi
+          echo "::notice::scan skipped on this pull request; agent-scan is not a required check until SNYK_TOKEN is set"
       - name: Scan skills
         if: env.SNYK_TOKEN != ''
         run: |

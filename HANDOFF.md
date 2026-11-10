@@ -4,12 +4,12 @@ Items that need Richard Berman, or a later stage, after PP-1 (Stage 1: repositor
 
 ## 1. Protect main
 
-Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`.
+Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`. `agent-scan` is left out of the required contexts until the Snyk token exists (item 2), because on a pull request without the token the job succeeds without scanning. Item 2 adds it.
 
 ```bash
 gh api -X PUT repos/MHSBai/platform-plugins/branches/main/protection -H "Accept: application/vnd.github+json" --input - <<'JSON'
 {
-  "required_status_checks": {"strict": true, "contexts": ["lint", "tests", "agent-scan"]},
+  "required_status_checks": {"strict": true, "contexts": ["lint", "tests"]},
   "enforce_admins": true,
   "required_pull_request_reviews": {"dismiss_stale_reviews": true, "require_code_owner_reviews": false, "required_approving_review_count": 1},
   "restrictions": null,
@@ -40,6 +40,16 @@ The `agent-scan` job prints `SNYK_TOKEN: SET` or `SNYK_TOKEN: EMPTY` and skips t
 ```bash
 gh secret set SNYK_TOKEN --repo MHSBai/platform-plugins
 ```
+
+Once a pull request shows `SNYK_TOKEN: SET` and a completed "Scan skills" step, make `agent-scan` required:
+
+```bash
+gh api -X POST repos/MHSBai/platform-plugins/branches/main/protection/required_status_checks/contexts -H "Accept: application/vnd.github+json" --input - <<'JSON'
+{"contexts": ["agent-scan"]}
+JSON
+```
+
+Until then, a push to main or a `v*` tag with the token empty fails `agent-scan` by design.
 
 ## 3. Release identity and tag ruleset
 

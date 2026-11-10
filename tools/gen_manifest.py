@@ -45,7 +45,7 @@ def plugin_json(manifest: Manifest, name: str) -> dict[str, object]:
         ("homepage", defaults["homepage"]),
         ("repository", defaults["repository"]),
         ("license", plugin.license_id),
-        ("keywords", ["legal", "law-firm", plugin.kind, plugin.category]),
+        ("keywords", list(dict.fromkeys(["legal", "law-firm", plugin.kind, plugin.category]))),
     ])
 
 

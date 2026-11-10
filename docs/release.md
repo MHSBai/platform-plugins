@@ -4,7 +4,7 @@ Applies to every tag of MHSBai/platform-plugins from 0.1.0 onward.
 
 ## Controls
 
-1. Protected main. No direct pushes. Changes arrive by pull request with the `lint`, `tests` and `agent-scan` checks green, linear history, signed commits, no force pushes and no deletion. Administrators are included. The commands that set this are in HANDOFF.md.
+1. Protected main. No direct pushes. Changes arrive by pull request with the `lint` and `tests` checks green, linear history, signed commits, no force pushes and no deletion. Administrators are included. `agent-scan` becomes a required check only once the `SNYK_TOKEN` secret is set; until then it skips the scan on pull requests and fails on main and on `v*` tags, so no release can carry a green scan that did not run. The commands that set this are in HANDOFF.md.
 2. Signed tags. Every release tag is an annotated tag signed with the release key: `git tag -s vX.Y.Z -m "Release X.Y.Z"`. Unsigned tags are not releases. A tag ruleset forbids updating or deleting `v*` tags.
 3. Tag-pinned sources. Firms and the directory consume a tag, never a branch. Users add the marketplace as `MHSBai/platform-plugins#vX.Y.Z`; the directory submission tracks the release tag. Within a tag, relative-path plugin sources resolve to the same commit.
 4. Second identity with a hardware key. A release requires a second GitHub identity, distinct from the day-to-day account, whose sign-in and signing key sit on a hardware security key. That identity approves the release pull request and creates the signed tag. The day-to-day account cannot create `v*` tags.
