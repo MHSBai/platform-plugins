@@ -175,3 +175,24 @@ lint: 14 rules, 0 error(s), 12 warning(s)
 OK: <each of 10 pilot and hidden packs> not found in marketplace
 verify exit=0
 ```
+
+### Step 12. Fix session FIX-PP-STACK-A, 2026-11-10 (PP1-H1, PP1-M1, PP1-M3, PP1-L2, PP1-L5)
+
+Each applied finding has a reproduction commit before its fix.
+
+- PP1-H1: the connector host resolved, but the TLS handshake failed (`SSLEOFError`). `tools/release_check.py` and lint rule L16 were committed first; at that commit `lint.py --release` reported L16 for the three connector plugins. Fix: `mhsb-operations`, `mhsb-lawmatics` and `mhsb-clio` are held at tier pilot; HANDOFF item 8 records the DNS and hosting step as the condition for release.
+- PP1-L2: L16 also requires `privacyPolicyUrl` and `termsOfServiceUrl` on any ga connector plugin; the generator emits them from `defaults.connector_listing` once the documents exist.
+- PP1-M1: `tests/test_ci.py` failed on the previous workflow (the job concluded success with the scan skipped). Fix: an `agent-scan-token` job; `agent-scan` is skipped on pull requests without the token and fails on push.
+- PP1-M3: `tests/test_licenses.py` failed (notices hand-copied, no buildout grant). Fix: notices generated from one template; buildout grant for `mhsb-mycase`; HANDOFF item 9 `[counsel review]`.
+- PP1-L5: "repository owner" in HANDOFF.md and decision 0002.
+
+```
+gen_manifest --check     generated files current
+gen_manifest --counts    895 combinations, maximum 22, catalog/counts.md identical
+lint                     15 rules, 0 error(s), 12 warning(s)
+lint --release           12 error(s), all L11 synthetic adoption (decision 0002; resolved by Stage 9, PP1-M2)
+release_check            3 connector(s), 0 blocking failure(s) (no connector plugin at tier ga)
+pytest                   85 passed
+verify_marketplace.sh    4 listed plugins installed; 13 unlisted plugins refused with "not found in marketplace"
+claude plugin validate . --strict   passed; 17 of 17 plugins pass --strict
+```
