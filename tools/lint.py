@@ -635,8 +635,17 @@ def rule_structure(ctx: Context) -> list[Finding]:
         for forbidden in FORBIDDEN_PLUGIN_PATHS:
             if (base / forbidden).exists():
                 findings.append(Finding("L13", f"{rel}/{forbidden}", "component not permitted in this line"))
-        if not (base / "README.md").exists():
+        readme = base / "README.md"
+        if not readme.exists():
             findings.append(Finding("L13", rel, "README.md is missing"))
+        else:
+            text = readme.read_text(encoding="utf-8")
+            tier = re.search(r"^Release tier: ([a-z]+)\.", text, re.M)
+            if not tier or tier.group(1) != plugin.tier:
+                findings.append(Finding("L13", ctx.rel(readme), f"release tier line must read "
+                                                                f"'Release tier: {plugin.tier}.'"))
+            if plugin.tier != "ga" and "/plugin install" in text:
+                findings.append(Finding("L13", ctx.rel(readme), "install line in an unlisted plugin"))
         if plugin.license_key == "apache":
             if not (base / "LICENSE").exists():
                 findings.append(Finding("L13", rel, "LICENSE (Apache-2.0) is missing"))

@@ -452,3 +452,17 @@ def test_l17_altered_plugin_license_copy(repo: Path) -> None:
 def test_l17_missing_notice_excerpt(repo: Path) -> None:
     (repo / "plugins/mhsb-pack-civil-litigation/NOTICE.md").unlink(missing_ok=True)
     assert "L17" in rules_failed(repo)
+
+
+def test_l13_readme_tier_must_match_manifest(repo: Path) -> None:
+    path = repo / "plugins/mhsb-clio/README.md"
+    path.write_text(path.read_text(encoding="utf-8").replace("Release tier: pilot.", "Release tier: ga."),
+                    encoding="utf-8")
+    assert "L13" in rules_failed(repo)
+
+
+def test_l13_install_line_in_unlisted_plugin(repo: Path) -> None:
+    path = repo / "plugins/mhsb-pack-real-estate/README.md"
+    path.write_text(path.read_text(encoding="utf-8") + "\n/plugin install mhsb-pack-real-estate\n",
+                    encoding="utf-8")
+    assert "L13" in rules_failed(repo)
