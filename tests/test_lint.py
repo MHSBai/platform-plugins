@@ -220,7 +220,11 @@ def test_l06_reading_level_operational(repo: Path) -> None:
     dense = ("Notwithstanding organizational considerations, the comprehensive administrative "
              "reconciliation methodology necessitates extraordinarily meticulous documentation, "
              "particularly regarding jurisdictional interpretations and institutional responsibilities.\n")
-    path.write_text(path.read_text(encoding="utf-8") + "\n" + dense * 6, encoding="utf-8")
+    # The body is replaced, not extended, so the fixture does not depend on the length of the
+    # shipped body (a longer body dilutes appended text below the bound).
+    text = path.read_text(encoding="utf-8")
+    end = text.index("\n---", 3) + len("\n---\n")
+    path.write_text(text[:end] + "\n" + dense * 6, encoding="utf-8")
     assert "L06" in rules_failed(repo)
 
 
