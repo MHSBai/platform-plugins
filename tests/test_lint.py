@@ -224,6 +224,36 @@ def test_l06_reading_level_operational(repo: Path) -> None:
     assert "L06" in rules_failed(repo)
 
 
+# textstat 0.7.13 (CMU pronouncing dictionary) on the lint's own fixtures, recorded 2026-11-10.
+# The fallback must give the same syllable count and grade when textstat is not installed.
+FK_FIXTURES = [
+    ("The cat sat. The dog ran. We read the list.", 10, -2.49),
+    ("Institutional administrative documentation necessitates comprehensive organizational "
+     "reconciliation methodologies.", 40, 46.53),
+    ("Notwithstanding organizational considerations, the comprehensive administrative "
+     "reconciliation methodology necessitates extraordinarily meticulous documentation, "
+     "particularly regarding jurisdictional interpretations and institutional responsibilities.", 85, 44.6095),
+    ("Comprehensive multidimensional organizational documentation, encompassing interdisciplinary "
+     "administrative responsibilities, institutional accountability considerations and "
+     "jurisdictional verification requirements.", 73, 47.6867),
+    ("Lists the dates. It shows the owner.", 8, -0.7393),
+]
+
+
+@pytest.mark.parametrize("text, syllables, grade", FK_FIXTURES)
+def test_fk_fallback_matches_textstat(text: str, syllables: int, grade: float) -> None:
+    """PP4-N2: the standard formula with textstat's counting rules, on the fixtures."""
+    assert sum(lint.count_syllables(w) for w in lint.fk_words(text)) == syllables
+    assert lint.standard_fk_grade(text) == pytest.approx(grade, abs=1e-3)
+
+
+def test_fk_uses_textstat_when_ready() -> None:
+    if lint.FK_IMPLEMENTATION != "textstat":
+        pytest.skip("textstat or its pronunciation dictionary is not available")
+    for text, _, grade in FK_FIXTURES:
+        assert lint.flesch_kincaid_grade(text) == pytest.approx(grade, abs=1e-3)
+
+
 def test_fk_grade_orders_texts() -> None:
     simple = lint.flesch_kincaid_grade("The cat sat. The dog ran. We read the list.")
     dense = lint.flesch_kincaid_grade("Institutional administrative documentation necessitates "
