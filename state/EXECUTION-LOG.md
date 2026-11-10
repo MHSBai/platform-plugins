@@ -565,3 +565,13 @@ $ python -m pytest -q | tail -1
 ```
 
 Run against the Step 8 record (merged from the remote branch before this push). The gate blocks a 0.2.0 tag on both pass rates; it does not run on pull requests.
+
+### Step 10. Fix session FIX-PP-STACK-A, 2026-11-10 (PP4-M1 per the fix contract; PP4-L1 to PP4-L3 verified; fixes from Stages 1, 2 and 9 merged)
+
+`cloud/pp9-pack-fragments` was merged into this branch after the evals commit (ce15397) and the review response (3eaad32, merged in 0faf5a0). PP4-M1: the routing check and lint L03 were first changed to read the SKILL.md description (139 routing failures, 111 L03 errors at d6b1b93). The 87 missing trigger phrases were then quoted in the descriptions and `metadata.triggers` removed (decision 0005, Section 10). PP4-L1 (per-request worst case from `max_tokens` and the configured prices; `--budget` clamped at 40), PP4-L2 and PP4-L3 were applied by 3eaad32 and verified here. `tools/model_evals.py` was not run in this session. The recorded run (status `ran`; routing 223 of 240; skills 46 of 144) predates the description change, so the 0.2.0 tag stays blocked (HANDOFF PP-8 item 1).
+
+```
+routing_check.py   description-phrase disjointness: 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+skill_evals.py     reference-transcript conformance: 24 skills, 144 cases, 144 passed, 0 failure(s)
+lint.py            17 rules, 0 error(s), 0 warning(s)
+```
