@@ -508,6 +508,15 @@ def test_l15_intake_block_map_drift(repo: Path) -> None:
     assert "L15" in rules_failed(repo)
 
 
+def test_l15_vendored_schema_hash_drift(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    schemas = repo / "tools" / "schemas"
+    monkeypatch.setattr(lint, "SCHEMA_DIR", schemas)
+    assert "L15" not in rules_failed(repo)
+    path = schemas / "fragment.schema.json"
+    path.write_text(path.read_text(encoding="utf-8").replace('"eligibility_question"\n', '"eligibility_question",\n          "extra_flag"\n', 1), encoding="utf-8")
+    assert "L15" in rules_failed(repo)
+
+
 def test_l15_hidden_pack_needs_co_design(repo: Path) -> None:
     (repo / "plugins/mhsb-pack-family-law/CO-DESIGN.md").unlink()
     assert "L15" in rules_failed(repo)
@@ -521,3 +530,32 @@ def test_l04_skips_harvest_clones_but_lints_ledger(repo: Path) -> None:
     ledger = repo / "harvest" / "LEDGER.yaml"
     ledger.write_text(ledger.read_text(encoding="utf-8") + f"# note {EN}\n", encoding="utf-8")
     assert "L04" in rules_failed(repo)
+
+
+def test_generated_keywords_unique() -> None:
+    for path in sorted((ROOT / "plugins").glob("*/.claude-plugin/plugin.json")):
+        keywords = json.loads(path.read_text(encoding="utf-8"))["keywords"]
+        assert len(keywords) == len(set(keywords)), path
+
+
+# --------------------------------------------------------------------- L17
+
+
+def test_l17_plugin_ships_license_and_notice() -> None:
+    assert not [f for f in lint.run(ROOT) if f.rule == "L17"]
+
+
+def test_l17_missing_plugin_license_copy(repo: Path) -> None:
+    (repo / "plugins/mhsb-operations/LICENSES/Apache-2.0-anthropics-claude-for-legal.txt").unlink()
+    assert "L17" in rules_failed(repo)
+
+
+def test_l17_altered_plugin_license_copy(repo: Path) -> None:
+    path = repo / "plugins/mhsb-pack-personal-injury/LICENSES/MIT-SuffolkLITLab-docassemble-AssemblyLine.txt"
+    path.write_text(path.read_text(encoding="utf-8") + "extra\n", encoding="utf-8")
+    assert "L17" in rules_failed(repo)
+
+
+def test_l17_missing_notice_excerpt(repo: Path) -> None:
+    (repo / "plugins/mhsb-pack-civil-litigation/NOTICE.md").unlink(missing_ok=True)
+    assert "L17" in rules_failed(repo)

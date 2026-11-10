@@ -19,4 +19,4 @@ Demoting the two packs to pilot would contradict the catalog. Inventing an attor
 
 ## Owner action
 
-Richard Berman to confirm this reading, or to direct one of the alternatives, before Stage 9.
+The repository owner to confirm this reading, or to direct one of the alternatives, before Stage 9.

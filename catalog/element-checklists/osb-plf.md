@@ -4,6 +4,8 @@ Publisher: Oregon State Bar Professional Liability Fund (PLF).
 
 Terms status: restricted (Research Brief F4: provided for Oregon lawyers only); republication terms not granted; to be confirmed with the publisher.
 
+Status: not yet compared with the form. The elements are MHSB's expectation of what the form covers, not a verified inventory.
+
 Use: element checklist only. This file lists what the form covers, in MHSB's words. It contains none of the form's wording and is not a substitute for the form.
 
 Scope: Personal injury and workers' compensation intake; nonengagement taxonomy; firm AI policy topics.

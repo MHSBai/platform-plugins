@@ -1,15 +1,15 @@
 # Handoff
 
-Items that need Richard Berman, or a later stage, after PP-1 (Stage 1: repository, marketplace, manifest and lint). The cloud session did not attempt any of the repository-administration commands below.
+Items that need the repository owner, or a later stage, after PP-1 (Stage 1: repository, marketplace, manifest and lint). The cloud session did not attempt any of the repository-administration commands below.
 
 ## 1. Protect main
 
-Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`.
+Requires repository administration. Status check names match the job names in `.github/workflows/ci.yml`. `agent-scan` is left out of the required contexts until the Snyk token exists (item 2): on a pull request without the token the job is skipped, and branch protection would count a skipped required check as passed. Item 2 adds it.
 
 ```bash
 gh api -X PUT repos/MHSBai/platform-plugins/branches/main/protection -H "Accept: application/vnd.github+json" --input - <<'JSON'
 {
-  "required_status_checks": {"strict": true, "contexts": ["lint", "tests", "agent-scan"]},
+  "required_status_checks": {"strict": true, "contexts": ["lint", "tests"]},
   "enforce_admins": true,
   "required_pull_request_reviews": {"dismiss_stale_reviews": true, "require_code_owner_reviews": false, "required_approving_review_count": 1},
   "restrictions": null,
@@ -35,11 +35,21 @@ With one approving review required, the second identity (item 3) approves pull r
 
 ## 2. Snyk token for agent-scan
 
-The `agent-scan` job prints `SNYK_TOKEN: SET` or `SNYK_TOKEN: EMPTY` and skips the scan when the secret is empty. The command prompts for the value; it is not echoed.
+The `agent-scan-token` job prints `SNYK_TOKEN: SET` or `SNYK_TOKEN: EMPTY`, never the value. With the secret empty, `agent-scan` is skipped on pull requests (the `agent-scan-token` job states the reason in a notice) and fails with an error on every push to main and every `v*` tag. Whenever `agent-scan` concludes success, the scan ran. The command below prompts for the value; it is not echoed.
 
 ```bash
 gh secret set SNYK_TOKEN --repo MHSBai/platform-plugins
 ```
+
+Once a pull request shows `SNYK_TOKEN: SET` and a completed "Scan skills" step, make `agent-scan` required:
+
+```bash
+gh api -X POST repos/MHSBai/platform-plugins/branches/main/protection/required_status_checks/contexts -H "Accept: application/vnd.github+json" --input - <<'JSON'
+{"contexts": ["agent-scan"]}
+JSON
+```
+
+Until then, a push to main or a `v*` tag with the token empty fails `agent-scan` by design.
 
 ## 3. Release identity and tag ruleset
 
@@ -96,12 +106,31 @@ The PP-1 prompt names `cloud/pp1-repository-marketplace`; the session environmen
 
 Stage 2 adds harvested files with ledger rows in PROVENANCE.md and the 4(b) notice. Stage 3 defines the authoritative fragment schema, replaces the placeholder `schema_status` in each `fragment.yaml`, and adds the MyCase vocabulary. Stage 8 replaces the Stage 1 skill bodies with the full procedures, examples and the sixty-phrase routing suite. Stage 14 adds the directory listing fields (privacy policy, terms, support URL) to `mhsb-firm-core`.
 
+## 8. Connector endpoint: condition for releasing the connector plugins
+
+Requires DNS and hosting administration, which no session performs. On 2026-11-10 the connector host named in `catalog/manifest.yaml` (`connectors`) resolved, but no TLS session could be opened to it, so no MHSB-operated service answers at the URL that `mhsb-operations`, `mhsb-lawmatics` and `mhsb-clio` bundle. The three plugins are therefore held at tier pilot and are not listed in the marketplace.
+
+1. Bind the connector host to MHSB-operated infrastructure (Design v2.1 Section 9: the service behind the Cloudflare tunnel), or remove the DNS record until the service is live.
+2. Publish the privacy policy and terms of service that cover the connector service, and set `defaults.connector_listing.privacy_policy_url` and `terms_of_service_url` in `catalog/manifest.yaml`.
+3. Run the release check from any machine with network access:
+
+   ```bash
+   python tools/release_check.py
+   ```
+
+   Each connector must report `PASS`: the host resolves, the certificate is valid for the host, and the endpoint answers the MCP `initialize` request (an initialize result, or HTTP 401 with a Bearer challenge naming the protected resource metadata).
+4. Only then set `tier: ga` for the plugins whose connector passed, run `python tools/gen_manifest.py`, and confirm `python tools/lint.py --release` (rule L16) before the release pull request.
+
+## 9. License text for counsel
+
+[counsel review] `plugins/mhsb-mycase/LICENSE-SOURCE-AVAILABLE.md`, clause 1 (use "under an MHSB AI Policy and Training buildout agreement" by a firm without an MHSB subscription) and clause 3 (that buildout agreement governs such use), generated from `catalog/templates/license-source-available.md` with `offered_without_subscription: true` in `catalog/manifest.yaml`. The wording is the minimum that aligns the notice with the offer to MyCase firms (Design v2.1 Section 3, buildout without a Connected subscription) and with the README License section. Counsel settles the final text; a change is made in the template and regenerated with `python tools/gen_manifest.py`.
+
 ## PP-2 (Stage 2) items
 
 1. Element checklists: compare each checklist in `catalog/element-checklists/` against the current edition of its form under the publisher's terms, and run the similarity review; confirm the five terms statuses marked "restricted or unstated".
 2. Consent requests: drafts are in mhsb-firm-service `docs/consents/consent-requests.md`; decide per form whether any wording is wanted, and send only those. Not sent from the cloud session.
 3. Adoption: the 32 adapted references and fragment sources are drafts in the repository's register; the skills point to them, but they carry no attorney adoption, and none is a template.
-4. MHSB hygiene items and the appointment-comms v3 gate on Stage 10 are recorded in mhsb-firm-service `HANDOFF.md`; they need pop-os and the vault.
+4. MHSB hygiene items and the appointment-comms v3 gate on Stage 10 are recorded in mhsb-firm-service `HANDOFF.md`; they need MHSB's workstation and MHSB's private notes, which a cloud session cannot reach.
 5. Stacking: `cloud/pp2-harvest` is based on `cloud/pp1-repository-marketplace`; merge that pull request first, then rebase this branch onto `main`.
 
 ## PP-9 (Stage 9) items
@@ -113,7 +142,8 @@ Stage 2 adds harvested files with ledger rows in PROVENANCE.md and the 4(b) noti
 5. Canonical stage maps are drafts: several practice stages map to the same canonical stage because the canonical intake pipeline is coarser than the practice pipelines (for example PI "Records Requested" and "Triage Complete" both map to `stage_intake_04_consult_completed`). Confirm with the first adopting firm.
 6. Hidden packs: each `CO-DESIGN.md` lists the questions an attorney in the practice must answer before any pilot. The family law draft sets a 90-day re-verification on the contact rule as a placeholder for that attorney's answer.
 7. The service-side validator run needs a local checkout of mhsb-firm-service: `python tools/validate_fragments_service.py --service ../mhsb-firm-service`. CI in this public repository runs L15 against the vendored schema and the pack evals, not the private validator.
-8. Stacking: `cloud/pp9-pack-fragments` is based on `cloud/pp2-harvest`; merge Stage 1 and Stage 2 first, then rebase this branch onto `main`.
+8. Schema provenance (PP3-L1): after the Stage 3 pull request in mhsb-firm-service merges, copy `firm_profile/schemas/fragment.schema.json` from the merged commit to `tools/schemas/fragment.schema.json`, update `tools/schemas/fragment.schema.source.json` (commit, branch, `source_merged: true`, sha256), and rerun `python tools/validate_fragments_service.py` and the lint.
+9. Stacking: `cloud/pp9-pack-fragments` is based on `cloud/pp2-harvest`; merge Stage 1 and Stage 2 first, then rebase this branch onto `main`.
 
 ## PP-8 (Stage 8) items
 

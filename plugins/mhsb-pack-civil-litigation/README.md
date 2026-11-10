@@ -15,3 +15,7 @@ The plugin does no legal research, drafts no filings, produces no citations, tak
 ## Adapted fragment sources
 
 The fragment is accompanied by `fragment/intake-blocks.yaml`, `fragment/sources/chronology.md`, `fragment/sources/legal-hold.md`, `fragment/sources/matter-briefing.md`. Each file names its source, commit and license in its header and has a row in the repository's `PROVENANCE.md`.
+
+## Third-party licenses
+
+Some files in this plugin adapt permissively licensed sources. Each such file names its source, commit and license at its top; those portions remain under their original licenses, whose texts are in this plugin's `LICENSES/` directory.

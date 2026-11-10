@@ -28,3 +28,7 @@ From a shell, after `claude plugin marketplace add MHSBai/platform-plugins#<tag>
 ## Scope
 
 The plugin does no legal research, drafts no filings, produces no citations, takes no trust account action, sends nothing, deletes nothing and, in version 1, writes nothing to the firm's platform. Outputs require review by a licensed attorney.
+
+## Third-party licenses
+
+Some files in this plugin adapt permissively licensed sources. Each such file names its source, commit and license at its top; those portions remain under their original licenses, whose texts are in this plugin's `LICENSES/` directory.

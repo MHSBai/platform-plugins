@@ -1,6 +1,6 @@
 # Element checklists for restricted bar forms
 
-Catalog v2.1 Section 6 lists bar-published forms whose terms are restricted or unstated. Each is used only as an element checklist in MHSB's own words: what the form covers, listed as topics, with nothing of the form's wording, structure of questions or examples. No form was copied or opened for this stage.
+Catalog v2.1 Section 6 lists bar-published forms whose terms are restricted or unstated. Each is used only as an element checklist in MHSB's own words: what the form covers, listed as topics, with nothing of the form's wording, structure of questions or examples. No form was copied or opened for this stage. Every checklist is marked "not yet compared with the form" until the comparison below is done.
 
 | Form | Publisher | Terms status | Checklist | Consent request |
 |---|---|---|---|---|

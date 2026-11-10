@@ -10,10 +10,16 @@ Reads harvest/LEDGER.yaml and the Ledger table of PROVENANCE.md and fails when:
      notice, or whose header names a different repository, commit or license;
   G4 a file under plugins/ carries a modification notice but has no PROVENANCE row;
   G5 no license text for a row's license is present in LICENSES/;
-  G6 (only with --clones) a clone's LICENSE no longer matches the hash in the ledger.
+  G6 (only with --clones or --upstream) a LICENSE no longer matches the hash in the ledger:
+     --clones re-hashes the git-ignored local clones that are present (a clean checkout has
+     none, which is reported, not failed); --upstream fetches each LICENSE from GitHub at the
+     pinned commit, so it runs from a clean checkout;
+  G7 a plugin directory that holds an adapted Apache-2.0 or MIT file does not ship that source's
+     license text as plugins/<name>/LICENSES/<SPDX>-<owner>-<repo>.txt (a marketplace install
+     copies only the plugin directory, so the root LICENSES/ does not reach the recipient).
 
 Usage:
-    python tools/license_gate.py [--root PATH] [--clones]
+    python tools/license_gate.py [--root PATH] [--clones] [--upstream]
 """
 
 from __future__ import annotations
@@ -22,6 +28,9 @@ import argparse
 import hashlib
 import re
 import sys
+import urllib.error
+import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -165,10 +174,30 @@ def check_license_texts(root: Path, licenses: set[str]) -> list[Failure]:
             for lic in sorted(licenses & ALLOWED) if not any(n.startswith(f"{lic}-") for n in present)]
 
 
-def check_clones(root: Path, ledger: dict[str, dict[str, Any]]) -> list[Failure]:
+def check_plugin_licenses(root: Path) -> list[Failure]:
     failures = []
+    for row in provenance_entries(root):
+        rel = row["file"].strip("`")
+        lic = row["license"].strip()
+        parts = Path(rel).parts
+        if lic not in {"Apache-2.0", "MIT"} or len(parts) < 2 or parts[0] != "plugins":
+            continue
+        repo = row["source"].split(",", 1)[0].strip()
+        name = f"{lic}-{repo.replace('/', '-')}.txt"
+        if not (root / "plugins" / parts[1] / "LICENSES" / name).is_file():
+            failures.append(Failure("G7", f"plugins/{parts[1]}", f"LICENSES/{name} is missing"))
+    return sorted(set(failures), key=lambda f: (f.path, f.message))
+
+
+def check_clones(root: Path, ledger: dict[str, dict[str, Any]]) -> tuple[list[Failure], int]:
+    """Re-hash the LICENSE of every clone that is present. Return (failures, clones checked)."""
+    failures, checked = [], 0
     for repo, entry in ledger.items():
-        lic = root / "harvest" / repo.replace("/", "_") / "repo" / "LICENSE"
+        clone = root / "harvest" / repo.replace("/", "_") / "repo"
+        if not clone.is_dir():
+            continue
+        checked += 1
+        lic = clone / "LICENSE"
         expected = entry.get("license_sha256")
         if not lic.exists():
             if expected not in (None, "null"):
@@ -176,17 +205,55 @@ def check_clones(root: Path, ledger: dict[str, dict[str, Any]]) -> list[Failure]
             continue
         if hashlib.sha256(lic.read_bytes()).hexdigest() != expected:
             failures.append(Failure("G6", repo, "clone LICENSE hash differs from the ledger"))
+    return failures, checked
+
+
+Fetcher = Callable[[str], bytes | None]
+
+
+def fetch_url(url: str) -> bytes | None:
+    """GET a URL; None on HTTP 404. Other errors propagate."""
+    try:
+        with urllib.request.urlopen(url, timeout=30) as resp:  # noqa: S310 (fixed https host)
+            data: bytes = resp.read()
+            return data
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return None
+        raise
+
+
+def check_upstream(ledger: dict[str, dict[str, Any]], fetch: Fetcher = fetch_url) -> list[Failure]:
+    """Compare each ledger entry's LICENSE hash with the file upstream at the pinned commit."""
+    failures = []
+    for repo, entry in ledger.items():
+        url = f"https://raw.githubusercontent.com/{repo}/{entry.get('commit')}/LICENSE"
+        data = fetch(url)
+        expected = entry.get("license_sha256")
+        if data is None:
+            if expected not in (None, "null"):
+                failures.append(Failure("G6", repo, "upstream LICENSE not found at the pinned commit"))
+        elif hashlib.sha256(data).hexdigest() != expected:
+            failures.append(Failure("G6", repo, "upstream LICENSE hash differs from the ledger"))
     return failures
 
 
-def run(root: Path, clones: bool = False) -> tuple[list[Failure], int, int]:
+def run(
+    root: Path, clones: bool = False, upstream: bool = False, fetch: Fetcher = fetch_url
+) -> tuple[list[Failure], int, int]:
     ledger, failures = load_ledger(root)
     row_failures, listed, licenses = check_rows(root, ledger)
     failures += row_failures
     failures += check_unlisted(root, listed)
     failures += check_license_texts(root, licenses)
+    failures += check_plugin_licenses(root)
     if clones:
-        failures += check_clones(root, ledger)
+        clone_failures, checked = check_clones(root, ledger)
+        failures += clone_failures
+        print(f"license gate: clones present and re-hashed: {checked} of {len(ledger)}")
+    if upstream:
+        failures += check_upstream(ledger, fetch)
+        print(f"license gate: upstream LICENSE files compared: {len(ledger)}")
     return failures, len(ledger), len(listed)
 
 
@@ -194,9 +261,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="License gate over LEDGER.yaml and PROVENANCE.md.")
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument("--clones", action="store_true",
-                        help="also re-hash LICENSE files in local harvest clones")
+                        help="also re-hash LICENSE files in the local harvest clones that are present")
+    parser.add_argument("--upstream", action="store_true",
+                        help="also compare each LICENSE upstream at the pinned commit (network)")
     args = parser.parse_args(argv)
-    failures, repos, rows = run(args.root.resolve(), clones=args.clones)
+    failures, repos, rows = run(args.root.resolve(), clones=args.clones, upstream=args.upstream)
     for failure in failures:
         print(failure.render())
     print(f"license gate: {repos} ledger entries, {rows} PROVENANCE rows, {len(failures)} failure(s)")

@@ -49,6 +49,7 @@ class Plugin:
     commands: tuple[Command, ...]
     practice: str | None = None
     catalog_tier: str | None = None
+    offered_without_subscription: bool = False
 
     @property
     def held(self) -> bool:
@@ -142,6 +143,13 @@ def _require(mapping: dict[str, Any], key: str, where: str) -> Any:
     return mapping[key]
 
 
+def _flag(mapping: dict[str, Any], key: str, where: str) -> bool:
+    value = mapping.get(key, False)
+    if not isinstance(value, bool):
+        raise ManifestError(f"{where}: '{key}' must be true or false")
+    return value
+
+
 def parse_manifest(raw: dict[str, Any]) -> Manifest:
     """Validate the manifest structure and return a typed view of it."""
     for key in ("schema_version", "marketplace", "defaults", "licenses", "connectors",
@@ -195,6 +203,7 @@ def parse_manifest(raw: dict[str, Any]) -> Manifest:
             mcp=mcp, description=" ".join(str(_require(entry, "description", where)).split()),
             commands=tuple(commands), practice=entry.get("practice"),
             catalog_tier=catalog_tier,
+            offered_without_subscription=_flag(entry, "offered_without_subscription", where),
         ))
     return manifest
 
