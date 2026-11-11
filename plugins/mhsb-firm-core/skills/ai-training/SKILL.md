@@ -70,8 +70,10 @@ Numbered lines, in this order:
 5. "Part 3, how to check an answer:" and the checks.
 6. "Part 4, how to record and bill the time:" and the policy rule.
 7. "Part 5, practice tasks:" and three tasks.
-8. "Not retrieved:" and each item that could not be read, or "Not retrieved: none".
+8. "Not retrieved:" and each item that could not be read, or "Not retrieved: none". Name the items in these words: "the firm's adopted AI policy", "the staff roles" and "the approved data categories". When the Firm Profile could not be read, none of them was read, and the line starts with these words: "Not retrieved: the firm's adopted AI policy and the staff roles". Add the reason after them, as the data gives it.
 9. The next step line.
+
+When the Firm Profile could not be read, write the coverage line and the "Not retrieved:" line first, then ask for the learner's role, then the next step line. Write no lesson parts until the role is known.
 
 ## Refusals
 

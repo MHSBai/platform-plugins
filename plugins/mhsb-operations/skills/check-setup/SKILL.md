@@ -2,7 +2,7 @@
 name: check-setup
 description: 'Checks the setup. It shows sign-in, the plan on file, packs and role mode, profile version
   and hash, and the plugin and service versions. It warns when the plugin is behind. It lists each scheduled
-  report and its last run. It does not check the firm''s own email automations. Use when a user asks,
+  report and its last run. It does not check the firm''s own email automations or whether its emails go out. Use when a user asks,
   for example: "check my setup"; "am I signed in"; "why can''t I see billing"; "did the Monday report
   go out"; "which version am i running"; "is the connector working"; "why cannot i see"; "did the monday
   report"; "hooked up".'

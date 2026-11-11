@@ -68,10 +68,10 @@ Numbered lines, in this order:
 
 1. The meeting: lead or matter, attorney, date and time, and time zone.
 2. The coverage statement, in this form: "Coverage: <scope>; <N> records; all pages read: <yes or no>; read at <HH:MM> <time zone>." If the read was incomplete, write "Coverage: incomplete (<reason>)."
-3. "Known facts:" then one line per fact, with the source field in brackets. For a lead or intake record, write the source as [intake.<field>], for example [intake.loss_type].
+3. "Known facts:" then one line per fact, with the source field in brackets. Write every source as [intake.<field>], for a lead and for a matter alike, for example [intake.loss_type] and [intake.loss_date]. Never write a bare field name such as [loss_date].
 4. "Missing information:" then one line per gap.
 5. "Questions from the fragment:" then one line per open question.
-6. "Conflict reminder:" with the name check status, counts and identifiers only: "name check run; <N> matches" or "name check not run".
+6. "Conflict reminder:" with the name check status, counts and identifiers only: "name check run; <N> matches" or "name check not run". The line label is "Conflict reminder:" word for word, never "Conflict check:".
 7. "Fee and disclosure:" with the points for the attorney.
 8. "Not retrieved:" then each item and its reason. Write "Not retrieved: none" when every page was read.
 9. The next step line.
