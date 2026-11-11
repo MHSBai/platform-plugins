@@ -740,7 +740,7 @@ model eval release gate: 4 problem(s)
 1
 $ grep -rnP '[\x{2014}\x{2013}\x{2012}]' tools tests plugins catalog docs evals state HANDOFF.md CHANGELOG.md README.md | wc -l
 0
-$ git grep -c "Rich Berman" | wc -l
+$ git grep -cE "Ric[h] Berman" | wc -l     (the short form of the owner's name)
 0
 $ python -m pytest -q | tail -1
 239 passed, 2 skipped in 461.51s (0:07:41)
