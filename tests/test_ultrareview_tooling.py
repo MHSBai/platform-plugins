@@ -226,3 +226,24 @@ def test_p4_release_gate_treats_truncated_as_not_passing(repo: Path,
     record["status"] = "ran"
     results.write_text(json.dumps(record), encoding="utf-8")
     assert model_evals.main(["--root", str(repo), "--check-release"]) == 0
+
+
+def test_p5_ran_record_survives_a_pending_run(repo: Path, monkeypatch: pytest.MonkeyPatch,
+                                              capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    results = _write_ran_record(repo)
+    assert model_evals.main(["--root", str(repo), "--no-log"]) == 0
+    assert json.loads(results.read_text(encoding="utf-8")) == {"status": "ran", "marker": "committed"}
+    attempt = json.loads((repo / model_evals.LAST_ATTEMPT).read_text(encoding="utf-8"))
+    assert attempt["status"] == "pending"
+    assert model_evals.LAST_ATTEMPT.as_posix() in capsys.readouterr().out
+
+
+def test_p5_ran_record_survives_an_error_run(repo: Path, monkeypatch: pytest.MonkeyPatch,
+                                             capsys: pytest.CaptureFixture[str]) -> None:
+    _use_fake_client(monkeypatch, raise_error=True)
+    results = _write_ran_record(repo)
+    assert model_evals.main(["--root", str(repo), "--budget", "1", "--no-log"]) == 1
+    assert json.loads(results.read_text(encoding="utf-8")) == {"status": "ran", "marker": "committed"}
+    assert json.loads((repo / model_evals.LAST_ATTEMPT).read_text(encoding="utf-8"))["status"] == "error"
+    assert model_evals.LAST_ATTEMPT.as_posix() in capsys.readouterr().out
