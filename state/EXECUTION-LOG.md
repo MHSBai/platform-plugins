@@ -652,3 +652,18 @@ model eval release gate: 3 problem(s)
 ```
 
 The gate blocks the release as intended; no digest problem is reported (record and tree: 95afc38ec1b4).
+
+### Step 11. Ultrareview of the tooling subset (2026-11-11)
+
+Six findings fixed (decision 0005, Section 13); four do not reproduce on the full branch.
+
+```
+$ python tools/lint.py | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: standard formula, fallback syllable count
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python -m pytest -q | tail -1
+205 passed, 1 skipped
+```

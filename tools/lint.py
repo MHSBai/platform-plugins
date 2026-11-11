@@ -217,7 +217,7 @@ def prose_for_reading(body: str) -> str:
         if not stripped or stripped.startswith("|"):
             continue
         stripped = re.sub(r"^(#+|[-*]|\d+\.)\s*", "", stripped)
-        if stripped and stripped[-1] not in ".?:;":
+        if stripped and stripped[-1] not in ".?!":
             stripped += "."
         lines.append(stripped)
     return " ".join(lines)

@@ -94,3 +94,16 @@ Test fixture. `test_l06_reading_level_operational` appended six dense lines to t
 PP4-N1. The record stores a sha256 per input file (every SKILL.md, the routing phrases, the case files, the model configuration, `tools/model_evals.py`, `tools/skill_evals.py`, `tools/routing_check.py`, and the manifest without its version labels) and a digest over them. `--check-release` fails when the digest differs from the tree and names the changed files. A failed case keeps its response text.
 
 PP4-N2. L06 uses textstat's Flesch-Kincaid grade when textstat and its pronunciation dictionary are installed, and otherwise the standard formula with textstat's sentence and word rules and a syllable heuristic that gives textstat's counts on the lint's fixtures (`tests/test_lint.py`). The bound is the specification's: 9 operational, 12 document. Under textstat the 24 description promises grade 3.2 to 7.0 and the bodies 4.7 to 6.0; no description exceeds the bound, so none was rewritten for grade.
+
+## 13. Ultrareview of the tooling subset (2026-11-11)
+
+The review ran on a narrowed diff (tools, workflows, tests, the model configuration and `mhsb-firm-core`) because the full pull request exceeds the reviewer's line limit. Four findings are artifacts of that narrowing and do not reproduce on the branch. The eval data files are committed. The pack fragments carry `phi_default` and `masked_in_reports` (60c5dbf). All 24 skills are rewritten. A model eval record is committed. The release gate fails on it by design (Section 12).
+
+Fixed:
+
+1. The invented-date check now recognizes abbreviated months, day-month-year order, numeric month/day/year, and month and day with no year. A yearless date is compared by month and day.
+2. The input digest also covers `tools/lint.py` and `tools/manifest_lib.py`, which the scorers import.
+3. `prose_for_reading` ends every line that does not end in `.`, `?` or `!`, so lines ending in `:` or `;` count as sentences under the current splitter.
+4. A run cut short by the spend cap is recorded as `truncated`, with the counts run and total, and exits 1.
+5. Only a complete run writes `evals/results/model-evals.json`. A pending, error or truncated run goes to `evals/results/model-evals-last-attempt.json` and leaves the complete record unchanged.
+6. The routing answer is taken as the first installed skill name in the reply. Slashes, backticks and trailing punctuation are ignored.

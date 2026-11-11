@@ -162,7 +162,9 @@ def test_suite_needs_all_six_kinds(repo: Path) -> None:
 def test_model_evals_record_pending_without_a_key(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     assert model_evals.main(["--root", str(repo)]) == 0
-    record = json.loads((repo / "evals" / "results" / "model-evals.json").read_text(encoding="utf-8"))
+    assert not (repo / "evals" / "results" / "model-evals.json").exists() or json.loads(
+        (repo / "evals" / "results" / "model-evals.json").read_text(encoding="utf-8")).get("status") != "pending"
+    record = json.loads((repo / "evals" / "results" / "model-evals-last-attempt.json").read_text(encoding="utf-8"))
     assert record["status"] == "pending" and record["key"] == "EMPTY"
     assert "pending" in (repo / "state" / "EXECUTION-LOG.md").read_text(encoding="utf-8")
 
@@ -368,3 +370,44 @@ def test_l06_grades_descriptions_without_the_trigger_sentence() -> None:
     assert lint.description_promise(long_promise + ' Use when a user asks, for example: "x".') == long_promise
     assert lint.flesch_kincaid_grade(long_promise) > 12
     assert lint.flesch_kincaid_grade("Lists the dates. It shows the owner.") < 9
+
+
+@pytest.mark.parametrize("text", [
+    "Hearing on Dec. 10, 2026.", "Hearing on 10 December 2026.", "Hearing on 12/10/2026.",
+    "Hearing on December 10th.", "Hearing on Dec 10.",
+])
+def test_other_date_forms_are_checked(text: str) -> None:
+    failures = skill_evals.score_response(_case(), text, [], REGISTRY, "dates")
+    assert any("invented date" in f for f in failures), text
+
+
+@pytest.mark.parametrize("text", ["Hearing on Dec. 9, 2026.", "Hearing on 12/9/2026.", "Hearing on December 9."])
+def test_supported_date_forms_pass(text: str) -> None:
+    assert not skill_evals.score_response(_case(), text, [], REGISTRY, "dates")
+
+
+def test_digest_covers_the_modules_the_scorers_import() -> None:
+    files = model_evals.input_files(ROOT)
+    assert "tools/lint.py" in files and "tools/manifest_lib.py" in files
+
+
+def test_complete_record_is_not_overwritten_by_a_pending_run(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    results = repo / "evals" / "results" / "model-evals.json"
+    results.parent.mkdir(parents=True, exist_ok=True)
+    results.write_text(json.dumps({"status": "ran", "marker": 1}), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--no-log"]) == 0
+    assert json.loads(results.read_text(encoding="utf-8"))["marker"] == 1
+
+
+@pytest.mark.parametrize("reply,expected", [
+    ("start.", "start"), ("`dates`", "dates"), ("/brief", "brief"), ("The skill is dates,", "dates"),
+])
+def test_routing_answer_parser(reply: str, expected: str) -> None:
+    assert model_evals.parse_routing_answer(reply, {"start", "dates", "brief"}) == expected
+
+
+def test_prose_lines_ending_in_colon_are_sentences() -> None:
+    import lint
+
+    assert lint.prose_for_reading("First line:\nSecond line;") == "First line:. Second line;."

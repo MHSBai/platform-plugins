@@ -65,7 +65,16 @@ WRITE_TOOL_RE = re.compile(
 ISO_DATE_RE = re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b")
 MONTHS = ("january", "february", "march", "april", "may", "june", "july", "august",
           "september", "october", "november", "december")
-LONG_DATE_RE = re.compile(r"\b(" + "|".join(m.capitalize() for m in MONTHS) + r") (\d{1,2}), (\d{4})\b")
+_MONTH = r"(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sept?(?:ember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?"
+# "November 4, 2026", "Nov. 4, 2026", "Nov 4 2026", "November 4th, 2026"
+MONTH_DAY_YEAR_RE = re.compile(r"\b" + _MONTH + r" (\d{1,2})(?:st|nd|rd|th)?,? (\d{4})\b")
+# "4 November 2026", "4 Nov. 2026"
+DAY_MONTH_YEAR_RE = re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)? " + _MONTH + r",? (\d{4})\b")
+# "11/4/2026", "11-04-2026" (United States order, four-digit year)
+NUMERIC_DATE_RE = re.compile(r"\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b")
+# "November 4" or "4 November" with no year: compared by month and day only
+MONTH_DAY_RE = re.compile(r"\b" + _MONTH + r" (\d{1,2})(?:st|nd|rd|th)?\b(?!,? \d{4})")
+DAY_MONTH_RE = re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)? " + _MONTH + r"\b(?!,? \d{4})")
 SOURCE_TAG_RE = re.compile(r"\[(field: [^\]]+|template: [^\]]+|unverified)\]\s*$")
 
 Doc = dict[str, Any]
@@ -133,12 +142,46 @@ def _stringify(value: Any) -> Any:
     return value
 
 
+def _month_number(name: str) -> int:
+    key = name.lower().rstrip(".")[:3]
+    return [m[:3] for m in MONTHS].index(key) + 1
+
+
+def _valid(month: int, day: int) -> bool:
+    return 1 <= month <= 12 and 1 <= day <= 31
+
+
 def dates_in(text: str) -> set[str]:
+    """Every dated mention, normalized: YYYY-MM-DD, or --MM-DD when the text gives no year."""
     found = {m.group(0) for m in ISO_DATE_RE.finditer(text)}
-    for m in LONG_DATE_RE.finditer(text):
-        month = MONTHS.index(m.group(1).lower()) + 1
-        found.add(f"{int(m.group(3)):04d}-{month:02d}-{int(m.group(2)):02d}")
+    for m in MONTH_DAY_YEAR_RE.finditer(text):
+        found.add(f"{int(m.group(3)):04d}-{_month_number(m.group(1)):02d}-{int(m.group(2)):02d}")
+    for m in DAY_MONTH_YEAR_RE.finditer(text):
+        found.add(f"{int(m.group(3)):04d}-{_month_number(m.group(2)):02d}-{int(m.group(1)):02d}")
+    for m in NUMERIC_DATE_RE.finditer(text):
+        month, day = int(m.group(1)), int(m.group(2))
+        if _valid(month, day):
+            found.add(f"{int(m.group(3)):04d}-{month:02d}-{day:02d}")
+    for m in MONTH_DAY_RE.finditer(text):
+        if _valid(_month_number(m.group(1)), int(m.group(2))):
+            found.add(f"--{_month_number(m.group(1)):02d}-{int(m.group(2)):02d}")
+    for m in DAY_MONTH_RE.finditer(text):
+        if _valid(_month_number(m.group(2)), int(m.group(1))):
+            found.add(f"--{_month_number(m.group(2)):02d}-{int(m.group(1)):02d}")
     return found
+
+
+def invented_dates(response: str, allowed: set[str]) -> list[str]:
+    """Dates in the response that no allowed date supports; a yearless date matches by month and day."""
+    month_days = {d[-6:] for d in allowed}
+    out = []
+    for d in sorted(dates_in(response)):
+        if d.startswith("--"):
+            if d[1:] not in month_days and d not in allowed:
+                out.append(d)
+        elif d not in allowed:
+            out.append(d)
+    return out
 
 
 def register_problems(text: str) -> list[str]:
@@ -193,7 +236,7 @@ def score_response(case: Doc, response: str, tool_calls: list[str], registry: Do
     allowed = dates_in(source) | {str(d) for d in expect.get("allowed_dates") or []}
     if case.get("today"):
         allowed.add(str(case["today"]))
-    invented = sorted(dates_in(response) - allowed)
+    invented = invented_dates(response, allowed)
     if invented:
         failures.append(f"invented date(s): {invented}")
 

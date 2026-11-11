@@ -39,6 +39,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 from dataclasses import dataclass, field
@@ -57,6 +58,8 @@ from manifest_lib import load_manifest  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = Path("evals/model-config.yaml")
 RESULTS = Path("evals/results/model-evals.json")
+# A run that is pending, failed or cut short never replaces the complete record above.
+LAST_ATTEMPT = Path("evals/results/model-evals-last-attempt.json")
 LOG = Path("state/EXECUTION-LOG.md")
 
 DECOY_WRITE_TOOLS = (
@@ -180,6 +183,21 @@ def skill_tasks(root: Path) -> list[tuple[str, str, dict[str, Any], str]]:
 # --------------------------------------------------------------------------- runner
 
 
+def installed_names(root: Path, cset: str) -> set[str]:
+    manifest = load_manifest(root)
+    combo = next(c for c in manifest.combinations() if routing_check.command_set(manifest, c) == cset)
+    return {c.name for c in manifest.commands_in(combo)}
+
+
+def parse_routing_answer(text: str, names: set[str]) -> str:
+    """The first installed skill name in the reply, ignoring slashes, backticks and punctuation."""
+    tokens = re.findall(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", text.lower())
+    for token in tokens:
+        if token in names:
+            return token
+    return tokens[0] if tokens else ""
+
+
 def run_routing(client: Any, root: Path, cfg: dict[str, Any], spend: Spend) -> dict[str, Any]:
     model = cfg["models"]["routing"]
     results = []
@@ -195,7 +213,7 @@ def run_routing(client: Any, root: Path, cfg: dict[str, Any], spend: Spend) -> d
             messages=[{"role": "user", "content": content}],
         )
         spend.add(model, message.usage)
-        answer = text_of(message).strip().strip("/").split()[0].lower() if text_of(message) else ""
+        answer = parse_routing_answer(text_of(message), installed_names(root, cset))
         results.append({"id": phrase.pid, "set": cset, "expected": expected, "answer": answer,
                         "passed": answer == expected})
     return {"model": model, "cases": len(results), "passed": sum(r["passed"] for r in results),
@@ -248,6 +266,9 @@ DIGEST_GLOBS = (
     "tools/model_evals.py",
     "tools/skill_evals.py",
     "tools/routing_check.py",
+    # Modules the scorers import: the register rules (lint) and the command sets (manifest_lib).
+    "tools/lint.py",
+    "tools/manifest_lib.py",
 )
 MANIFEST = Path("catalog/manifest.yaml")
 RESPONSE_CHARS = 6000
@@ -346,6 +367,8 @@ def summary_block(record: dict[str, Any]) -> str:
     if record["status"] == "pending":
         lines.append(f"Reason: {record['reason']}")
         return "\n".join(lines)
+    for name, cut in (record.get("truncated") or {}).items():
+        lines.append(f"{name}: cut short by the spend cap, {cut['ran']} of {cut['total']} tasks ran.")
     for name in ("routing", "skills"):
         suite = record.get(name)
         if suite:
@@ -412,12 +435,20 @@ def main(argv: list[str] | None = None) -> int:
             record["error"] = f"API status {exc.status_code}"
         except anthropic.APIConnectionError:
             record["error"] = "API connection error"
-        record.update(status="ran" if "error" not in record else "error",
+        totals = {"routing": len(routing_tasks(root)), "skills": len(skill_tasks(root))}
+        short = [s for s in suites if "error" not in record
+                 and int((record.get(s) or {}).get("cases", 0)) < totals[s]]
+        if short:
+            record["truncated"] = {s: {"ran": int(record[s]["cases"]), "total": totals[s]} for s in short}
+        status_now = "error" if "error" in record else ("truncated" if short else "ran")
+        record.update(status=status_now,
                       seconds=round(time.monotonic() - started, 1),
                       spend={"cap": cap, "cost": spend.cost, "input_tokens": spend.input_tokens,
                              "output_tokens": spend.output_tokens, "requests": spend.requests,
                              "per_model": spend.per_model})
-    out = root / RESULTS
+    out = root / (RESULTS if record["status"] == "ran" else LAST_ATTEMPT)
+    if out != root / RESULTS:
+        print(f"Status {record['status']}: written to {LAST_ATTEMPT}; {RESULTS} is left unchanged.")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(record, indent=2, default=str) + "\n", encoding="utf-8")
     block = summary_block(record)
