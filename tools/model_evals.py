@@ -40,7 +40,6 @@ import ast
 import hashlib
 import json
 import os
-import re
 import sys
 import time
 from dataclasses import dataclass, field
@@ -190,13 +189,22 @@ def installed_names(root: Path, cset: str) -> set[str]:
     return {c.name for c in manifest.commands_in(combo)}
 
 
+# Stripped from both ends of the reply's first word: slashes, backticks, straight and curly
+# quotation marks, Markdown emphasis, brackets and punctuation.
+ANSWER_STRIP = "/`'\"\u2018\u2019\u201c\u201d*_()[].,;:!?"
+
+
 def parse_routing_answer(text: str, names: set[str]) -> str:
-    """The first installed skill name in the reply, ignoring slashes, backticks and punctuation."""
-    tokens = re.findall(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", text.lower())
-    for token in tokens:
-        if token in names:
-            return token
-    return tokens[0] if tokens else ""
+    """The installed skill the reply names, or "" when it names none.
+
+    ROUTING_SYSTEM asks for the skill name only. The reply's first word is stripped of whitespace,
+    slashes, backticks, quotation marks and trailing punctuation, lower-cased, and matched against
+    the installed skill names. A reply that is a sentence, or that names a skill not installed in
+    the command set, matches no skill and is scored as wrong.
+    """
+    words = text.split()
+    answer = words[0].strip(ANSWER_STRIP).lower() if words else ""
+    return answer if answer in names else ""
 
 
 def run_routing(client: Any, root: Path, cfg: dict[str, Any], spend: Spend) -> dict[str, Any]:
@@ -214,9 +222,14 @@ def run_routing(client: Any, root: Path, cfg: dict[str, Any], spend: Spend) -> d
             messages=[{"role": "user", "content": content}],
         )
         spend.add(model, message.usage)
-        answer = parse_routing_answer(text_of(message), installed_names(root, cset))
-        results.append({"id": phrase.pid, "set": cset, "expected": expected, "answer": answer,
-                        "passed": answer == expected})
+        reply = text_of(message)
+        answer = parse_routing_answer(reply, installed_names(root, cset))
+        row = {"id": phrase.pid, "set": cset, "expected": expected, "answer": answer,
+               "passed": answer == expected}
+        if not row["passed"]:
+            # The reply as given, so that a review can tell a wrong skill from an unparsed reply.
+            row["reply"] = reply[:200]
+        results.append(row)
     return {"model": model, "cases": len(results), "passed": sum(r["passed"] for r in results),
             "results": results}
 

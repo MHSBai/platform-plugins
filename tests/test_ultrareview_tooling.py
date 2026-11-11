@@ -247,3 +247,25 @@ def test_p5_ran_record_survives_an_error_run(repo: Path, monkeypatch: pytest.Mon
     assert json.loads(results.read_text(encoding="utf-8")) == {"status": "ran", "marker": "committed"}
     assert json.loads((repo / model_evals.LAST_ATTEMPT).read_text(encoding="utf-8"))["status"] == "error"
     assert model_evals.LAST_ATTEMPT.as_posix() in capsys.readouterr().out
+
+
+# --------------------------------------------------------------------------- P6 answer parser
+
+
+NAMES = {"start", "dates", "brief", "follow-up"}
+
+
+@pytest.mark.parametrize("reply,expected", [
+    ("start.", "start"),
+    ("dates,", "dates"),
+    ("`dates`", "dates"),
+    ("'dates'", "dates"),
+    ('"/brief"', "brief"),
+    (" /follow-up \n", "follow-up"),
+    ("Dates!", "dates"),
+    ("calendar", ""),
+    ("calendar.", ""),
+    ("", ""),
+])
+def test_p6_answer_is_normalized_and_matched_against_installed_names(reply: str, expected: str) -> None:
+    assert model_evals.parse_routing_answer(reply, NAMES) == expected

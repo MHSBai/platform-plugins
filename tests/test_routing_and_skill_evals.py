@@ -401,7 +401,7 @@ def test_complete_record_is_not_overwritten_by_a_pending_run(repo: Path, monkeyp
 
 
 @pytest.mark.parametrize("reply,expected", [
-    ("start.", "start"), ("`dates`", "dates"), ("/brief", "brief"), ("The skill is dates,", "dates"),
+    ("start.", "start"), ("`dates`", "dates"), ("/brief", "brief"), ("The skill is dates,", ""),
 ])
 def test_routing_answer_parser(reply: str, expected: str) -> None:
     assert model_evals.parse_routing_answer(reply, {"start", "dates", "brief"}) == expected
