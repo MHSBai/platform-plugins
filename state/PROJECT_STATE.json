@@ -23,7 +23,7 @@
       "name": "model routing and skill evals",
       "command": "python tools/model_evals.py",
       "status": "fail",
-      "evidence": "run 2026-11-10T19:53:46Z, input digest 95afc38ec1b4 equal to the tree: routing 238 of 240, skills 120 of 144 (mhsb-firm-core 40 of 48; 6 injection cases fail, 2 in mhsb-firm-core); USD 6.36 of a USD 12 cap; --check-release blocks the release; every plugin held at 0.1.0 (decision 0005, Section 12)"
+      "evidence": "run 2026-11-10T19:53:46Z, input digest 95afc38ec1b4, equal to the tree at the run and stale since 0d39e9b and FIX-ULTRA-PP8 (HANDOFF PP-8 item 6): routing 238 of 240, skills 120 of 144 (mhsb-firm-core 40 of 48; 6 injection cases fail, 2 in mhsb-firm-core); USD 6.36 of a USD 12 cap; --check-release blocks the release; every plugin held at 0.1.0 (decision 0005, Section 12)"
     },
     {
       "id": "C4",

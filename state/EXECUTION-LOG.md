@@ -708,3 +708,44 @@ at 302d267: 4 failed, 30 passed, 1 skipped (textstat environment: P3 2 passed)
 P3 grades: on both paths, the terminator change lowers 16 body grades (fallback path) and 17 (textstat path) by 0.1 to 0.2. No grade crosses its bound. Bodies under textstat: 4.7 to 6.0 before, 4.6 to 5.9 after. Description grades do not pass through `prose_for_reading` and are unchanged.
 
 The record was already stale before this session. The digest of the tree differs from the record's in 25 inputs: 21 skill and case files changed by `0d39e9b` (SKILLS-PP-8) after the recorded run, and four tools changed by `302d267`.
+
+Fixes and tests, one commit per finding (FIX-ULTRA-PP8):
+
+| Finding | Change | Commit |
+|---|---|---|
+| P1 date forms | `NUMERIC_DATE_RE` reads a two-digit year as 20YY; the other seven forms were already read (302d267) | 01bc725 |
+| P2 input digest | `scorer_modules` derives the tool modules from the imports of `tools/model_evals.py` (ast, through `tools/`); `DIGEST_GLOBS` lists data only | 42466e5 |
+| P3 sentence count | tests only; `prose_for_reading` already terminates lines not ending in . ? ! (302d267) | cccca3c |
+| P4 truncated runs | tests only; status `truncated`, counts printed, exit 1, gate not passing (302d267) | 11aab3e |
+| P5 record protection | tests only; pending and error runs write `model-evals-last-attempt.json` and print the path (302d267) | b845c47 |
+| P6 answer parser | first word stripped of whitespace, slashes, backticks, quotation marks and trailing punctuation; matched against installed names, else "" | 8b37e5a |
+
+CHECKPOINT A (head 1b5f3c4):
+
+```
+$ python tools/lint.py | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: standard formula, fallback syllable count
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/gen_manifest.py --check
+generated files current
+$ python tools/model_evals.py --check-release; echo $?
+RELEASE BLOCKED input digest 95afc38ec1b4 does not match the tree fc90eff5f40c; re-run the model evals on the current text (changed: ... 27 inputs)
+RELEASE BLOCKED routing: 238 of 240 passed; a release needs 100 percent
+RELEASE BLOCKED skills: 120 of 144 passed; a release needs 100 percent
+RELEASE BLOCKED mhsb-firm-core is tier ga and its latest eval record fails: 8 of 48 skill cases failed, 2 routing failures involve its skills (...)
+model eval release gate: 4 problem(s)
+1
+$ grep -rnP '[\x{2014}\x{2013}\x{2012}]' tools tests plugins catalog docs evals state HANDOFF.md CHANGELOG.md README.md | wc -l
+0
+$ git grep -c "Rich Berman" | wc -l
+0
+$ python -m pytest -q | tail -1
+239 passed, 2 skipped in 461.51s (0:07:41)
+$ python -m pytest -q tests/test_ultrareview_tooling.py tests/test_lint.py tests/test_routing_and_skill_evals.py | tail -1   (textstat environment)
+171 passed in 436.57s (0:07:16)
+```
+
+The release gate is red as intended. The digest problem follows from P2 and from `0d39e9b`. The pass-rate problems are those of decision 0005, Section 12. `evals/results/model-evals.json` was not edited and no run was made (no key). Remaining item for Richard Berman: a model evaluation rerun on a funded key to replace the stale record before the 0.2.0 release gate can pass (HANDOFF, PP-8 item 6).
