@@ -11,6 +11,7 @@ practice_area: landlord_tenant_consumer
 version: 0.1.0
 release_tier: hidden
 adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
+phi_default: true
 intake_questions:
 - {id: side, prompt: "Which side the person is on", answer_type: choice, choices: [tenant, landlord, consumer, other], required: true, sensitive_tag: null}
 - {id: property, prompt: "Property address", answer_type: address, required: false, sensitive_tag: null}
@@ -76,8 +77,8 @@ consent_flags:
 - {id: limited_scope_in_agreement, label: "Limited scope stated in the signed agreement", evidence: [signed_form], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
 - {id: tribunal_disclosure, label: "Tribunal disclosure of limited-scope representation, as the forum requires", evidence: [engagement_letter_clause, platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.rent_ledger, tag: financial, excluded_from_scoring: true}
-- {field: intake.subsidy_status, tag: financial, excluded_from_scoring: true}
-- {field: intake.debt, tag: financial, excluded_from_scoring: true}
+- {field: intake.rent_ledger, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.subsidy_status, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.debt, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
 brief_views: []
 reports: []

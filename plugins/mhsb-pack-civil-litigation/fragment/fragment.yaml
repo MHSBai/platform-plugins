@@ -13,6 +13,7 @@ practice_area: civil_litigation
 version: 1.0.0
 release_tier: pilot
 adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
+phi_default: true
 intake_questions:
 - {id: parties_counsel, prompt: "Parties and their counsel", answer_type: text, required: true, sensitive_tag: null}
 - {id: claim_type, prompt: "Type of claim", answer_type: choice, choices: [contract, property damage, business tort, debt collection, other, unknown], required: true, sensitive_tag: null}
@@ -85,8 +86,8 @@ consent_flags:
 - {id: limited_scope_informed_consent, label: "Informed consent to a limited scope of representation", evidence: [signed_form], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
 - {id: recording_consent, label: "Recording consent where the state requires it", evidence: [recorded_verbal, signed_form], verifier_required: true, permitted_channels: [phone], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.insurance, tag: insurance_limits, excluded_from_scoring: true}
-- {field: intake.goals_budget, tag: financial, excluded_from_scoring: true}
+- {field: intake.insurance, tag: insurance_limits, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.goals_budget, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
 brief_views:
 - {id: event_updates_due, name: "Event updates due"}
 reports: []

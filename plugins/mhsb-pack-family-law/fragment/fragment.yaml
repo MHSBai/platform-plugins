@@ -16,6 +16,7 @@ practice_area: family_law
 version: 0.1.0
 release_tier: hidden
 adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
+phi_default: true
 intake_questions:
 - {id: parties_children, prompt: "Parties and any children of the relationship", answer_type: text, required: true, sensitive_tag: null}
 - {id: key_dates, prompt: "Key dates such as marriage, separation and filing, each with its source", answer_type: text, required: false, sensitive_tag: null}
@@ -75,8 +76,8 @@ communication_templates:
 consent_flags:
 - {id: verified_contact_rule, label: "Verified contact rule from the firm's safety protocol; outreach drafts are refused without it", evidence: [recorded_verbal, platform_field], verifier_required: true, permitted_channels: [], expiry_days: 90, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.income, tag: financial, excluded_from_scoring: true}
-- {field: intake.assets_debts, tag: financial, excluded_from_scoring: true}
-- {field: record.health_information, tag: health, excluded_from_scoring: true}
+- {field: intake.income, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.assets_debts, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: record.health_information, tag: health, excluded_from_scoring: true, masked_in_reports: true}
 brief_views: []
 reports: []

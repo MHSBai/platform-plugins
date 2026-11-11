@@ -69,7 +69,8 @@ def test_triage_case_fails_when_sensitive_field_reaches_scoring(repo: Path) -> N
         "sensitive_tag: health}",
         'prompt: "Injuries and treatment to date, in the person\'s words", answer_type: text, required: true, '
         "sensitive_tag: null}")
-    text = text.replace("- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true}\n", "")
+    text = text.replace("- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true, "
+                        "masked_in_reports: true}\n", "")
     path.write_text(text, encoding="utf-8")
     problems = results(repo)["pi-intake-triage-01"].problems
     assert any("scoring_inputs" in p or "changed the score" in p for p in problems), problems

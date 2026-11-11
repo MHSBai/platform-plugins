@@ -10,6 +10,7 @@ practice_area: workers_compensation
 version: 0.1.0
 release_tier: hidden
 adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
+phi_default: true
 intake_questions:
 - {id: injury_date_or_onset, prompt: "Date of injury or onset, as the person states it", answer_type: date, required: true, sensitive_tag: null}
 - {id: employer_supervisor, prompt: "Employer and supervisor", answer_type: text, required: true, sensitive_tag: null}
@@ -76,8 +77,8 @@ consent_flags:
 - {id: ime_attendance_acknowledged, label: "Client acknowledged the examination appointment", evidence: [recorded_verbal, platform_field], verifier_required: true, permitted_channels: [phone, email, sms], expiry_days: null, when_unknown: not_permitted}
 - {id: recorded_insurer_statement, label: "Attorney decision recorded on any recorded statement to the insurer", evidence: [platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.treating_physician, tag: treatment, excluded_from_scoring: true}
-- {field: intake.prior_injuries_claims, tag: health, excluded_from_scoring: true}
-- {field: intake.wages, tag: financial, excluded_from_scoring: true}
+- {field: intake.treating_physician, tag: treatment, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.prior_injuries_claims, tag: health, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.wages, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
 brief_views: []
 reports: []

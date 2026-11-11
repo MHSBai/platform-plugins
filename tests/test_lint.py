@@ -531,7 +531,8 @@ def test_l15_unresolved_template_reference(repo: Path) -> None:
 def test_l15_sensitive_question_without_tag(repo: Path) -> None:
     path = repo / PI / "fragment/fragment.yaml"
     path.write_text(path.read_text(encoding="utf-8").replace(
-        "- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true}\n", ""), encoding="utf-8")
+        "- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true, "
+        "masked_in_reports: true}\n", ""), encoding="utf-8")
     assert "L15" in rules_failed(repo)
 
 
@@ -546,8 +547,12 @@ def test_l15_vendored_schema_hash_drift(repo: Path, monkeypatch: pytest.MonkeyPa
     schemas = repo / "tools" / "schemas"
     monkeypatch.setattr(lint, "SCHEMA_DIR", schemas)
     assert "L15" not in rules_failed(repo)
+    # Any byte that changes the vendored schema without updating the recorded sha256
+    # trips the L15 hash pin. A trailing newline keeps the JSON valid, so only the hash
+    # pin fires; the schema shape is unchanged and the fragments still validate. This
+    # mutation is independent of the schema's content, so a re-vendor does not break it.
     path = schemas / "fragment.schema.json"
-    path.write_text(path.read_text(encoding="utf-8").replace('"eligibility_question"\n', '"eligibility_question",\n          "extra_flag"\n', 1), encoding="utf-8")
+    path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
     assert "L15" in rules_failed(repo)
 
 

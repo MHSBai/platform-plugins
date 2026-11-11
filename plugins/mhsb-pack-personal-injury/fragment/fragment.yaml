@@ -7,7 +7,7 @@
 # restricted form; bar forms are used only as element checklists in MHSB's words.
 # Intake question ids match the AssemblyLine-derived blocks in intake-blocks.yaml.
 # PHI flag on by default, with documents and note bodies off: a Firm Profile data rule,
-# set at activation; the fragment schema carries no field for it.
+# set at activation; the fragment's phi_default field records it.
 # Adoption: adoption.yaml (PENDING ADOPTION). Catalog tier ga; held at pilot in the
 # manifest until an attorney adoption is recorded (Stage 11).
 fragment_id: personal_injury
@@ -15,6 +15,7 @@ practice_area: personal_injury
 version: 1.0.0
 release_tier: ga
 adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
+phi_default: true
 intake_questions:
 - {id: loss_date, prompt: "Date of the loss, as the person states it", answer_type: date, required: true, sensitive_tag: null}
 - {id: loss_location, prompt: "Where the loss occurred", answer_type: address, required: true, sensitive_tag: null}
@@ -91,10 +92,10 @@ consent_flags:
 - {id: psychotherapy_notes_authorization, label: "Psychotherapy notes authorized separately from other records", evidence: [signed_form], verifier_required: true, permitted_channels: [portal, letter], expiry_days: null, when_unknown: not_permitted}
 - {id: all_party_recording, label: "Recording consent from every party where the state requires it", evidence: [recorded_verbal, signed_form], verifier_required: true, permitted_channels: [phone], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true}
-- {field: intake.treatment_providers, tag: treatment, excluded_from_scoring: true}
-- {field: intake.insurance_both_parties, tag: insurance_limits, excluded_from_scoring: true}
-- {field: intake.employment_wage_loss, tag: financial, excluded_from_scoring: true}
+- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.treatment_providers, tag: treatment, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.insurance_both_parties, tag: insurance_limits, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.employment_wage_loss, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
 brief_views:
 - {id: incident_aging, name: "Incident aging"}
 - {id: records_requested, name: "Records requested"}
