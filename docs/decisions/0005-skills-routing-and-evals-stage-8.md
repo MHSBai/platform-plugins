@@ -101,9 +101,11 @@ The review ran on a narrowed diff (tools, workflows, tests, the model configurat
 
 Fixed:
 
-1. The invented-date check now recognizes abbreviated months, day-month-year order, numeric month/day/year, and month and day with no year. A yearless date is compared by month and day.
-2. The input digest also covers `tools/lint.py` and `tools/manifest_lib.py`, which the scorers import.
+1. The invented-date check now recognizes abbreviated months, day-month-year order, numeric month/day/year with a four-digit or a two-digit year (read as 20YY, FIX-ULTRA-PP8), and month and day with no year. A yearless date is compared by month and day.
+2. The input digest covers the code a run executes. `scorer_modules` reads the imports of `tools/model_evals.py` with `ast` and follows them through `tools/`, so `lint.py`, `manifest_lib.py`, `gen_manifest.py` and `release_check.py` are covered, and so is any module a scorer imports later (FIX-ULTRA-PP8). `DIGEST_GLOBS` lists data only.
 3. `prose_for_reading` ends every line that does not end in `.`, `?` or `!`, so lines ending in `:` or `;` count as sentences under the current splitter.
 4. A run cut short by the spend cap is recorded as `truncated`, with the counts run and total, and exits 1.
 5. Only a complete run writes `evals/results/model-evals.json`. A pending, error or truncated run goes to `evals/results/model-evals-last-attempt.json` and leaves the complete record unchanged.
-6. The routing answer is taken as the first installed skill name in the reply. Slashes, backticks and trailing punctuation are ignored.
+6. The routing answer is the reply's first word, stripped of whitespace, slashes, backticks, quotation marks and trailing punctuation. It counts only when it is an installed skill name in the command set; otherwise the answer is empty and the case fails, and the row keeps the reply (FIX-ULTRA-PP8). The first version took the first installed name anywhere in the reply. That credited a sentence, which the routing prompt does not permit, and it returned an unknown name as the answer.
+
+Tests for all six are in `tests/test_ultrareview_tooling.py`. They were run at `cad608b`, where each finding reproduces, and at the branch head. The record of the last run is not edited, so the release gate reports its digest as stale until a model evaluation runs on the current text.
