@@ -70,8 +70,8 @@ _MONTH = r"(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug
 MONTH_DAY_YEAR_RE = re.compile(r"\b" + _MONTH + r" (\d{1,2})(?:st|nd|rd|th)?,? (\d{4})\b")
 # "4 November 2026", "4 Nov. 2026"
 DAY_MONTH_YEAR_RE = re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)? " + _MONTH + r",? (\d{4})\b")
-# "11/4/2026", "11-04-2026" (United States order, four-digit year)
-NUMERIC_DATE_RE = re.compile(r"\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b")
+# "11/4/2026", "11-04-2026", "11/4/26" (United States order; a two-digit year is read as 20YY)
+NUMERIC_DATE_RE = re.compile(r"\b(\d{1,2})[/-](\d{1,2})[/-](\d{4}|\d{2})\b")
 # "November 4" or "4 November" with no year: compared by month and day only
 MONTH_DAY_RE = re.compile(r"\b" + _MONTH + r" (\d{1,2})(?:st|nd|rd|th)?\b(?!,? \d{4})")
 DAY_MONTH_RE = re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)? " + _MONTH + r"\b(?!,? \d{4})")
@@ -161,7 +161,8 @@ def dates_in(text: str) -> set[str]:
     for m in NUMERIC_DATE_RE.finditer(text):
         month, day = int(m.group(1)), int(m.group(2))
         if _valid(month, day):
-            found.add(f"{int(m.group(3)):04d}-{month:02d}-{day:02d}")
+            year = int(m.group(3)) + (2000 if len(m.group(3)) == 2 else 0)
+            found.add(f"{year:04d}-{month:02d}-{day:02d}")
     for m in MONTH_DAY_RE.finditer(text):
         if _valid(_month_number(m.group(1)), int(m.group(2))):
             found.add(f"--{_month_number(m.group(1)):02d}-{int(m.group(2)):02d}")
