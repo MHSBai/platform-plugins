@@ -36,6 +36,7 @@ Requires the `anthropic` Python package only when a key is SET.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -256,22 +257,43 @@ def run_skills(client: Any, root: Path, cfg: dict[str, Any], spend: Spend) -> di
             "skills_covered": len(skills_seen), "results": results}
 
 
+# The data a run reads. The code a run executes is not listed here: scorer_modules derives it
+# from the imports of the runner, so a change to a prompt, a task list or a scoring rule after
+# a run makes the run stale (PP4-N1), including a rule in a module a scorer imports later.
 DIGEST_GLOBS = (
     "plugins/*/skills/*/SKILL.md",
     "evals/routing/phrases.yaml",
     "evals/skills/*.yaml",
     "evals/model-config.yaml",
-    # The runner and the scorers: a change to a prompt, a task list or a scoring rule
-    # after a run makes the run stale (PP4-N1).
-    "tools/model_evals.py",
-    "tools/skill_evals.py",
-    "tools/routing_check.py",
-    # Modules the scorers import: the register rules (lint) and the command sets (manifest_lib).
-    "tools/lint.py",
-    "tools/manifest_lib.py",
 )
+RUNNER = Path("tools/model_evals.py")
 MANIFEST = Path("catalog/manifest.yaml")
 RESPONSE_CHARS = 6000
+
+
+def scorer_modules(root: Path) -> list[str]:
+    """The runner and every module under tools/ that it imports, directly or through another module.
+
+    The imports are read from the source with ast, at any depth (a function-level import counts),
+    so the list follows the code: model_evals imports skill_evals, routing_check and manifest_lib;
+    skill_evals imports lint, which imports gen_manifest and release_check. Imports that resolve
+    outside tools/ (the standard library, yaml, anthropic, textstat) are not repository inputs.
+    """
+    tools = root / RUNNER.parent
+    seen: set[str] = set()
+    pending = [RUNNER.stem]
+    while pending:
+        name = pending.pop()
+        path = tools / f"{name}.py"
+        if name in seen or not path.is_file():
+            continue
+        seen.add(name)
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"), filename=str(path))):
+            if isinstance(node, ast.Import):
+                pending.extend(alias.name.split(".")[0] for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                pending.append(node.module.split(".")[0])
+    return sorted((RUNNER.parent / f"{name}.py").as_posix() for name in seen)
 
 
 def _manifest_bytes(root: Path) -> bytes:
@@ -285,7 +307,8 @@ def _manifest_bytes(root: Path) -> bytes:
 
 def input_files(root: Path) -> dict[str, str]:
     """sha256 of every file a model eval run reads, by repository path."""
-    paths = sorted({p for pattern in DIGEST_GLOBS for p in root.glob(pattern) if p.is_file()})
+    paths = sorted({p for pattern in DIGEST_GLOBS for p in root.glob(pattern) if p.is_file()}
+                   | {root / rel for rel in scorer_modules(root)})
     files = {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     files[MANIFEST.as_posix() + " (without version labels)"] = hashlib.sha256(_manifest_bytes(root)).hexdigest()
     return files

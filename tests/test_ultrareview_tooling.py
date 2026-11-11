@@ -72,3 +72,30 @@ def test_p1_invented_date_is_caught_in_every_form(form: str, invented: str, allo
 @pytest.mark.parametrize("form,invented,allowed", DATE_FORMS, ids=[f[0] for f in DATE_FORMS])
 def test_p1_allowed_date_is_accepted_in_every_form(form: str, invented: str, allowed: str) -> None:
     assert not _date_failures(f"Hearing on {allowed}. Not retrieved: none."), form
+
+
+# --------------------------------------------------------------------------- P2 input digest
+
+
+def test_p2_digest_covers_every_imported_scoring_module() -> None:
+    files = model_evals.input_files(ROOT)
+    for module in ("model_evals", "skill_evals", "routing_check", "lint", "manifest_lib"):
+        assert f"tools/{module}.py" in files, module
+
+
+def test_p2_a_change_to_lint_changes_the_digest(repo: Path) -> None:
+    before = model_evals.input_digest(repo)
+    path = repo / "tools" / "lint.py"
+    path.write_text(path.read_text(encoding="utf-8") + "\n# A change to a register rule.\n", encoding="utf-8")
+    assert model_evals.input_digest(repo) != before
+
+
+def test_p2_digest_follows_a_new_import(repo: Path) -> None:
+    """The module list is derived from the imports: a new scorer module enters the digest unlisted."""
+    (repo / "tools" / "extra_rule.py").write_text("RULE = 1\n", encoding="utf-8")
+    path = repo / "tools" / "skill_evals.py"
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace("import lint  # noqa: E402\n",
+                                 "import lint  # noqa: E402\nimport extra_rule  # noqa: E402,F401\n", 1),
+                    encoding="utf-8")
+    assert "tools/extra_rule.py" in model_evals.input_files(repo)
