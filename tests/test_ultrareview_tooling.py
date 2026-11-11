@@ -128,3 +128,101 @@ def test_p3_colon_lines_count_as_sentences_on_the_textstat_path() -> None:
     textstat = pytest.importorskip("textstat")
     prose = lint.prose_for_reading(COLON_FIXTURE)
     assert textstat.sentence_count(prose) == lint.fk_sentence_count(prose) == 3
+
+
+# --------------------------------------------------------------------------- P4, P5 fake client
+
+
+def _fake_anthropic(raise_error: bool = False) -> tuple[types.ModuleType, list[dict]]:
+    """A stand-in for the anthropic package: each reply is 'start' and is charged a million input tokens."""
+    module = types.ModuleType("anthropic")
+    calls: list[dict] = []
+
+    class APIStatusError(Exception):
+        status_code = 529
+
+    class APIConnectionError(Exception):
+        pass
+
+    class Usage:
+        input_tokens = 1_000_000
+        output_tokens = 1
+
+    class Block:
+        type = "text"
+        text = "start"
+
+    class Message:
+        content = [Block()]
+        usage = Usage()
+
+    class Messages:
+        def create(self, **kwargs: object) -> Message:
+            calls.append(kwargs)
+            if raise_error:
+                raise APIStatusError("overloaded")
+            return Message()
+
+    class Anthropic:
+        def __init__(self) -> None:
+            self.messages = Messages()
+
+    module.Anthropic = Anthropic
+    module.APIStatusError = APIStatusError
+    module.APIConnectionError = APIConnectionError
+    return module, calls
+
+
+def _use_fake_client(monkeypatch: pytest.MonkeyPatch, raise_error: bool = False) -> list[dict]:
+    module, calls = _fake_anthropic(raise_error)
+    monkeypatch.setitem(sys.modules, "anthropic", module)
+    # Not a credential: the fake client never sends a request.
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "placeholder-for-the-fake-client")
+    return calls
+
+
+def _write_ran_record(repo: Path) -> Path:
+    results = repo / model_evals.RESULTS
+    results.parent.mkdir(parents=True, exist_ok=True)
+    results.write_text(json.dumps({"status": "ran", "marker": "committed"}), encoding="utf-8")
+    return results
+
+
+def test_p4_budget_cut_run_is_recorded_as_truncated(repo: Path, monkeypatch: pytest.MonkeyPatch,
+                                                     capsys: pytest.CaptureFixture[str]) -> None:
+    calls = _use_fake_client(monkeypatch)
+    # USD 1 admits the first routing request (worst case well under 1); its charged cost
+    # (one million input tokens) leaves no room for a second.
+    code = model_evals.main(["--root", str(repo), "--budget", "1", "--no-log"])
+    out = capsys.readouterr().out
+    assert len(calls) == 1
+    assert code != 0
+    record = json.loads((repo / model_evals.LAST_ATTEMPT).read_text(encoding="utf-8"))
+    routing_total = len(model_evals.routing_tasks(repo))
+    skill_total = len(model_evals.skill_tasks(repo))
+    assert record["status"] == "truncated"
+    assert record["truncated"] == {"routing": {"ran": 1, "total": routing_total},
+                                   "skills": {"ran": 0, "total": skill_total}}
+    assert "status truncated" in out
+    assert f"1 of {routing_total} tasks ran" in out and f"0 of {skill_total} tasks ran" in out
+
+
+def test_p4_release_gate_treats_truncated_as_not_passing(repo: Path,
+                                                         capsys: pytest.CaptureFixture[str]) -> None:
+    # A record complete in every other respect, marked truncated.
+    routing = [{"id": ph.pid, "set": cset, "expected": exp, "answer": exp, "passed": True}
+               for cset, ph, exp in model_evals.routing_tasks(repo)]
+    skills = [{"skill": skill, "id": case.get("id"), "kind": case.get("kind"), "passed": True, "failures": []}
+              for skill, _, case, _ in model_evals.skill_tasks(repo)]
+    record = {"status": "truncated", "input_digest": model_evals.input_digest(repo),
+              "input_files": model_evals.input_files(repo),
+              "routing": {"cases": len(routing), "passed": len(routing), "results": routing},
+              "skills": {"cases": len(skills), "passed": len(skills), "results": skills}}
+    results = repo / model_evals.RESULTS
+    results.parent.mkdir(parents=True, exist_ok=True)
+    results.write_text(json.dumps(record), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 1
+    assert "'truncated'" in capsys.readouterr().out
+    record["status"] = "ran"
+    results.write_text(json.dumps(record), encoding="utf-8")
+    assert model_evals.main(["--root", str(repo), "--check-release"]) == 0
