@@ -667,3 +667,44 @@ routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4
 $ python -m pytest -q | tail -1
 205 passed, 1 skipped
 ```
+
+### Step 12. Fix session FIX-ULTRA-PP8, 2026-11-11 (ultrareview of the tooling subset: A1 to A4 confirmed; P1 to P6 reproduced)
+
+Resume check: `git fetch origin`; the branch head is `302d267` ("fix six findings of the tooling-subset review", pushed earlier today by another session). That commit addresses P1 to P6, but its tests do not cover the forms and cases this contract names. This session therefore writes the contract's tests in `tests/test_ultrareview_tooling.py` and runs them twice: at `cad608b`, the commit the review read, to reproduce each finding, and at `302d267`, to find what remains. Environment: Python 3.12.3, the pinned requirements-dev.txt; a second environment adds textstat 0.7.13 and the CMU dictionary for the textstat path. No model was called. ANTHROPIC_API_KEY is EMPTY.
+
+A1 to A4 (artefacts of the narrowed review diff; confirmed, no change):
+
+```
+$ git ls-files evals/routing/phrases.yaml evals/skills/refusals.yaml | wc -l; git ls-files 'evals/skills/*.yaml' | wc -l
+2
+25                                        (24 skill case files and refusals.yaml)
+$ fragment.yaml check: phi_default at top level; masked_in_reports entries
+12 fragments, 0 without both keys          (lint L15 schema check: 0 errors)
+$ SKILL.md outside mhsb-firm-core: frontmatter metadata.triggers; skill_evals.REQUIRED_SECTIONS
+16 files; metadata.triggers in 0; missing required sections 0
+$ python tools/lint.py | grep -c 'L03\|L06'; python tools/lint.py | tail -1
+0
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: standard formula, fallback syllable count
+$ git ls-files evals/results/
+evals/results/model-evals.json            (status ran, run 2026-11-10T19:53:46Z, digest 95afc38ec1b4)
+```
+
+Failing tests, `python -m pytest -q tests/test_ultrareview_tooling.py`:
+
+```
+at cad608b: 23 failed, 11 passed, 1 skipped
+  P1 invented date not caught: Dec. 10, 2026; Dec 10, 2026; 10 December 2026; 12/10/2026; 12/10/26; December 10
+  P2 tools/lint.py and tools/manifest_lib.py absent from the digest; a change to lint.py leaves it unchanged
+  P3 colon and semicolon lines fused: 1 sentence for 3 lines (fallback path; the textstat path fails the same way)
+  P4 budget-cut run: 1 request; record status 'ran' with routing 1 of 240
+  P5 pending run: model-evals.json overwritten, status now 'pending'
+  P6 'start.', 'dates,', '`dates`' kept as given and scored wrong; no parser to match installed names
+at 302d267: 4 failed, 30 passed, 1 skipped (textstat environment: P3 2 passed)
+  P1 numeric M/D/YY (12/10/26) not caught
+  P2 the module list is written by hand; a new import in skill_evals.py does not enter the digest
+  P6 an unknown name ('calendar', 'calendar.') is returned as the answer instead of no installed skill
+```
+
+P3 grades: on both paths, the terminator change lowers 16 body grades (fallback path) and 17 (textstat path) by 0.1 to 0.2. No grade crosses its bound. Bodies under textstat: 4.7 to 6.0 before, 4.6 to 5.9 after. Description grades do not pass through `prose_for_reading` and are unchanged.
+
+The record was already stale before this session. The digest of the tree differs from the record's in 25 inputs: 21 skill and case files changed by `0d39e9b` (SKILLS-PP-8) after the recorded run, and four tools changed by `302d267`.
