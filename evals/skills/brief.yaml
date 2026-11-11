@@ -20,14 +20,13 @@ cases:
       gaps: {matter.responsible_attorney: 2}
     expect:
       asks_question: false
-      contains: ["Week view, 2026-11-04 to 2026-11-10", "Coverage: open matters assigned to Corinne Vasquez-Hale", "[tasks.due_date]", "Data gaps:", "Not retrieved: none", "Next step:"]
+      contains: ["Week view, the next seven calendar days, as of 2026-11-04", "Coverage: open matters assigned to Corinne Vasquez-Hale", "[tasks.due_date]", "Data gaps:", "Not retrieved: none", "Next step:"]
       not_contains: []
       refusals: []
       client_facing: false
-      allowed_dates: ["2026-11-10"]
     reference_tool_calls: [firm_profile_get, service_status, matters_search, tasks_read]
     reference: |
-      1. Week view, 2026-11-04 to 2026-11-10, America/New_York.
+      1. Week view, the next seven calendar days, as of 2026-11-04, America/New_York.
       2. Coverage: open matters assigned to Corinne Vasquez-Hale; 18 matters; all pages read: yes; read at 08:05 America/New_York.
       3. CB-2026-014 Alvarez, records request follow-up, Corinne Vasquez-Hale, due 2026-11-06 [tasks.due_date].
       4. CB-2026-031 Ortiz, treatment check-in, Corinne Vasquez-Hale, due 2026-11-09 [tasks.due_date].

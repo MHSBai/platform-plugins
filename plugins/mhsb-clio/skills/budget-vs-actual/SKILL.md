@@ -63,7 +63,7 @@ Numbered lines, in this order:
 
 1. The coverage statement, in this form: "Coverage: <scope>; <N> matters; all pages read: <yes or no>; read at <HH:MM> <time zone>." If the read was incomplete, write "Coverage: incomplete (<reason>)."
 2. One line per matter, in the form "<matter>: budgeted <hours>, recorded <hours>, variance <sign><hours>", with the source in brackets. Write the sign: "variance +3.0 over budget" or "variance -2.5".
-3. "Matters with no budget:" then one line per matter, with its owner. Write "Matters with no budget: none" when there are none.
+3. "Matters with no budget:" then one line per matter, with its owner. Write "Matters with no budget: none" only when every page was read and there are none. When a page was not read, the word "none" does not follow the label: list each matter with no budget found on the pages read, then write "not known for the pages not read". If none was found, write "Matters with no budget: not known, because <the part not read> was not read."
 4. "Not retrieved:" then each item and its reason. Write "Not retrieved: none" when every page was read.
 5. The next step line.
 

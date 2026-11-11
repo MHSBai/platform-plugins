@@ -2,8 +2,8 @@
 name: start
 description: 'Shows five things to do for your role and practice area. It says what changed in this release
   and which packs the firm has. It also takes any request that needs a command the firm does not have,
-  such as leads, matters, dates, letters, reports, setup or a draft''s wording. It names the plugin that
-  provides that command. Use when a user asks, for example: "what can you do for me"; "where do i start";
+  such as leads, matters, stale or overdue work, dates, letters, reports, setup, whether the firm''s
+  automated emails go out, or a draft''s wording. It names the plugin that provides that command. Use when a user asks, for example: "what can you do for me"; "where do i start";
   "show me my commands"; "what changed in the plugin"; "where do i begin"; "what can this do".'
 metadata:
   register: operational

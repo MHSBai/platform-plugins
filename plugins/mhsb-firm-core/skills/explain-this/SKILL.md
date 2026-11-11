@@ -65,7 +65,7 @@ Numbered lines, in this order:
 2. "What this is:" and one sentence.
 3. One numbered line per point, in plain words.
 4. "Dates in the passage:" and each date as written, or "date not established" with the start point. Quote the start point in the passage's own words, in quotation marks, for example "the date of mailing". Name it the same way in the point lines above.
-5. "Not retrieved:" and any missing part, or "Not retrieved: none".
+5. "Not retrieved:" and any missing part, or "Not retrieved: none". Missing pages come first, written as one range: "page 2", "pages 2 and 3" or "pages 2 to 4". For a passage marked "Page 1 of 3", the line starts "Not retrieved: pages 2 and 3". Any other missing part, such as a list the passage refers to, follows after a semicolon.
 6. The next step line.
 7. The last line: "This is an explanation, not legal advice. Ask the attorney how it applies."
 

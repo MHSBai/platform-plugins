@@ -32,7 +32,7 @@ Clarification rule. Ask as many questions as it takes on three points. There is 
 
 1. Identity. Which forms are meant. If two forms have the same or a similar name, list both and ask.
 2. Authority. Who at the firm may change a form. Use the person the Firm Profile names for the platform. If it names no one, ask.
-3. Dates. Which period, when the user asks about submits over time. Name the period in words, with today's date and the firm's time zone. Write its start and end dates only when the data gives them.
+3. Dates. Which period, when the user asks about submits over time. Name the period in words, with today's date and the firm's time zone. Write its start and end dates only when the data gives them. When the period starts at a date the data does not hold, such as "since we last checked" with no date of the last check on record, write "Last form review: date not established." Then ask this question word for word, on its own line: "What start date should I use?" Give no count until the user answers. Report the form settings that were read.
 
 ## Procedure
 
