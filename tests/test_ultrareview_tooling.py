@@ -99,3 +99,32 @@ def test_p2_digest_follows_a_new_import(repo: Path) -> None:
                                  "import lint  # noqa: E402\nimport extra_rule  # noqa: E402,F401\n", 1),
                     encoding="utf-8")
     assert "tools/extra_rule.py" in model_evals.input_files(repo)
+
+
+# --------------------------------------------------------------------------- P3 sentence count
+
+
+# Three lines of more than two words each, ending in ':', ';' and '.'.
+COLON_FIXTURE = (
+    "Check the open matters first:\n"
+    "Confirm the owner of each date;\n"
+    "Send the summary to the team.\n"
+)
+
+
+def _count_before_the_splitter_change(body: str) -> int:
+    """The splitter before fdb496b: sentences end at . ? : ; and need one letter."""
+    text = " ".join(line.strip() for line in body.splitlines() if line.strip())
+    return len([s for s in re.split(r"[.?:;]+(?:\s|$)", text) if re.search(r"[A-Za-z]", s)])
+
+
+def test_p3_colon_lines_count_as_sentences_on_the_fallback_path() -> None:
+    prose = lint.prose_for_reading(COLON_FIXTURE)
+    assert _count_before_the_splitter_change(COLON_FIXTURE) == 3
+    assert lint.fk_sentence_count(prose) == 3
+
+
+def test_p3_colon_lines_count_as_sentences_on_the_textstat_path() -> None:
+    textstat = pytest.importorskip("textstat")
+    prose = lint.prose_for_reading(COLON_FIXTURE)
+    assert textstat.sentence_count(prose) == lint.fk_sentence_count(prose) == 3
