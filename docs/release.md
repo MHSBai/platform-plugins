@@ -25,7 +25,7 @@ Applies to every tag of MHSBai/platform-plugins from 0.1.0 onward.
 
 | Item | Command | Passes when |
 |---|---|---|
-| P0 committed tree | `git status` over tracked files | nothing uncommitted |
+| P0 committed tree | `git status` | nothing uncommitted and no untracked file outside the ignored ones |
 | P1 generated files current | `tools/gen_manifest.py --check` | the generated files match the manifest |
 | P2 lint | `tools/lint.py` | no error |
 | P3 release lint | `tools/lint.py --release` | no error or warning |
@@ -35,7 +35,7 @@ Applies to every tag of MHSBai/platform-plugins from 0.1.0 onward.
 | P7 skill evals | `tools/skill_evals.py` | every reference transcript passes its scoring rules |
 | P8 model eval release gate | `tools/model_evals.py --check-release` | the latest model eval record is on the current text and every case passed |
 | P9 PROVENANCE and license gate | `tools/license_gate.py --upstream` | rules G1 to G6 hold, upstream LICENSE hashes included |
-| P10 firm service items | the service's `tools/release-gate.sh --own-only` | its own items pass |
+| P10 firm service items | the service's `tools/release-gate.sh --own-only` | the directory is the firm service checkout (not this one) and its own items pass |
 
 `tools/release-gate.sh --self-test` runs `tests/test_release_gate.py`. The `agent-scan` CI job is not part of the gate: it needs the `SNYK_TOKEN` secret (decision D8) and fails until that secret is set.
 

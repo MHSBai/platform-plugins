@@ -10,10 +10,11 @@
 #
 # PLATFORM_SERVICE_DIR (default ../mhsb-firm-service) names the firm service checkout, whose own
 # gate runs the isolation suite, the log-leak test, the custody tests, the drill evidence and the
-# controls.md freshness items. A missing checkout is a FAIL, never a skip. PYTHON names the
-# interpreter (default .venv/bin/python when present, else python3) with requirements-dev.txt
-# installed. P9 reads each upstream LICENSE from raw.githubusercontent.com; nothing else here uses
-# the network, reads a credential or calls a model.
+# controls.md freshness items. A missing checkout, or a directory that is not the firm service
+# (this checkout included), is a FAIL, never a skip. PYTHON names the interpreter (default
+# .venv/bin/python when present, else python3) with requirements-dev.txt installed. P3's connector
+# release checks and P9's upstream license hashes can reach the network; nothing here reads a
+# credential or calls a model.
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 2
 ROOT="$(pwd)"
@@ -42,9 +43,9 @@ step() {  # name, command...
 
 echo "release gate: $(git rev-parse --short HEAD) on $(git rev-parse --abbrev-ref HEAD), $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
-echo "== P0 committed tree (a release is a commit)"
-dirty="$(git status --porcelain --untracked-files=no | wc -l)"
-echo "  uncommitted tracked paths: $dirty"
+echo "== P0 committed tree (a release is a commit; untracked files count)"
+dirty="$(git status --porcelain | wc -l)"
+echo "  uncommitted or untracked paths (ignored files excepted): $dirty"
 [ "$dirty" -eq 0 ]; mark "P0 committed tree" $?
 
 step "P1 generated files current" "$PY" tools/gen_manifest.py --check
@@ -60,13 +61,15 @@ step "P9 PROVENANCE and license gate (ledger, notices, upstream license hashes)"
 echo "== P10 firm service items (isolation, log leak, custody, drills, controls.md, service provenance)"
 if [ "$MODE" = "own" ]; then
   echo "  not run: --own-only"; RESULTS+=("PARTIAL P10 firm service items (not run: --own-only)")
-elif [ -x "$SERVICE/tools/release-gate.sh" ]; then
+elif [ -x "$SERVICE/tools/release-gate.sh" ] && [ -f "$SERVICE/tools/controls.py" ] \
+  && [ -f "$SERVICE/tools/release_gate.py" ] \
+  && [ "$(cd "$SERVICE" && pwd -P)" != "$(cd "$ROOT" && pwd -P)" ]; then
   echo "  firm service head: $(git -C "$SERVICE" rev-parse --short HEAD) ($(git -C "$SERVICE" rev-parse --abbrev-ref HEAD))"
   PLATFORM_PLUGINS_DIR="$ROOT" "$SERVICE/tools/release-gate.sh" --own-only
   r=$?; [ "$r" -eq 3 ] && r=0
   mark "P10 firm service items" "$r"
 else
-  echo "  problem: no firm service checkout with tools/release-gate.sh at $SERVICE"
+  echo "  problem: no firm service checkout (with its gate and controls tools) at $SERVICE"
   mark "P10 firm service items" 1
 fi
 
