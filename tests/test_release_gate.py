@@ -57,6 +57,19 @@ def test_the_gate_refuses_an_unknown_argument() -> None:
     assert "usage" in proc.stderr
 
 
+def test_the_service_checkout_must_be_the_service_and_not_this_one() -> None:
+    """Rule 9 review R9-3: a stand-in directory whose gate exits 3 is not the firm service."""
+    block = TEXT[TEXT.index("== P10") : TEXT.index("== summary")]
+    assert '"$SERVICE/tools/controls.py"' in block and '"$SERVICE/tools/release_gate.py"' in block
+    assert 'pwd -P)" != "$(cd "$ROOT" && pwd -P)"' in block
+
+
+def test_untracked_files_make_the_tree_uncommitted() -> None:
+    """Rule 9 review R9-4: P0 counts untracked files, which pytest would collect."""
+    block = TEXT[TEXT.index("== P0") : TEXT.index('step "P1')]
+    assert "git status --porcelain | wc -l" in block and "--untracked-files=no" not in block
+
+
 def test_own_only_never_reports_green() -> None:
     assert 'RELEASE GATE: PARTIAL' in TEXT
     assert TEXT.index('if [ "$MODE" = "own" ]; then echo "RELEASE GATE: PARTIAL') < TEXT.index(
