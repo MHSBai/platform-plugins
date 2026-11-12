@@ -24,6 +24,10 @@ jobs:
         run: python tools/lint.py
       - name: Pack evals
         run: python tools/pack_evals.py
+      - name: Routing suite (deterministic)
+        run: python tools/routing_check.py
+      - name: Skill evals (deterministic)
+        run: python tools/skill_evals.py
       - name: License gate (LEDGER.yaml, PROVENANCE.md, plugin license copies, upstream hashes)
         run: python tools/license_gate.py --upstream
 
@@ -32,7 +36,8 @@ jobs:
     # release gate therefore runs on every pull request, every push to main and
     # every v* tag, not on tags alone: a promotion to ga cannot reach main
     # without lint rule L16 (tools/release_check.py against the connector and
-    # the listing URLs) and the adoption records of rule L11.
+    # the listing URLs), the adoption records of rule L11 and the model eval
+    # gate (a record on the current text in which every ga plugin passes).
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -42,6 +47,8 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - name: Release lint (L11 adoption, L16 connector release check and listing URLs)
         run: python tools/lint.py --release
+      - name: Model eval release gate (Design v2.1 Section 12; every ga plugin passes its evals)
+        run: python tools/model_evals.py --check-release
 
   tests:
     runs-on: ubuntu-24.04

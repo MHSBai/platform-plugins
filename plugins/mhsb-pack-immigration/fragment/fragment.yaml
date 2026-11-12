@@ -14,6 +14,7 @@ practice_area: immigration
 version: 0.1.0
 release_tier: hidden
 adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
+phi_default: true
 intake_questions:
 - {id: country_of_birth, prompt: "Country of birth", answer_type: text, required: true, sensitive_tag: national_origin}
 - {id: current_status, prompt: "Current immigration status, as the person states it", answer_type: text, required: true, sensitive_tag: immigration_status}
@@ -72,17 +73,17 @@ communication_templates:
 - imm_renewal_reminder
 consent_flags: []
 sensitive_field_tags:
-- {field: intake.country_of_birth, tag: national_origin, excluded_from_scoring: true}
-- {field: intake.current_status, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.status_document_type, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.status_expiry_date, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.a_number, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.entry_date, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.entry_manner, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.travel_history, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.relatives_status, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.prior_applications, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.proceedings_detention, tag: immigration_status, excluded_from_scoring: true}
-- {field: intake.criminal_history, tag: criminal_history, excluded_from_scoring: true}
+- {field: intake.country_of_birth, tag: national_origin, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.current_status, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.status_document_type, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.status_expiry_date, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.a_number, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.entry_date, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.entry_manner, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.travel_history, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.relatives_status, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.prior_applications, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.proceedings_detention, tag: immigration_status, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.criminal_history, tag: criminal_history, excluded_from_scoring: true, masked_in_reports: true}
 brief_views: []
 reports: []

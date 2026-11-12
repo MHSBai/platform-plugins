@@ -13,6 +13,7 @@ practice_area: criminal_defense
 version: 1.0.0
 release_tier: pilot
 adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
+phi_default: true
 intake_questions:
 - {id: name_as_charged, prompt: "Name as charged, and other names used", answer_type: person, required: true, sensitive_tag: null}
 - {id: case_number, prompt: "Case number and court", answer_type: text, required: false, sensitive_tag: null}
@@ -79,10 +80,10 @@ consent_flags:
 - {id: jail_calls_recorded_advised, label: "Client advised that jail calls are recorded", evidence: [recorded_verbal, platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
 - {id: third_party_presence, label: "Third parties present during attorney communications, recorded for privilege review", evidence: [platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.citizenship, tag: citizenship, excluded_from_scoring: true}
-- {field: intake.probation_parole, tag: prior_record, excluded_from_scoring: true}
-- {field: intake.pending_prior_charges, tag: prior_record, excluded_from_scoring: true}
-- {field: record.health_information, tag: health, excluded_from_scoring: true}
+- {field: intake.citizenship, tag: citizenship, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.probation_parole, tag: prior_record, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.pending_prior_charges, tag: prior_record, excluded_from_scoring: true, masked_in_reports: true}
+- {field: record.health_information, tag: health, excluded_from_scoring: true, masked_in_reports: true}
 brief_views:
 - {id: next_court_dates, name: "Next court dates"}
 - {id: release_conditions, name: "Release conditions"}

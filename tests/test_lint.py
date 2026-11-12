@@ -220,8 +220,42 @@ def test_l06_reading_level_operational(repo: Path) -> None:
     dense = ("Notwithstanding organizational considerations, the comprehensive administrative "
              "reconciliation methodology necessitates extraordinarily meticulous documentation, "
              "particularly regarding jurisdictional interpretations and institutional responsibilities.\n")
-    path.write_text(path.read_text(encoding="utf-8") + "\n" + dense * 6, encoding="utf-8")
+    # The body is replaced, not extended, so the fixture does not depend on the length of the
+    # shipped body (a longer body dilutes appended text below the bound).
+    text = path.read_text(encoding="utf-8")
+    end = text.index("\n---", 3) + len("\n---\n")
+    path.write_text(text[:end] + "\n" + dense * 6, encoding="utf-8")
     assert "L06" in rules_failed(repo)
+
+
+# textstat 0.7.13 (CMU pronouncing dictionary) on the lint's own fixtures, recorded 2026-11-10.
+# The fallback must give the same syllable count and grade when textstat is not installed.
+FK_FIXTURES = [
+    ("The cat sat. The dog ran. We read the list.", 10, -2.49),
+    ("Institutional administrative documentation necessitates comprehensive organizational "
+     "reconciliation methodologies.", 40, 46.53),
+    ("Notwithstanding organizational considerations, the comprehensive administrative "
+     "reconciliation methodology necessitates extraordinarily meticulous documentation, "
+     "particularly regarding jurisdictional interpretations and institutional responsibilities.", 85, 44.6095),
+    ("Comprehensive multidimensional organizational documentation, encompassing interdisciplinary "
+     "administrative responsibilities, institutional accountability considerations and "
+     "jurisdictional verification requirements.", 73, 47.6867),
+    ("Lists the dates. It shows the owner.", 8, -0.7393),
+]
+
+
+@pytest.mark.parametrize("text, syllables, grade", FK_FIXTURES)
+def test_fk_fallback_matches_textstat(text: str, syllables: int, grade: float) -> None:
+    """PP4-N2: the standard formula with textstat's counting rules, on the fixtures."""
+    assert sum(lint.count_syllables(w) for w in lint.fk_words(text)) == syllables
+    assert lint.standard_fk_grade(text) == pytest.approx(grade, abs=1e-3)
+
+
+def test_fk_uses_textstat_when_ready() -> None:
+    if lint.FK_IMPLEMENTATION != "textstat":
+        pytest.skip("textstat or its pronunciation dictionary is not available")
+    for text, _, grade in FK_FIXTURES:
+        assert lint.flesch_kincaid_grade(text) == pytest.approx(grade, abs=1e-3)
 
 
 def test_fk_grade_orders_texts() -> None:
@@ -497,7 +531,8 @@ def test_l15_unresolved_template_reference(repo: Path) -> None:
 def test_l15_sensitive_question_without_tag(repo: Path) -> None:
     path = repo / PI / "fragment/fragment.yaml"
     path.write_text(path.read_text(encoding="utf-8").replace(
-        "- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true}\n", ""), encoding="utf-8")
+        "- {field: intake.injuries_treatment, tag: health, excluded_from_scoring: true, "
+        "masked_in_reports: true}\n", ""), encoding="utf-8")
     assert "L15" in rules_failed(repo)
 
 
@@ -512,8 +547,12 @@ def test_l15_vendored_schema_hash_drift(repo: Path, monkeypatch: pytest.MonkeyPa
     schemas = repo / "tools" / "schemas"
     monkeypatch.setattr(lint, "SCHEMA_DIR", schemas)
     assert "L15" not in rules_failed(repo)
+    # Any byte that changes the vendored schema without updating the recorded sha256
+    # trips the L15 hash pin. A trailing newline keeps the JSON valid, so only the hash
+    # pin fires; the schema shape is unchanged and the fragments still validate. This
+    # mutation is independent of the schema's content, so a re-vendor does not break it.
     path = schemas / "fragment.schema.json"
-    path.write_text(path.read_text(encoding="utf-8").replace('"eligibility_question"\n', '"eligibility_question",\n          "extra_flag"\n', 1), encoding="utf-8")
+    path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
     assert "L15" in rules_failed(repo)
 
 
@@ -559,6 +598,25 @@ def test_l17_altered_plugin_license_copy(repo: Path) -> None:
 def test_l17_missing_notice_excerpt(repo: Path) -> None:
     (repo / "plugins/mhsb-pack-civil-litigation/NOTICE.md").unlink(missing_ok=True)
     assert "L17" in rules_failed(repo)
+
+
+# --------------------------------------------------------------------- L03 triggers in descriptions (PP4-M1)
+
+
+def test_l03_description_must_quote_each_trigger(repo: Path) -> None:
+    path = skill(repo, "mhsb-clio", "production")
+    text = path.read_text(encoding="utf-8")
+    assert '"how much did we bill"' in text
+    path.write_text(text.replace('"how much did we bill"', '"how much was billed"', 1), encoding="utf-8")
+    assert "L03" in rules_failed(repo)
+
+
+def test_l03_metadata_triggers_rejected(repo: Path) -> None:
+    path = skill(repo, "mhsb-clio", "production")
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace("metadata:\n", "metadata:\n  triggers:\n  - how much did we bill\n", 1),
+                    encoding="utf-8")
+    assert "L03" in rules_failed(repo)
 
 
 def test_l13_readme_tier_must_match_manifest(repo: Path) -> None:

@@ -12,6 +12,7 @@ practice_area: bankruptcy_consumer
 version: 0.1.0
 release_tier: hidden
 adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
+phi_default: true
 intake_questions:
 - {id: income_six_months, prompt: "Household income for each of the last six months", answer_type: text, required: true, sensitive_tag: financial}
 - {id: household_size, prompt: "Household size", answer_type: number, required: true, sensitive_tag: null}
@@ -71,10 +72,10 @@ communication_templates:
 - bk_discharge_notice
 consent_flags: []
 sensitive_field_tags:
-- {field: intake.income_six_months, tag: financial, excluded_from_scoring: true}
-- {field: intake.debts_by_type, tag: financial, excluded_from_scoring: true}
-- {field: intake.assets, tag: financial, excluded_from_scoring: true}
-- {field: intake.transfers, tag: financial, excluded_from_scoring: true}
+- {field: intake.income_six_months, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.debts_by_type, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.assets, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.transfers, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
 brief_views:
 - {id: meeting_341_readiness, name: "341 readiness"}
 - {id: document_readiness, name: "Document readiness"}

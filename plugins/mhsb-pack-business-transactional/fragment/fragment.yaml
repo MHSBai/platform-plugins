@@ -12,6 +12,7 @@ practice_area: business_transactional
 version: 1.0.0
 release_tier: ga
 adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
+phi_default: false
 intake_questions:
 - {id: client_identity, prompt: "Who the client is: the entity, a founder, or another person", answer_type: choice, choices: [entity, founder, other person, not yet decided], required: true, sensitive_tag: null}
 - {id: owners_percentages, prompt: "Owners and their stated ownership percentages", answer_type: text, required: true, sensitive_tag: null}
@@ -77,7 +78,7 @@ consent_flags:
 - {id: entity_as_client, label: "Engagement letter names the entity as the client", evidence: [engagement_letter_clause, signed_form], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
 - {id: constituent_role_explained, label: "The firm's role explained to each constituent", evidence: [engagement_letter_clause, recorded_verbal], verifier_required: true, permitted_channels: [email, phone, letter], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.capital_debt, tag: financial, excluded_from_scoring: true}
+- {field: intake.capital_debt, tag: financial, excluded_from_scoring: true, masked_in_reports: false}
 brief_views:
 - {id: entity_roster, name: "Entity roster with the next compliance item"}
 - {id: budget_vs_actual, name: "Budget versus actual"}

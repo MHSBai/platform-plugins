@@ -1,0 +1,490 @@
+# Routing suite: sixty ambiguous phrases (Design v2.1 Sections 4 and 12).
+#
+# Each phrase names the single skill expected in each command set. A command set is the
+# set of commands installed by a supported combination: core-only, or connected with one
+# platform plugin (practice packs add no commands). When the expected command is not
+# installed, /start answers and names the plugin that provides it (start/SKILL.md,
+# Procedure step 8). tools/routing_check.py expands every set to all supported combinations.
+
+schema_version: 1
+phrases:
+  - id: R01
+    phrase: "what's due this week"
+    intended: brief
+    expected:
+      core-only: start
+      lawmatics: brief
+      clio: brief
+      mycase: brief
+  - id: R02
+    phrase: "anything stale"
+    intended: brief
+    expected:
+      core-only: start
+      lawmatics: brief
+      clio: brief
+      mycase: brief
+  - id: R03
+    phrase: "write back to Mrs. Alvarez"
+    intended: follow-up
+    expected:
+      core-only: follow-up
+      lawmatics: follow-up
+      clio: follow-up
+      mycase: follow-up
+  - id: R04
+    phrase: "how many days since the accident on the Ortiz matter"
+    intended: dates
+    expected:
+      core-only: start
+      lawmatics: dates
+      clio: dates
+      mycase: dates
+  - id: R05
+    phrase: "where do I start"
+    intended: start
+    expected:
+      core-only: start
+      lawmatics: start
+      clio: start
+      mycase: start
+  - id: R06
+    phrase: "what can this do for an intake person"
+    intended: start
+    expected:
+      core-only: start
+      lawmatics: start
+      clio: start
+      mycase: start
+  - id: R07
+    phrase: "is it okay to put a medical record in here"
+    intended: before-i-paste
+    expected:
+      core-only: before-i-paste
+      lawmatics: before-i-paste
+      clio: before-i-paste
+      mycase: before-i-paste
+  - id: R08
+    phrase: "can I paste the police report"
+    intended: before-i-paste
+    expected:
+      core-only: before-i-paste
+      lawmatics: before-i-paste
+      clio: before-i-paste
+      mycase: before-i-paste
+  - id: R09
+    phrase: "what does this letter from the insurance company mean"
+    intended: explain-this
+    expected:
+      core-only: explain-this
+      lawmatics: explain-this
+      clio: explain-this
+      mycase: explain-this
+  - id: R10
+    phrase: "explain this paragraph to me like I'm not a lawyer"
+    intended: explain-this
+    expected:
+      core-only: explain-this
+      lawmatics: explain-this
+      clio: explain-this
+      mycase: explain-this
+  - id: R11
+    phrase: "what should I say to the client who called twice"
+    intended: follow-up
+    expected:
+      core-only: follow-up
+      lawmatics: follow-up
+      clio: follow-up
+      mycase: follow-up
+  - id: R12
+    phrase: "which clients are waiting on a reply"
+    intended: follow-up
+    expected:
+      core-only: follow-up
+      lawmatics: follow-up
+      clio: follow-up
+      mycase: follow-up
+  - id: R13
+    phrase: "turn my notes from the Ortiz call into a file note"
+    intended: meeting-notes
+    expected:
+      core-only: meeting-notes
+      lawmatics: meeting-notes
+      clio: meeting-notes
+      mycase: meeting-notes
+  - id: R14
+    phrase: "I recorded the consult, can you write it up"
+    intended: meeting-notes
+    expected:
+      core-only: meeting-notes
+      lawmatics: meeting-notes
+      clio: meeting-notes
+      mycase: meeting-notes
+  - id: R15
+    phrase: "we need rules for using AI at the firm"
+    intended: ai-policy-draft
+    expected:
+      core-only: ai-policy-draft
+      lawmatics: ai-policy-draft
+      clio: ai-policy-draft
+      mycase: ai-policy-draft
+  - id: R16
+    phrase: "do we have to tell clients we use AI"
+    intended: ai-policy-draft
+    expected:
+      core-only: ai-policy-draft
+      lawmatics: ai-policy-draft
+      clio: ai-policy-draft
+      mycase: ai-policy-draft
+  - id: R17
+    phrase: "show the new paralegal how to use this safely"
+    intended: ai-training
+    expected:
+      core-only: ai-training
+      lawmatics: ai-training
+      clio: ai-training
+      mycase: ai-training
+  - id: R18
+    phrase: "how do I bill time when Claude helped with a draft"
+    intended: ai-training
+    expected:
+      core-only: ai-training
+      lawmatics: ai-training
+      clio: ai-training
+      mycase: ai-training
+  - id: R19
+    phrase: "the plugin keeps saying not retrieved, who do I tell"
+    intended: ask-mhsb
+    expected:
+      core-only: ask-mhsb
+      lawmatics: ask-mhsb
+      clio: ask-mhsb
+      mycase: ask-mhsb
+  - id: R20
+    phrase: "send a note to MHSB about the error"
+    intended: ask-mhsb
+    expected:
+      core-only: ask-mhsb
+      lawmatics: ask-mhsb
+      clio: ask-mhsb
+      mycase: ask-mhsb
+  - id: R21
+    phrase: "what's on my plate today"
+    intended: brief
+    expected:
+      core-only: start
+      lawmatics: brief
+      clio: brief
+      mycase: brief
+  - id: R22
+    phrase: "which matters have nothing scheduled"
+    intended: brief
+    expected:
+      core-only: start
+      lawmatics: brief
+      clio: brief
+      mycase: brief
+  - id: R23
+    phrase: "who has the most open cases"
+    intended: brief
+    expected:
+      core-only: start
+      lawmatics: brief
+      clio: brief
+      mycase: brief
+  - id: R24
+    phrase: "are any leads slipping through the cracks"
+    intended: brief
+    expected:
+      core-only: start
+      lawmatics: brief
+      clio: brief
+      mycase: brief
+  - id: R25
+    phrase: "get me ready for my two o'clock with the new client"
+    intended: consult-prep
+    expected:
+      core-only: start
+      lawmatics: consult-prep
+      clio: consult-prep
+      mycase: consult-prep
+  - id: R26
+    phrase: "what do I need to ask Mrs. Alvarez on Thursday"
+    intended: consult-prep
+    expected:
+      core-only: start
+      lawmatics: consult-prep
+      clio: consult-prep
+      mycase: consult-prep
+  - id: R27
+    phrase: "hearing tomorrow on the Ortiz matter, what should I know"
+    intended: consult-prep
+    expected:
+      core-only: start
+      lawmatics: consult-prep
+      clio: consult-prep
+      mycase: consult-prep
+  - id: R28
+    phrase: "where are we on the Ortiz case"
+    intended: matter-status
+    expected:
+      core-only: start
+      lawmatics: matter-status
+      clio: matter-status
+      mycase: matter-status
+  - id: R29
+    phrase: "can you tell Mrs. Alvarez where her case stands"
+    intended: matter-status
+    expected:
+      core-only: start
+      lawmatics: matter-status
+      clio: matter-status
+      mycase: matter-status
+  - id: R30
+    phrase: "give me a client update on the case for Mr. Ortiz"
+    intended: matter-status
+    expected:
+      core-only: start
+      lawmatics: matter-status
+      clio: matter-status
+      mycase: matter-status
+  - id: R31
+    phrase: "who came in overnight"
+    intended: intake-triage
+    expected:
+      core-only: start
+      lawmatics: intake-triage
+      clio: intake-triage
+      mycase: intake-triage
+  - id: R32
+    phrase: "which new people should we call first"
+    intended: intake-triage
+    expected:
+      core-only: start
+      lawmatics: intake-triage
+      clio: intake-triage
+      mycase: intake-triage
+  - id: R33
+    phrase: "is the new lead a conflict with anyone we represent"
+    intended: intake-triage
+    expected:
+      core-only: start
+      lawmatics: intake-triage
+      clio: intake-triage
+      mycase: intake-triage
+  - id: R34
+    phrase: "say no to the dog bite inquiry politely"
+    intended: letter
+    expected:
+      core-only: start
+      lawmatics: letter
+      clio: letter
+      mycase: letter
+  - id: R35
+    phrase: "Mrs. Alvarez needs the list of papers we need from her"
+    intended: letter
+    expected:
+      core-only: start
+      lawmatics: letter
+      clio: letter
+      mycase: letter
+  - id: R36
+    phrase: "we signed Mr. Ortiz, start his welcome packet"
+    intended: letter
+    expected:
+      core-only: start
+      lawmatics: letter
+      clio: letter
+      mycase: letter
+  - id: R37
+    phrase: "what deadlines are coming up on the Ortiz matter"
+    intended: dates
+    expected:
+      core-only: start
+      lawmatics: dates
+      clio: dates
+      mycase: dates
+  - id: R38
+    phrase: "when does the statute run for Mrs. Alvarez"
+    intended: dates
+    expected:
+      core-only: start
+      lawmatics: dates
+      clio: dates
+      mycase: dates
+  - id: R39
+    phrase: "any court dates next week"
+    intended: dates
+    expected:
+      core-only: start
+      lawmatics: dates
+      clio: dates
+      mycase: dates
+  - id: R40
+    phrase: "what's still missing from the Alvarez file"
+    intended: checklist
+    expected:
+      core-only: start
+      lawmatics: checklist
+      clio: checklist
+      mycase: checklist
+  - id: R41
+    phrase: "do we have the medical records for Ortiz yet"
+    intended: checklist
+    expected:
+      core-only: start
+      lawmatics: checklist
+      clio: checklist
+      mycase: checklist
+  - id: R42
+    phrase: "is the Alvarez file ready to settle"
+    intended: checklist
+    expected:
+      core-only: start
+      lawmatics: checklist
+      clio: checklist
+      mycase: checklist
+  - id: R43
+    phrase: "which fields does nobody use"
+    intended: hygiene
+    expected:
+      core-only: start
+      lawmatics: hygiene
+      clio: hygiene
+      mycase: hygiene
+  - id: R44
+    phrase: "we have two date fields for the accident"
+    intended: hygiene
+    expected:
+      core-only: start
+      lawmatics: hygiene
+      clio: hygiene
+      mycase: hygiene
+  - id: R45
+    phrase: "cases with no attorney assigned"
+    intended: hygiene
+    expected:
+      core-only: start
+      lawmatics: hygiene
+      clio: hygiene
+      mycase: hygiene
+  - id: R46
+    phrase: "send me the Monday numbers every week"
+    intended: report
+    expected:
+      core-only: start
+      lawmatics: report
+      clio: report
+      mycase: report
+  - id: R47
+    phrase: "run the statute report now"
+    intended: report
+    expected:
+      core-only: start
+      lawmatics: report
+      clio: report
+      mycase: report
+  - id: R48
+    phrase: "what reports can I get"
+    intended: report
+    expected:
+      core-only: start
+      lawmatics: report
+      clio: report
+      mycase: report
+  - id: R49
+    phrase: "how do I get the limitations report emailed to me"
+    intended: report
+    expected:
+      core-only: start
+      lawmatics: report
+      clio: report
+      mycase: report
+  - id: R50
+    phrase: "does this email sound like us"
+    intended: on-brand
+    expected:
+      core-only: start
+      lawmatics: on-brand
+      clio: on-brand
+      mycase: on-brand
+  - id: R51
+    phrase: "check my letter before it goes out"
+    intended: on-brand
+    expected:
+      core-only: start
+      lawmatics: on-brand
+      clio: on-brand
+      mycase: on-brand
+  - id: R52
+    phrase: "is it fine to mention Claude in this email"
+    intended: on-brand
+    expected:
+      core-only: start
+      lawmatics: on-brand
+      clio: on-brand
+      mycase: on-brand
+  - id: R53
+    phrase: "why can't I see billing"
+    intended: check-setup
+    expected:
+      core-only: start
+      lawmatics: check-setup
+      clio: check-setup
+      mycase: check-setup
+  - id: R54
+    phrase: "did the Monday report go out"
+    intended: check-setup
+    expected:
+      core-only: start
+      lawmatics: check-setup
+      clio: check-setup
+      mycase: check-setup
+  - id: R55
+    phrase: "is everything hooked up right"
+    intended: check-setup
+    expected:
+      core-only: start
+      lawmatics: check-setup
+      clio: check-setup
+      mycase: check-setup
+  - id: R56
+    phrase: "could a bot fill out our contact form"
+    intended: form-protections
+    expected:
+      core-only: start
+      lawmatics: form-protections
+      clio: start
+      mycase: start
+  - id: R57
+    phrase: "are our follow-up emails actually going out"
+    intended: pipeline-health
+    expected:
+      core-only: start
+      lawmatics: pipeline-health
+      clio: start
+      mycase: start
+  - id: R58
+    phrase: "how many hours did the paralegals put in last month"
+    intended: timekeeper-hours
+    expected:
+      core-only: start
+      lawmatics: start
+      clio: timekeeper-hours
+      mycase: start
+  - id: R59
+    phrase: "how much did we bill in October"
+    intended: production
+    expected:
+      core-only: start
+      lawmatics: start
+      clio: production
+      mycase: start
+  - id: R60
+    phrase: "is the Ortiz flat fee over budget"
+    intended: budget-vs-actual
+    expected:
+      core-only: start
+      lawmatics: start
+      clio: budget-vs-actual
+      mycase: start

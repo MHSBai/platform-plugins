@@ -405,7 +405,7 @@ $ python -m pytest -q | tail -1
 $ grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv . | wc -l
 identifiers: 17
 hits (case-insensitive, word): 0
-hits (MAN, RW case-sensitive, word): 0
+hits (two short codes, case-sensitive, word): 0
 $ dash check U+2014 U+2013 U+2012 in changed and new files
 0
 ```
@@ -438,3 +438,314 @@ fragments: 12, schema and rule failures: 0
 ### Step 6. Fix session FIX-PP-STACK-A, 2026-11-10 (PP3-L1 and PP3-L2 verified; fixes from Stages 1 and 2 merged)
 
 `cloud/pp2-harvest`, carrying the PP1 and PP2 fixes, was merged into this branch. In the `tools/verify_marketplace.sh` conflict the Stage 1 loop was kept: it covers every plugin whose tier is not ga (the three connector plugins, the two held packs, the four pilot packs and the six hidden packs) and requires the exact "not found in marketplace" refusal (PP3-L2). The 919c3a9 loop required only a failed install. PP3-L1: the vendored schema hash `9d537e09...` equals the file at service commit `bfcddee`; L15 compares it with `tools/schemas/fragment.schema.source.json`. The Stage 3 pull request in the service repository is still open on 2026-11-10, so re-vendoring stays in HANDOFF (PP-9 item 8).
+
+## PP-8, Stage 8: skills to final text, routing suite and evals
+
+### Step 0. Resume check and base (2026-11-04)
+
+Command: `git ls-remote origin; git log --oneline origin/main`
+
+Output: `main` holds only `080d165`; `cloud/pp1-repository-marketplace`, `cloud/pp2-harvest` and `cloud/pp9-pack-fragments` are open and unmerged, each stacked on the previous one. No PP-8 entry existed in this log. Branch `cloud/pp8-skills-evals` was created from `cloud/pp9-pack-fragments` (head adfce89), the most recent open `cloud/pp*` branch. Stage 1 skeleton present; Stage 2 adapted sources present (32 files), so the skills were written against them. The session harness named `roo/sleepy-hopper-sgigzr`; the task's branch name was used, as in earlier stages.
+
+### Step 1. Reading
+
+Design v2.1 Sections 4, 5, 6, 12 (and the remainder for context); Catalog v2.1 Section 1 (and Sections 2, 3 for report identifiers and fragment content); the 24 skill skeletons and their adapted references; capability-forge `skills/mhsb-brand/SKILL.md` (voice, punctuation, banned phrases). No skill-creator skill exists under capability-forge `skills/` or `plugins/`; recorded, not a stop. The PI sample firm in mhsb-firm-service (`firm_profile/samples/pi_lawmatics.json`, synthetic) supplies the example firm. No docs/decisions record verifies California SB 574 against the chaptered statute, so no SB 574 text was written.
+
+### Step 2. Model identifiers and key
+
+`ANTHROPIC_API_KEY`: EMPTY. `curl -sSL https://platform.claude.com/docs/en/about-claude/models` returned 200 (redirect to /docs/en/models/overview) and lists `claude-sonnet-5-5` and `claude-opus-5-5` as the current Sonnet and Opus; recorded in `evals/model-config.yaml` with prices of 2/10 and 4/20 US dollars per million input/output tokens.
+
+### Step 3. Build
+
+Triggers extended in `catalog/manifest.yaml`; `evals/routing/phrases.yaml` (60 phrases, expected skill per command set); `tools/routing_check.py`; `evals/skills/refusals.yaml` (exact sentences); `tools/skill_evals.py` (pass bar of Design Section 12); `tools/model_evals.py` and `evals/model-config.yaml`; 24 SKILL.md files to final text; 24 eval files of six cases each; Florida and California state modules marked "state module not yet reviewed"; decision 0005; tests; CI steps; version 0.2.0; CHANGELOG. Commits 228ebc2, 04f3b7d, 5cd6b6f, fbedfd5, 763679b, 358736d, 2314558.
+
+### Step 4. Checkpoint run
+
+```
+$ python tools/lint.py
+lint: 15 rules, 0 error(s), 0 warning(s)
+exit 0
+$ python tools/lint.py --release
+lint: 15 rules, 0 error(s), 0 warning(s)
+$ python tools/routing_check.py
+routing check: 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+exit 0
+$ python tools/skill_evals.py
+skill evals (deterministic): 24 skills, 144 cases, 144 passed, 0 failure(s)
+exit 0
+$ python tools/gen_manifest.py --check
+generated files current
+$ diff counts table vs Stage 9 base
+combination counts table unchanged
+$ python tools/gen_manifest.py --counts | sed -n 7,16p
+| Combination | Platform | Variants | Breakdown | Commands (min) | Commands (max) |
+|---|---|---|---|---|---|
+| core-only | none | 1 | 8 | 8 | 8 |
+| connected | mhsb-lawmatics | 298 | 8 + 11 + 2 + 0 | 21 | 21 |
+| connected | mhsb-clio | 298 | 8 + 11 + 3 + 0 | 22 | 22 |
+| connected | mhsb-mycase | 298 | 8 + 11 + 0 + 0 | 19 | 19 |
+
+Supported combinations enumerated: 895.
+Maximum commands in any combination: 22.
+Lint cap: 24. Design figure: 22.
+$ python tools/pack_evals.py | tail -1
+pack evals: 28 cases, 28 passed, 0 failed
+$ python tools/license_gate.py
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ denylist grep
+identifiers: 17
+hits (case-insensitive, word): 0
+hits (short codes, case-sensitive, word): 0
+$ dash check in files changed since adfce89
+0
+$ reading level per skill (Flesch-Kincaid; limits 9 operational, 12 document)
+mhsb-clio/budget-vs-actual operational 3.6
+mhsb-clio/production operational 3.6
+mhsb-clio/timekeeper-hours operational 3.8
+mhsb-firm-core/ai-policy-draft document 4.9
+mhsb-firm-core/ai-training operational 3.9
+mhsb-firm-core/ask-mhsb operational 3.7
+mhsb-firm-core/before-i-paste operational 4.6
+mhsb-firm-core/explain-this operational 3.5
+mhsb-firm-core/follow-up operational 3.1
+mhsb-firm-core/meeting-notes operational 3.2
+mhsb-firm-core/start operational 3.5
+mhsb-lawmatics/form-protections operational 3.8
+mhsb-lawmatics/pipeline-health operational 3.9
+mhsb-operations/brief operational 3.5
+mhsb-operations/check-setup operational 4.1
+mhsb-operations/checklist operational 4.3
+mhsb-operations/consult-prep document 3.9
+mhsb-operations/dates operational 4.2
+mhsb-operations/hygiene operational 4.2
+mhsb-operations/intake-triage operational 4.2
+mhsb-operations/letter document 4.4
+mhsb-operations/matter-status document 4.3
+mhsb-operations/on-brand operational 3.9
+mhsb-operations/report document 4.7
+$ python -m pytest -q | tail -1
+118 passed in 253.16s (0:04:13)
+$ bash tools/verify_marketplace.sh (filtered)
+Validation passed; five listed plugins installed; skills 8, 11, 2, 3; mhsb-pack-family-law not installable
+```
+
+### Step 5. Model evals
+
+Command: `python tools/model_evals.py`
+
+
+Model eval run 2026-11-04T00:55:00Z: key EMPTY; status pending.
+Reason: ANTHROPIC_API_KEY is EMPTY in this environment; deterministic checks ran (tools/routing_check.py, tools/skill_evals.py).
+Tokens: input 0, output 0; requests 0; estimated cost USD 0.00 (no request sent).
+Planned run when a key is SET (`python tools/model_evals.py --dry-run`): routing tasks: 240; skill tasks: 144; cap USD 40.00. At the configured estimates the full run is about USD 11 (240 routing requests on claude-sonnet-5-5, 144 skill requests on claude-opus-5-5), under the USD 40 cap.
+
+### Step 6. Firm identifier check
+
+The private identifier list (17 identifiers: pilot firm codes, full firm names, one brand name) is held in the session scratchpad, outside the repository; the counts are in Step 4 (0 hits). The Stage 9 log line that named two short codes was rewritten (decision 0005, Section 8).
+
+### Step 7. Push and pull request
+
+Command: `git push -u origin cloud/pp8-skills-evals`. Draft pull request opened: https://github.com/MHSBai/platform-plugins/pull/4 ("Stage 8: skills to final text, routing suite and evals"), base `cloud/pp9-pack-fragments`. Not merged. Outcome: DONE PP-8, with model evals pending (no key).
+
+### Step 8. Model evals run 2026-11-10 (run API-1, MHSB workstation, Console API credit)
+
+Preflight: `GET /v1/models` lists claude-sonnet-5-5 and claude-opus-5-5 with lifecycle active; the prices in `evals/model-config.yaml` equal the standard first-party rates on https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-11-10); no configuration change. Environment: Python 3.12.3, anthropic 2.7.0, PyYAML 6.0.3.
+
+Command: `python -u tools/model_evals.py --budget 20`, with the key sourced from the local environment file in a subshell. A first attempt (`python tools/model_evals.py`) was stopped by the session's 10-minute command timeout before it wrote any record; its requests are unrecorded and form a prefix of the same task list, so its spend is below that of the full run below. The cap of the second attempt was lowered from USD 40 to USD 20 so that the two attempts together remain under USD 40.
+
+Model eval run 2026-11-10T16:20:52Z: key SET; status ran.
+routing: model claude-sonnet-5-5; 223 of 240 passed.
+skills: model claude-opus-5-5; 46 of 144 passed.
+Tokens: input 1019126, output 125426; requests 384; estimated cost USD 5.46 of cap 20.00.
+
+Decoy write tool calls: 0 of 144 skill cases. Routing failures: 12 of 17 are in the core-only command set, where the expected answer is `start`. Skill failures are mostly exact-text rules (required phrases, exact refusal and injection notices); per-case detail is in `evals/results/model-evals.json`. Estimated spend for both attempts: at most about USD 10.91 (USD 5.46 measured, plus an unrecorded first attempt below USD 5.46).
+
+### Step 9. Review XREVIEW-PP-STACK-A (2026-11-10)
+
+Findings PP4-M1, PP4-L1, PP4-L2 and PP4-L3 fixed on this branch (decision 0005, Section 9). The inherited findings PP1-H1, PP1-M1, PP1-M3 and PP2-M1 belong to the Stage 1 and Stage 2 pull requests.
+
+```
+$ python tools/lint.py | tail -1
+lint: 15 rules, 0 error(s), 0 warning(s)
+$ python tools/routing_check.py
+routing check (trigger-list disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/gen_manifest.py --check
+generated files current
+$ python tools/model_evals.py --check-release; echo $?
+RELEASE BLOCKED routing: 223 of 240 passed; a release needs 100 percent
+RELEASE BLOCKED skills: 46 of 144 passed; a release needs 100 percent
+model eval release gate: 2 problem(s)
+1
+$ python -m pytest -q | tail -1
+121 passed in 173.09s (0:02:53)
+```
+
+Run against the Step 8 record (merged from the remote branch before this push). The gate blocks a 0.2.0 tag on both pass rates; it does not run on pull requests.
+
+### Step 10. Fix session FIX-PP-STACK-A, 2026-11-10 (PP4-M1 per the fix contract; PP4-L1 to PP4-L3 verified; fixes from Stages 1, 2 and 9 merged)
+
+`cloud/pp9-pack-fragments` was merged into this branch after the evals commit (ce15397) and the review response (3eaad32, merged in 0faf5a0). PP4-M1: the routing check and lint L03 were first changed to read the SKILL.md description (139 routing failures, 111 L03 errors at d6b1b93). The 87 missing trigger phrases were then quoted in the descriptions and `metadata.triggers` removed (decision 0005, Section 10). PP4-L1 (per-request worst case from `max_tokens` and the configured prices; `--budget` clamped at 40), PP4-L2 and PP4-L3 were applied by 3eaad32 and verified here. `tools/model_evals.py` was not run in this session. The recorded run (status `ran`; routing 223 of 240; skills 46 of 144) predates the description change, so the 0.2.0 tag stays blocked (HANDOFF PP-8 item 1).
+
+```
+routing_check.py   description-phrase disjointness: 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+skill_evals.py     reference-transcript conformance: 24 skills, 144 cases, 144 passed, 0 failure(s)
+lint.py            17 rules, 0 error(s), 0 warning(s)
+```
+
+### Step 10. Review XREVIEW2-PP-STACK-A (2026-11-10)
+
+PP4-N1 and PP4-N2 fixed (decision 0005, Section 11). PP4-N3 waits for an owner decision.
+
+```
+$ python tools/lint.py | tail -1; python tools/lint.py --release | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s)
+lint: 17 rules, 0 error(s), 0 warning(s)
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/model_evals.py --check-release | tail -1
+model eval release gate: 3 problem(s)   (digest absent; routing 223 of 240; skills 46 of 144)
+$ python -m pytest -q | tail -1
+165 passed (164 plus the repaired helper test; tests/test_routing_and_skill_evals.py 29 passed)
+```
+
+Model eval run 2026-11-10T19:53:46Z: key SET; status ran.
+routing: model claude-sonnet-5-5; 238 of 240 passed.
+skills: model claude-opus-5-5; 120 of 144 passed.
+Tokens: input 1323237, output 125259; requests 384; estimated cost USD 6.36 of cap 12.00.
+
+### Step 11. Fix session FIX2-PP-STACK-A, 2026-11-10 (PP4-N1, PP4-N2 and PP4-N3; two runs)
+
+First run: `cloud/pp9-pack-fragments` merged (39c77dc); PP4-N2 (26817e8), PP4-N1 and the gate over every ga plugin (93accdf), skill revision (27ac41e), case contexts (f96b313), then one model eval run (record 7fa11af). Second run: the first run's uncommitted edits finished to the decision of decision 0005, Section 12 (92bfe1c): Design v2.1 Section 12 is not met (routing 238 of 240; skills 120 of 144; `mhsb-firm-core` 40 of 48 with 2 injection cases failing), so every plugin is held at 0.1.0 and the 0.2.0 entry is unreleased. The L06 operational test fixture, which the longer `/production` body had diluted below the bound, now replaces the body (186a47a). `tools/model_evals.py` was not run in the second run; the record's input digest equals the digest of the tree. No rule in `tools/skill_evals.py` changed in either run.
+
+```
+$ python tools/gen_manifest.py --check | tail -1; python tools/gen_manifest.py --counts > /dev/null; echo $?
+generated files current
+0
+$ python tools/lint.py | tail -1; python tools/lint.py --release | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: textstat
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: textstat
+$ python -m pytest -q | tail -1
+189 passed
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/pack_evals.py | tail -1
+pack evals: 28 cases, 28 passed, 0 failed
+$ python tools/license_gate.py --upstream | tail -1
+license gate: 17 ledger entries, 32 PROVENANCE rows, 0 failure(s)
+$ python -m pytest -q tests/test_release_check.py | tail -1
+23 passed
+$ bash tools/verify_marketplace.sh > /dev/null; echo $?
+0
+$ claude plugin validate . --strict | tail -1
+Validation passed
+$ python tools/model_evals.py --check-release
+RELEASE BLOCKED routing: 238 of 240 passed; a release needs 100 percent
+RELEASE BLOCKED skills: 120 of 144 passed; a release needs 100 percent
+RELEASE BLOCKED mhsb-firm-core is tier ga and its latest eval record fails: 8 of 48 skill cases failed, 2 routing failures involve its skills (ai-policy-draft-04, ai-policy-draft-06, ai-training-06, ask-mhsb-04, before-i-paste-01, before-i-paste-03, explain-this-06, follow-up-05)
+model eval release gate: 3 problem(s)
+```
+
+The gate blocks the release as intended; no digest problem is reported (record and tree: 95afc38ec1b4).
+
+### Step 11. Ultrareview of the tooling subset (2026-11-11)
+
+Six findings fixed (decision 0005, Section 13); four do not reproduce on the full branch.
+
+```
+$ python tools/lint.py | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: standard formula, fallback syllable count
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python -m pytest -q | tail -1
+205 passed, 1 skipped
+```
+
+### Step 12. Fix session FIX-ULTRA-PP8, 2026-11-11 (ultrareview of the tooling subset: A1 to A4 confirmed; P1 to P6 reproduced)
+
+Resume check: `git fetch origin`; the branch head is `302d267` ("fix six findings of the tooling-subset review", pushed earlier today by another session). That commit addresses P1 to P6, but its tests do not cover the forms and cases this contract names. This session therefore writes the contract's tests in `tests/test_ultrareview_tooling.py` and runs them twice: at `cad608b`, the commit the review read, to reproduce each finding, and at `302d267`, to find what remains. Environment: Python 3.12.3, the pinned requirements-dev.txt; a second environment adds textstat 0.7.13 and the CMU dictionary for the textstat path. No model was called. ANTHROPIC_API_KEY is EMPTY.
+
+A1 to A4 (artefacts of the narrowed review diff; confirmed, no change):
+
+```
+$ git ls-files evals/routing/phrases.yaml evals/skills/refusals.yaml | wc -l; git ls-files 'evals/skills/*.yaml' | wc -l
+2
+25                                        (24 skill case files and refusals.yaml)
+$ fragment.yaml check: phi_default at top level; masked_in_reports entries
+12 fragments, 0 without both keys          (lint L15 schema check: 0 errors)
+$ SKILL.md outside mhsb-firm-core: frontmatter metadata.triggers; skill_evals.REQUIRED_SECTIONS
+16 files; metadata.triggers in 0; missing required sections 0
+$ python tools/lint.py | grep -c 'L03\|L06'; python tools/lint.py | tail -1
+0
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: standard formula, fallback syllable count
+$ git ls-files evals/results/
+evals/results/model-evals.json            (status ran, run 2026-11-10T19:53:46Z, digest 95afc38ec1b4)
+```
+
+Failing tests, `python -m pytest -q tests/test_ultrareview_tooling.py`:
+
+```
+at cad608b: 23 failed, 11 passed, 1 skipped
+  P1 invented date not caught: Dec. 10, 2026; Dec 10, 2026; 10 December 2026; 12/10/2026; 12/10/26; December 10
+  P2 tools/lint.py and tools/manifest_lib.py absent from the digest; a change to lint.py leaves it unchanged
+  P3 colon and semicolon lines fused: 1 sentence for 3 lines (fallback path; the textstat path fails the same way)
+  P4 budget-cut run: 1 request; record status 'ran' with routing 1 of 240
+  P5 pending run: model-evals.json overwritten, status now 'pending'
+  P6 'start.', 'dates,', '`dates`' kept as given and scored wrong; no parser to match installed names
+at 302d267: 4 failed, 30 passed, 1 skipped (textstat environment: P3 2 passed)
+  P1 numeric M/D/YY (12/10/26) not caught
+  P2 the module list is written by hand; a new import in skill_evals.py does not enter the digest
+  P6 an unknown name ('calendar', 'calendar.') is returned as the answer instead of no installed skill
+```
+
+P3 grades: on both paths, the terminator change lowers 16 body grades (fallback path) and 17 (textstat path) by 0.1 to 0.2. No grade crosses its bound. Bodies under textstat: 4.7 to 6.0 before, 4.6 to 5.9 after. Description grades do not pass through `prose_for_reading` and are unchanged.
+
+The record was already stale before this session. The digest of the tree differs from the record's in 25 inputs: 21 skill and case files changed by `0d39e9b` (SKILLS-PP-8) after the recorded run, and four tools changed by `302d267`.
+
+Fixes and tests, one commit per finding (FIX-ULTRA-PP8):
+
+| Finding | Change | Commit |
+|---|---|---|
+| P1 date forms | `NUMERIC_DATE_RE` reads a two-digit year as 20YY; the other seven forms were already read (302d267) | 01bc725 |
+| P2 input digest | `scorer_modules` derives the tool modules from the imports of `tools/model_evals.py` (ast, through `tools/`); `DIGEST_GLOBS` lists data only | 42466e5 |
+| P3 sentence count | tests only; `prose_for_reading` already terminates lines not ending in . ? ! (302d267) | cccca3c |
+| P4 truncated runs | tests only; status `truncated`, counts printed, exit 1, gate not passing (302d267) | 11aab3e |
+| P5 record protection | tests only; pending and error runs write `model-evals-last-attempt.json` and print the path (302d267) | b845c47 |
+| P6 answer parser | first word stripped of whitespace, slashes, backticks, quotation marks and trailing punctuation; matched against installed names, else "" | 8b37e5a |
+
+CHECKPOINT A (head 1b5f3c4):
+
+```
+$ python tools/lint.py | tail -1
+lint: 17 rules, 0 error(s), 0 warning(s); reading grade: standard formula, fallback syllable count
+$ python tools/routing_check.py | tail -1
+routing check (description-phrase disjointness): 60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failure(s)
+$ python tools/skill_evals.py | tail -1
+skill evals (reference-transcript conformance): 24 skills, 144 cases, 144 passed, 0 failure(s)
+$ python tools/gen_manifest.py --check
+generated files current
+$ python tools/model_evals.py --check-release; echo $?
+RELEASE BLOCKED input digest 95afc38ec1b4 does not match the tree fc90eff5f40c; re-run the model evals on the current text (changed: ... 27 inputs)
+RELEASE BLOCKED routing: 238 of 240 passed; a release needs 100 percent
+RELEASE BLOCKED skills: 120 of 144 passed; a release needs 100 percent
+RELEASE BLOCKED mhsb-firm-core is tier ga and its latest eval record fails: 8 of 48 skill cases failed, 2 routing failures involve its skills (...)
+model eval release gate: 4 problem(s)
+1
+$ grep -rnP '[\x{2014}\x{2013}\x{2012}]' tools tests plugins catalog docs evals state HANDOFF.md CHANGELOG.md README.md | wc -l
+0
+$ git grep -cE "Ric[h] Berman" | wc -l     (the short form of the owner's name)
+0
+$ python -m pytest -q | tail -1
+239 passed, 2 skipped in 461.51s (0:07:41)
+$ python -m pytest -q tests/test_ultrareview_tooling.py tests/test_lint.py tests/test_routing_and_skill_evals.py | tail -1   (textstat environment)
+171 passed in 436.57s (0:07:16)
+```
+
+The release gate is red as intended. The digest problem follows from P2 and from `0d39e9b`. The pass-rate problems are those of decision 0005, Section 12. `evals/results/model-evals.json` was not edited and no run was made (no key). Remaining item for Richard Berman: a model evaluation rerun on a funded key to replace the stale record before the 0.2.0 release gate can pass (HANDOFF, PP-8 item 6).

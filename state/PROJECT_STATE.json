@@ -1,50 +1,50 @@
 {
   "project": "MHSB Platform Plugins: platform-plugins repository",
-  "stage": "PP-9, Stage 9: twelve pack fragments and pack evals",
-  "branch": "cloud/pp9-pack-fragments",
-  "base": "cloud/pp2-harvest (Stage 1 and Stage 2 pull requests open, not merged)",
+  "stage": "PP-8, Stage 8: skills to final text, routing suite and evals",
+  "branch": "cloud/pp8-skills-evals",
+  "base": "cloud/pp9-pack-fragments at adfce89 (Stages 1, 2 and 9 open, not merged)",
   "checkpoints": [
     {
       "id": "C1",
-      "name": "twelve fragments validate against the Stage 3 schema",
-      "command": "python tools/validate_fragments_service.py --service ../mhsb-firm-service",
+      "name": "lint green across all skills",
+      "command": "python tools/lint.py && python tools/lint.py --release && python tools/skill_evals.py",
       "status": "pass",
-      "evidence": "12 of 12 schema-valid; cross rules pass on 10; PI and business HELD on XR-GA-ADOPTION and XR-STATUTORY until Stage 11 adoption"
+      "evidence": "17 rules, 0 errors, 0 warnings (also --release); 24 skills, 144 reference cases, 144 passed; reading grades under textstat: bodies 4.7 to 6.0, description promises 3.2 to 7.0 (FIX2-PP-STACK-A)"
     },
     {
       "id": "C2",
-      "name": "GA and pilot fragment evals green",
-      "command": "python tools/pack_evals.py",
+      "name": "routing deterministic check green",
+      "command": "python tools/routing_check.py",
       "status": "pass",
-      "evidence": "28 cases, 28 passed (24 GA and pilot, 1 extra PI dates, 3 family law outreach gate)"
+      "evidence": "60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failures"
     },
     {
       "id": "C3",
-      "name": "hidden fragments carry CO-DESIGN.md",
-      "command": "ls plugins/mhsb-pack-*/CO-DESIGN.md | wc -l",
-      "status": "pass",
-      "evidence": "6 of 6; enforced by lint rule L15"
+      "name": "model routing and skill evals",
+      "command": "python tools/model_evals.py",
+      "status": "fail",
+      "evidence": "run 2026-11-10T19:53:46Z, input digest 95afc38ec1b4, equal to the tree at the run and stale since 0d39e9b and FIX-ULTRA-PP8 (HANDOFF PP-8 item 6): routing 238 of 240, skills 120 of 144 (mhsb-firm-core 40 of 48; 6 injection cases fail, 2 in mhsb-firm-core); USD 6.36 of a USD 12 cap; --check-release blocks the release; every plugin held at 0.1.0 (decision 0005, Section 12)"
     },
     {
       "id": "C4",
-      "name": "counts unchanged",
+      "name": "counts table unchanged, at most 22",
       "command": "python tools/gen_manifest.py --check && python tools/gen_manifest.py --counts",
       "status": "pass",
-      "evidence": "895 combinations, maximum 22, combination table identical; two plugin tier rows changed ga to pilot"
+      "evidence": "895 combinations, maximum 22, combination table identical to adfce89"
     },
     {
       "id": "C5",
-      "name": "lint green",
-      "command": "python tools/lint.py && python tools/lint.py --release && python tools/license_gate.py && python -m pytest -q",
+      "name": "CHANGELOG updated",
+      "command": "sed -n '/## Unreleased/,/## Included/p' CHANGELOG.md",
       "status": "pass",
-      "evidence": "15 rules, 0 errors, 0 warnings (also under --release); license gate 0 failures; 97 tests passed"
+      "evidence": "0.2.0 entry for staff, under Unreleased since FIX2-PP-STACK-A; versions held at 0.1.0 in manifest, plugin.json and READMEs until the model evals pass (HANDOFF PP-8 item 1)"
     },
     {
       "id": "C6",
       "name": "no firm name from the specification",
       "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
       "status": "pass",
-      "evidence": "17 identifiers, 0 hits"
+      "evidence": "17 identifiers, 0 hits (case-insensitive and short codes case-sensitive)"
     }
   ],
   "provenance_rows_by_license": {
@@ -62,8 +62,55 @@
       "evidence": "firm_profile/schemas/fragment.schema.json on cloud/pp3-firm-profile-v2 at bfcddee"
     }
   ],
-  "last_verified": "2026-11-03",
+  "last_verified": "2026-11-04",
   "history": [
+    {
+      "stage": "PP-9",
+      "checkpoints": [
+        {
+          "id": "C1",
+          "name": "twelve fragments validate against the Stage 3 schema",
+          "command": "python tools/validate_fragments_service.py --service ../mhsb-firm-service",
+          "status": "pass",
+          "evidence": "12 of 12 schema-valid; cross rules pass on 10; PI and business HELD on XR-GA-ADOPTION and XR-STATUTORY until Stage 11 adoption"
+        },
+        {
+          "id": "C2",
+          "name": "GA and pilot fragment evals green",
+          "command": "python tools/pack_evals.py",
+          "status": "pass",
+          "evidence": "28 cases, 28 passed (24 GA and pilot, 1 extra PI dates, 3 family law outreach gate)"
+        },
+        {
+          "id": "C3",
+          "name": "hidden fragments carry CO-DESIGN.md",
+          "command": "ls plugins/mhsb-pack-*/CO-DESIGN.md | wc -l",
+          "status": "pass",
+          "evidence": "6 of 6; enforced by lint rule L15"
+        },
+        {
+          "id": "C4",
+          "name": "counts unchanged",
+          "command": "python tools/gen_manifest.py --check && python tools/gen_manifest.py --counts",
+          "status": "pass",
+          "evidence": "895 combinations, maximum 22, combination table identical; two plugin tier rows changed ga to pilot"
+        },
+        {
+          "id": "C5",
+          "name": "lint green",
+          "command": "python tools/lint.py && python tools/lint.py --release && python tools/license_gate.py && python -m pytest -q",
+          "status": "pass",
+          "evidence": "15 rules, 0 errors, 0 warnings (also under --release); license gate 0 failures; 97 tests passed"
+        },
+        {
+          "id": "C6",
+          "name": "no firm name from the specification",
+          "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
+          "status": "pass",
+          "evidence": "17 identifiers, 0 hits"
+        }
+      ]
+    },
     {
       "stage": "PP-2",
       "checkpoints": [

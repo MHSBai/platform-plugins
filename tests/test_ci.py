@@ -152,7 +152,9 @@ def test_release_gate_runs_on_every_event() -> None:
     assert "if" not in job
     runs = [s for s in job["steps"] if "lint.py --release" in str(s.get("run", ""))]
     assert len(runs) == 1 and "if" not in runs[0]
+    evals = [s for s in job["steps"] if "model_evals.py --check-release" in str(s.get("run", ""))]
+    assert len(evals) == 1 and "if" not in evals[0]
     for name, other in jobs().items():
         for item in other["steps"]:
-            if "--release" in str(item.get("run", "")):
+            if "--release" in str(item.get("run", "")) or "--check-release" in str(item.get("run", "")):
                 assert "if" not in item, f"{name}: a release step is conditional"

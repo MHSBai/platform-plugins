@@ -10,6 +10,7 @@ practice_area: real_estate
 version: 1.0.0
 release_tier: pilot
 adoption: {adopted_by: null, adopted_on: null, version: 1.0.0}
+phi_default: false
 intake_questions:
 - {id: role, prompt: "The person's role in the transaction", answer_type: choice, choices: [buyer, seller, borrower, lender, landlord, tenant, other], required: true, sensitive_tag: null}
 - {id: property, prompt: "Property address and type", answer_type: address, required: true, sensitive_tag: null}
@@ -79,8 +80,8 @@ consent_flags:
 - {id: multi_party_representation, label: "Multi-party representation consent under the firm's state rule", evidence: [signed_form, engagement_letter_clause], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
 - {id: withdraw_on_conflict_acknowledged, label: "Client acknowledged the withdraw-on-conflict term", evidence: [engagement_letter_clause], verifier_required: true, permitted_channels: [email, letter], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: documents.pre_approval, tag: financial, excluded_from_scoring: true}
-- {field: documents.note_mortgage, tag: financial, excluded_from_scoring: true}
+- {field: documents.pre_approval, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: documents.note_mortgage, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
 brief_views:
 - {id: contingency_dates, name: "Contingency dates"}
 - {id: closing_checklist, name: "Closing checklist"}

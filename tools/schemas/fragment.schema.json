@@ -11,6 +11,7 @@
     "version",
     "release_tier",
     "adoption",
+    "phi_default",
     "intake_questions",
     "attorney_review_flags",
     "document_list",
@@ -26,7 +27,8 @@
   "properties": {
     "fragment_id": {
       "type": "string",
-      "pattern": "^[a-z][a-z0-9_]*$"
+      "pattern": "^[a-z][a-z0-9_]*$(?!\\n)",
+      "maxLength": 254
     },
     "practice_area": {
       "enum": [
@@ -46,7 +48,8 @@
     },
     "version": {
       "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$(?!\\n)",
+      "maxLength": 254
     },
     "release_tier": {
       "enum": [
@@ -57,6 +60,9 @@
     },
     "adoption": {
       "$ref": "#/$defs/adoption"
+    },
+    "phi_default": {
+      "type": "boolean"
     },
     "intake_questions": {
       "type": "array",
@@ -85,7 +91,8 @@
           "notice_or_claim_deadline_question",
           "answer_deadline_question",
           "fee_shifting_question",
-          "eligibility_question"
+          "eligibility_question",
+          "immigration_consequences"
         ]
       },
       "minItems": 1,
@@ -98,11 +105,14 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
+            "pattern": "^[a-z][a-z0-9_]*$(?!\\n)",
+            "maxLength": 254
           },
           "name": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           },
           "required": {
             "type": "boolean"
@@ -124,7 +134,9 @@
         "properties": {
           "fragment_stage": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           },
           "canonical": {
             "enum": [
@@ -172,7 +184,9 @@
         },
         "notes": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "$ref": "#/$defs/safe_text",
+          "maxLength": 500
         }
       },
       "required": [
@@ -188,11 +202,14 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
+            "pattern": "^[a-z][a-z0-9_]*$(?!\\n)",
+            "maxLength": 254
           },
           "name": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           },
           "kind": {
             "enum": [
@@ -207,7 +224,9 @@
             "anyOf": [
               {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "$ref": "#/$defs/safe_text",
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -245,7 +264,9 @@
           "properties": {
             "citation": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "$ref": "#/$defs/safe_text",
+              "maxLength": 500
             },
             "adopter": {
               "$ref": "#/$defs/adoption"
@@ -258,7 +279,8 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[a-z][a-z0-9_]*$"
+        "pattern": "^[a-z][a-z0-9_]*$(?!\\n)",
+        "maxLength": 254
       },
       "uniqueItems": true
     },
@@ -269,11 +291,14 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
+            "pattern": "^[a-z][a-z0-9_]*$(?!\\n)",
+            "maxLength": 254
           },
           "label": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           },
           "evidence": {
             "type": "array",
@@ -337,19 +362,25 @@
         "properties": {
           "field": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           },
           "tag": {
             "$ref": "#/$defs/sensitive_tag"
           },
           "excluded_from_scoring": {
             "const": true
+          },
+          "masked_in_reports": {
+            "type": "boolean"
           }
         },
         "required": [
           "field",
           "tag",
-          "excluded_from_scoring"
+          "excluded_from_scoring",
+          "masked_in_reports"
         ],
         "additionalProperties": false
       }
@@ -361,11 +392,14 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
+            "pattern": "^[a-z][a-z0-9_]*$(?!\\n)",
+            "maxLength": 254
           },
           "name": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           }
         },
         "required": [
@@ -379,10 +413,14 @@
       "type": "array",
       "items": {
         "enum": [
+          "automation_health",
           "caseload",
           "days_in_stage",
+          "deadline_risk_inventory",
+          "document_readiness",
           "flat_fee_budget_vs_actual",
           "follow_up_sla",
+          "handoff_leakage",
           "incident_aging",
           "intake_source",
           "intake_summary",
@@ -394,6 +432,7 @@
           "settlements",
           "signed_vs_sent",
           "sol_tracker",
+          "speed_to_lead",
           "timekeeper_hours",
           "treatment_status"
         ]
@@ -409,7 +448,9 @@
           "anyOf": [
             {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "$ref": "#/$defs/safe_text",
+              "maxLength": 500
             },
             {
               "type": "null"
@@ -421,7 +462,8 @@
             {
               "type": "string",
               "format": "date",
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$(?!\\n)",
+              "maxLength": 254
             },
             {
               "type": "null"
@@ -430,7 +472,8 @@
         },
         "version": {
           "type": "string",
-          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$(?!\\n)",
+          "maxLength": 254
         }
       },
       "required": [
@@ -442,7 +485,9 @@
       "if": {
         "properties": {
           "adopted_by": {
-            "type": "string"
+            "type": "string",
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           }
         }
       },
@@ -451,7 +496,8 @@
           "adopted_on": {
             "type": "string",
             "format": "date",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$(?!\\n)",
+            "maxLength": 254
           }
         }
       }
@@ -461,11 +507,14 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^[a-z][a-z0-9_]*$"
+          "pattern": "^[a-z][a-z0-9_]*$(?!\\n)",
+          "maxLength": 254
         },
         "prompt": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "$ref": "#/$defs/safe_text",
+          "maxLength": 500
         },
         "answer_type": {
           "enum": [
@@ -484,7 +533,9 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "$ref": "#/$defs/safe_text",
+            "maxLength": 500
           },
           "uniqueItems": true
         },
@@ -542,8 +593,16 @@
         "criminal_history",
         "national_origin",
         "protected_class",
-        "financial"
+        "financial",
+        "minor_child",
+        "safety_screen",
+        "contact_rule",
+        "entry_manner"
       ]
+    },
+    "safe_text": {
+      "type": "string",
+      "pattern": "^[^\u0000-\u001f\u007f-\u009f\u00ad\u034f\u0378-\u0379\u0380-\u0383\u038b\u038d\u03a2\u0530\u0557-\u0558\u058b-\u058c\u0590\u05c8-\u05cf\u05eb-\u05ee\u05f5-\u0605\u061c\u06dd\u070e-\u070f\u074b-\u074c\u07b2-\u07bf\u07fb-\u07fc\u082e-\u082f\u083f\u085c-\u085d\u085f\u086b-\u086f\u088f-\u0897\u08e2\u0984\u098d-\u098e\u0991-\u0992\u09a9\u09b1\u09b3-\u09b5\u09ba-\u09bb\u09c5-\u09c6\u09c9-\u09ca\u09cf-\u09d6\u09d8-\u09db\u09de\u09e4-\u09e5\u09ff-\u0a00\u0a04\u0a0b-\u0a0e\u0a11-\u0a12\u0a29\u0a31\u0a34\u0a37\u0a3a-\u0a3b\u0a3d\u0a43-\u0a46\u0a49-\u0a4a\u0a4e-\u0a50\u0a52-\u0a58\u0a5d\u0a5f-\u0a65\u0a77-\u0a80\u0a84\u0a8e\u0a92\u0aa9\u0ab1\u0ab4\u0aba-\u0abb\u0ac6\u0aca\u0ace-\u0acf\u0ad1-\u0adf\u0ae4-\u0ae5\u0af2-\u0af8\u0b00\u0b04\u0b0d-\u0b0e\u0b11-\u0b12\u0b29\u0b31\u0b34\u0b3a-\u0b3b\u0b45-\u0b46\u0b49-\u0b4a\u0b4e-\u0b54\u0b58-\u0b5b\u0b5e\u0b64-\u0b65\u0b78-\u0b81\u0b84\u0b8b-\u0b8d\u0b91\u0b96-\u0b98\u0b9b\u0b9d\u0ba0-\u0ba2\u0ba5-\u0ba7\u0bab-\u0bad\u0bba-\u0bbd\u0bc3-\u0bc5\u0bc9\u0bce-\u0bcf\u0bd1-\u0bd6\u0bd8-\u0be5\u0bfb-\u0bff\u0c0d\u0c11\u0c29\u0c3a-\u0c3b\u0c45\u0c49\u0c4e-\u0c54\u0c57\u0c5b-\u0c5c\u0c5e-\u0c5f\u0c64-\u0c65\u0c70-\u0c76\u0c8d\u0c91\u0ca9\u0cb4\u0cba-\u0cbb\u0cc5\u0cc9\u0cce-\u0cd4\u0cd7-\u0cdc\u0cdf\u0ce4-\u0ce5\u0cf0\u0cf4-\u0cff\u0d0d\u0d11\u0d45\u0d49\u0d50-\u0d53\u0d64-\u0d65\u0d80\u0d84\u0d97-\u0d99\u0db2\u0dbc\u0dbe-\u0dbf\u0dc7-\u0dc9\u0dcb-\u0dce\u0dd5\u0dd7\u0de0-\u0de5\u0df0-\u0df1\u0df5-\u0e00\u0e3b-\u0e3e\u0e5c-\u0e80\u0e83\u0e85\u0e8b\u0ea4\u0ea6\u0ebe-\u0ebf\u0ec5\u0ec7\u0ecf\u0eda-\u0edb\u0ee0-\u0eff\u0f48\u0f6d-\u0f70\u0f98\u0fbd\u0fcd\u0fdb-\u0fff\u10c6\u10c8-\u10cc\u10ce-\u10cf\u115f-\u1160\u1249\u124e-\u124f\u1257\u1259\u125e-\u125f\u1289\u128e-\u128f\u12b1\u12b6-\u12b7\u12bf\u12c1\u12c6-\u12c7\u12d7\u1311\u1316-\u1317\u135b-\u135c\u137d-\u137f\u139a-\u139f\u13f6-\u13f7\u13fe-\u13ff\u169d-\u169f\u16f9-\u16ff\u1716-\u171e\u1737-\u173f\u1754-\u175f\u176d\u1771\u1774-\u177f\u17de-\u17df\u17ea-\u17ef\u17fa-\u17ff\u180b-\u180f\u181a-\u181f\u1879-\u187f\u18ab-\u18af\u18f6-\u18ff\u191f\u192c-\u192f\u193c-\u193f\u1941-\u1943\u196e-\u196f\u1975-\u197f\u19ac-\u19af\u19ca-\u19cf\u19db-\u19dd\u1a1c-\u1a1d\u1a5f\u1a7d-\u1a7e\u1a8a-\u1a8f\u1a9a-\u1a9f\u1aae-\u1aaf\u1acf-\u1aff\u1b4d-\u1b4f\u1b7f\u1bf4-\u1bfb\u1c38-\u1c3a\u1c4a-\u1c4c\u1c89-\u1c8f\u1cbb-\u1cbc\u1cc8-\u1ccf\u1cfb-\u1cff\u1f16-\u1f17\u1f1e-\u1f1f\u1f46-\u1f47\u1f4e-\u1f4f\u1f58\u1f5a\u1f5c\u1f5e\u1f7e-\u1f7f\u1fb5\u1fc5\u1fd4-\u1fd5\u1fdc\u1ff0-\u1ff1\u1ff5\u1fff\u200b-\u200f\u2028-\u202e\u2060-\u206f\u2072-\u2073\u208f\u209d-\u209f\u20c1-\u20cf\u20f1-\u20ff\u218c-\u218f\u2427-\u243f\u244b-\u245f\u2800\u2b74-\u2b75\u2b96\u2cf4-\u2cf8\u2d26\u2d28-\u2d2c\u2d2e-\u2d2f\u2d68-\u2d6e\u2d71-\u2d7e\u2d97-\u2d9f\u2da7\u2daf\u2db7\u2dbf\u2dc7\u2dcf\u2dd7\u2ddf\u2e5e-\u2e7f\u2e9a\u2ef4-\u2eff\u2fd6-\u2fef\u2ffc-\u2fff\u3040\u3097-\u3098\u3100-\u3104\u3130\u3164\u318f\u31e4-\u31ef\u321f\ua48d-\ua48f\ua4c7-\ua4cf\ua62c-\ua63f\ua6f8-\ua6ff\ua7cb-\ua7cf\ua7d2\ua7d4\ua7da-\ua7f1\ua82d-\ua82f\ua83a-\ua83f\ua878-\ua87f\ua8c6-\ua8cd\ua8da-\ua8df\ua954-\ua95e\ua97d-\ua97f\ua9ce\ua9da-\ua9dd\ua9ff\uaa37-\uaa3f\uaa4e-\uaa4f\uaa5a-\uaa5b\uaac3-\uaada\uaaf7-\uab00\uab07-\uab08\uab0f-\uab10\uab17-\uab1f\uab27\uab2f\uab6c-\uab6f\uabee-\uabef\uabfa-\uabff\ud7a4-\ud7af\ud7c7-\ud7ca\ud7fc-\uf8ff\ufa6e-\ufa6f\ufada-\ufaff\ufb07-\ufb12\ufb18-\ufb1c\ufb37\ufb3d\ufb3f\ufb42\ufb45\ufbc3-\ufbd2\ufd90-\ufd91\ufdc8-\ufdce\ufdd0-\ufdef\ufe00-\ufe0f\ufe1a-\ufe1f\ufe53\ufe67\ufe6c-\ufe6f\ufe75\ufefd-\uff00\uffa0\uffbf-\uffc1\uffc8-\uffc9\uffd0-\uffd1\uffd8-\uffd9\uffdd-\uffdf\uffe7\uffef-\ufffb\ufffe-\uffff\ud800\udc0c\ud800\udc27\ud800\udc3b\ud800\udc3e\ud800\udc4e-\ud800\udc4f\ud800\udc5e-\ud800\udc7f\ud800\udcfb-\ud800\udcff\ud800\udd03-\ud800\udd06\ud800\udd34-\ud800\udd36\ud800\udd8f\ud800\udd9d-\ud800\udd9f\ud800\udda1-\ud800\uddcf\ud800\uddfe-\ud800\ude7f\ud800\ude9d-\ud800\ude9f\ud800\uded1-\ud800\udedf\ud800\udefc-\ud800\udeff\ud800\udf24-\ud800\udf2c\ud800\udf4b-\ud800\udf4f\ud800\udf7b-\ud800\udf7f\ud800\udf9e\ud800\udfc4-\ud800\udfc7\ud800\udfd6-\ud800\udfff\ud801\udc9e-\ud801\udc9f\ud801\udcaa-\ud801\udcaf\ud801\udcd4-\ud801\udcd7\ud801\udcfc-\ud801\udcff\ud801\udd28-\ud801\udd2f\ud801\udd64-\ud801\udd6e\ud801\udd7b\ud801\udd8b\ud801\udd93\ud801\udd96\ud801\udda2\ud801\uddb2\ud801\uddba\ud801\uddbd-\ud801\uddff\ud801\udf37-\ud801\udf3f\ud801\udf56-\ud801\udf5f\ud801\udf68-\ud801\udf7f\ud801\udf86\ud801\udfb1\ud801\udfbb-\ud801\udfff\ud802\udc06-\ud802\udc07\ud802\udc09\ud802\udc36\ud802\udc39-\ud802\udc3b\ud802\udc3d-\ud802\udc3e\ud802\udc56\ud802\udc9f-\ud802\udca6\ud802\udcb0-\ud802\udcdf\ud802\udcf3\ud802\udcf6-\ud802\udcfa\ud802\udd1c-\ud802\udd1e\ud802\udd3a-\ud802\udd3e\ud802\udd40-\ud802\udd7f\ud802\uddb8-\ud802\uddbb\ud802\uddd0-\ud802\uddd1\ud802\ude04\ud802\ude07-\ud802\ude0b\ud802\ude14\ud802\ude18\ud802\ude36-\ud802\ude37\ud802\ude3b-\ud802\ude3e\ud802\ude49-\ud802\ude4f\ud802\ude59-\ud802\ude5f\ud802\udea0-\ud802\udebf\ud802\udee7-\ud802\udeea\ud802\udef7-\ud802\udeff\ud802\udf36-\ud802\udf38\ud802\udf56-\ud802\udf57\ud802\udf73-\ud802\udf77\ud802\udf92-\ud802\udf98\ud802\udf9d-\ud802\udfa8\ud802\udfb0-\ud802\udfff\ud803\udc49-\ud803\udc7f\ud803\udcb3-\ud803\udcbf\ud803\udcf3-\ud803\udcf9\ud803\udd28-\ud803\udd2f\ud803\udd3a-\ud803\ude5f\ud803\ude7f\ud803\udeaa\ud803\udeae-\ud803\udeaf\ud803\udeb2-\ud803\udefc\ud803\udf28-\ud803\udf2f\ud803\udf5a-\ud803\udf6f\ud803\udf8a-\ud803\udfaf\ud803\udfcc-\ud803\udfdf\ud803\udff7-\ud803\udfff\ud804\udc4e-\ud804\udc51\ud804\udc76-\ud804\udc7e\ud804\udcbd\ud804\udcc3-\ud804\udccf\ud804\udce9-\ud804\udcef\ud804\udcfa-\ud804\udcff\ud804\udd35\ud804\udd48-\ud804\udd4f\ud804\udd77-\ud804\udd7f\ud804\udde0\ud804\uddf5-\ud804\uddff\ud804\ude12\ud804\ude42-\ud804\ude7f\ud804\ude87\ud804\ude89\ud804\ude8e\ud804\ude9e\ud804\udeaa-\ud804\udeaf\ud804\udeeb-\ud804\udeef\ud804\udefa-\ud804\udeff\ud804\udf04\ud804\udf0d-\ud804\udf0e\ud804\udf11-\ud804\udf12\ud804\udf29\ud804\udf31\ud804\udf34\ud804\udf3a\ud804\udf45-\ud804\udf46\ud804\udf49-\ud804\udf4a\ud804\udf4e-\ud804\udf4f\ud804\udf51-\ud804\udf56\ud804\udf58-\ud804\udf5c\ud804\udf64-\ud804\udf65\ud804\udf6d-\ud804\udf6f\ud804\udf75-\ud804\udfff\ud805\udc5c\ud805\udc62-\ud805\udc7f\ud805\udcc8-\ud805\udccf\ud805\udcda-\ud805\udd7f\ud805\uddb6-\ud805\uddb7\ud805\uddde-\ud805\uddff\ud805\ude45-\ud805\ude4f\ud805\ude5a-\ud805\ude5f\ud805\ude6d-\ud805\ude7f\ud805\udeba-\ud805\udebf\ud805\udeca-\ud805\udeff\ud805\udf1b-\ud805\udf1c\ud805\udf2c-\ud805\udf2f\ud805\udf47-\ud805\udfff\ud806\udc3c-\ud806\udc9f\ud806\udcf3-\ud806\udcfe\ud806\udd07-\ud806\udd08\ud806\udd0a-\ud806\udd0b\ud806\udd14\ud806\udd17\ud806\udd36\ud806\udd39-\ud806\udd3a\ud806\udd47-\ud806\udd4f\ud806\udd5a-\ud806\udd9f\ud806\udda8-\ud806\udda9\ud806\uddd8-\ud806\uddd9\ud806\udde5-\ud806\uddff\ud806\ude48-\ud806\ude4f\ud806\udea3-\ud806\udeaf\ud806\udef9-\ud806\udeff\ud806\udf0a-\ud806\udfff\ud807\udc09\ud807\udc37\ud807\udc46-\ud807\udc4f\ud807\udc6d-\ud807\udc6f\ud807\udc90-\ud807\udc91\ud807\udca8\ud807\udcb7-\ud807\udcff\ud807\udd07\ud807\udd0a\ud807\udd37-\ud807\udd39\ud807\udd3b\ud807\udd3e\ud807\udd48-\ud807\udd4f\ud807\udd5a-\ud807\udd5f\ud807\udd66\ud807\udd69\ud807\udd8f\ud807\udd92\ud807\udd99-\ud807\udd9f\ud807\uddaa-\ud807\udedf\ud807\udef9-\ud807\udeff\ud807\udf11\ud807\udf3b-\ud807\udf3d\ud807\udf5a-\ud807\udfaf\ud807\udfb1-\ud807\udfbf\ud807\udff2-\ud807\udffe\ud808\udf9a-\ud808\udfff\ud809\udc6f\ud809\udc75-\ud809\udc7f\ud809\udd44-\ud80b\udf8f\ud80b\udff3-\ud80b\udfff\ud80d\udc30-\ud80d\udc3f\ud80d\udc56-\ud810\udfff\ud811\ude47-\ud819\udfff\ud81a\ude39-\ud81a\ude3f\ud81a\ude5f\ud81a\ude6a-\ud81a\ude6d\ud81a\udebf\ud81a\udeca-\ud81a\udecf\ud81a\udeee-\ud81a\udeef\ud81a\udef6-\ud81a\udeff\ud81a\udf46-\ud81a\udf4f\ud81a\udf5a\ud81a\udf62\ud81a\udf78-\ud81a\udf7c\ud81a\udf90-\ud81b\ude3f\ud81b\ude9b-\ud81b\udeff\ud81b\udf4b-\ud81b\udf4e\ud81b\udf88-\ud81b\udf8e\ud81b\udfa0-\ud81b\udfdf\ud81b\udfe5-\ud81b\udfef\ud81b\udff2-\ud81b\udfff\ud821\udff8-\ud821\udfff\ud823\udcd6-\ud823\udcff\ud823\udd09-\ud82b\udfef\ud82b\udff4\ud82b\udffc\ud82b\udfff\ud82c\udd23-\ud82c\udd31\ud82c\udd33-\ud82c\udd4f\ud82c\udd53-\ud82c\udd54\ud82c\udd56-\ud82c\udd63\ud82c\udd68-\ud82c\udd6f\ud82c\udefc-\ud82e\udfff\ud82f\udc6b-\ud82f\udc6f\ud82f\udc7d-\ud82f\udc7f\ud82f\udc89-\ud82f\udc8f\ud82f\udc9a-\ud82f\udc9b\ud82f\udca0-\ud833\udeff\ud833\udf2e-\ud833\udf2f\ud833\udf47-\ud833\udf4f\ud833\udfc4-\ud833\udfff\ud834\udcf6-\ud834\udcff\ud834\udd27-\ud834\udd28\ud834\udd73-\ud834\udd7a\ud834\uddeb-\ud834\uddff\ud834\ude46-\ud834\udebf\ud834\uded4-\ud834\udedf\ud834\udef4-\ud834\udeff\ud834\udf57-\ud834\udf5f\ud834\udf79-\ud834\udfff\ud835\udc55\ud835\udc9d\ud835\udca0-\ud835\udca1\ud835\udca3-\ud835\udca4\ud835\udca7-\ud835\udca8\ud835\udcad\ud835\udcba\ud835\udcbc\ud835\udcc4\ud835\udd06\ud835\udd0b-\ud835\udd0c\ud835\udd15\ud835\udd1d\ud835\udd3a\ud835\udd3f\ud835\udd45\ud835\udd47-\ud835\udd49\ud835\udd51\ud835\udea6-\ud835\udea7\ud835\udfcc-\ud835\udfcd\ud836\ude8c-\ud836\ude9a\ud836\udea0\ud836\udeb0-\ud837\udeff\ud837\udf1f-\ud837\udf24\ud837\udf2b-\ud837\udfff\ud838\udc07\ud838\udc19-\ud838\udc1a\ud838\udc22\ud838\udc25\ud838\udc2b-\ud838\udc2f\ud838\udc6e-\ud838\udc8e\ud838\udc90-\ud838\udcff\ud838\udd2d-\ud838\udd2f\ud838\udd3e-\ud838\udd3f\ud838\udd4a-\ud838\udd4d\ud838\udd50-\ud838\ude8f\ud838\udeaf-\ud838\udebf\ud838\udefa-\ud838\udefe\ud838\udf00-\ud839\udccf\ud839\udcfa-\ud839\udfdf\ud839\udfe7\ud839\udfec\ud839\udfef\ud839\udfff\ud83a\udcc5-\ud83a\udcc6\ud83a\udcd7-\ud83a\udcff\ud83a\udd4c-\ud83a\udd4f\ud83a\udd5a-\ud83a\udd5d\ud83a\udd60-\ud83b\udc70\ud83b\udcb5-\ud83b\udd00\ud83b\udd3e-\ud83b\uddff\ud83b\ude04\ud83b\ude20\ud83b\ude23\ud83b\ude25-\ud83b\ude26\ud83b\ude28\ud83b\ude33\ud83b\ude38\ud83b\ude3a\ud83b\ude3c-\ud83b\ude41\ud83b\ude43-\ud83b\ude46\ud83b\ude48\ud83b\ude4a\ud83b\ude4c\ud83b\ude50\ud83b\ude53\ud83b\ude55-\ud83b\ude56\ud83b\ude58\ud83b\ude5a\ud83b\ude5c\ud83b\ude5e\ud83b\ude60\ud83b\ude63\ud83b\ude65-\ud83b\ude66\ud83b\ude6b\ud83b\ude73\ud83b\ude78\ud83b\ude7d\ud83b\ude7f\ud83b\ude8a\ud83b\ude9c-\ud83b\udea0\ud83b\udea4\ud83b\udeaa\ud83b\udebc-\ud83b\udeef\ud83b\udef2-\ud83b\udfff\ud83c\udc2c-\ud83c\udc2f\ud83c\udc94-\ud83c\udc9f\ud83c\udcaf-\ud83c\udcb0\ud83c\udcc0\ud83c\udcd0\ud83c\udcf6-\ud83c\udcff\ud83c\uddae-\ud83c\udde5\ud83c\ude03-\ud83c\ude0f\ud83c\ude3c-\ud83c\ude3f\ud83c\ude49-\ud83c\ude4f\ud83c\ude52-\ud83c\ude5f\ud83c\ude66-\ud83c\udeff\ud83d\uded8-\ud83d\udedb\ud83d\udeed-\ud83d\udeef\ud83d\udefd-\ud83d\udeff\ud83d\udf77-\ud83d\udf7a\ud83d\udfda-\ud83d\udfdf\ud83d\udfec-\ud83d\udfef\ud83d\udff1-\ud83d\udfff\ud83e\udc0c-\ud83e\udc0f\ud83e\udc48-\ud83e\udc4f\ud83e\udc5a-\ud83e\udc5f\ud83e\udc88-\ud83e\udc8f\ud83e\udcae-\ud83e\udcaf\ud83e\udcb2-\ud83e\udcff\ud83e\ude54-\ud83e\ude5f\ud83e\ude6e-\ud83e\ude6f\ud83e\ude7d-\ud83e\ude7f\ud83e\ude89-\ud83e\ude8f\ud83e\udebe\ud83e\udec6-\ud83e\udecd\ud83e\udedc-\ud83e\udedf\ud83e\udee9-\ud83e\udeef\ud83e\udef9-\ud83e\udeff\ud83e\udf93\ud83e\udfcb-\ud83e\udfef\ud83e\udffa-\ud83f\udfff\ud869\udee0-\ud869\udeff\ud86d\udf3a-\ud86d\udf3f\ud86e\udc1e-\ud86e\udc1f\ud873\udea2-\ud873\udeaf\ud87a\udfe1-\ud87d\udfff\ud87e\ude1e-\ud87f\udfff\ud884\udf4b-\ud884\udf4f\ud888\udfb0-\udbff\udfff]*$(?!\\n)"
     }
   }
 }

@@ -8,7 +8,10 @@ Rules (identifier, scope):
   L03 skill-frontmatter   every SKILL.md: allowed keys, required metadata, agreement with the manifest
   L04 dashes              U+2014, U+2013 and U+2012 in any text file
   L05 banned-phrases      marketing phrases, exclamation marks, emoji and listed words in user-facing text
-  L06 reading-level       Flesch-Kincaid grade per SKILL.md body: 9 operational, 12 document
+  L06 reading-level       Flesch-Kincaid grade per SKILL.md body and per description (trigger
+                          sentence removed): 9 operational, 12 document. textstat when it and
+                          its dictionary are installed, else the standard formula with
+                          textstat's sentence and word rules (FK_IMPLEMENTATION)
   L07 coverage            "coverage" and "not retrieved" in every connected skill body
   L08 command-cap         command count above the cap in any supported combination
   L09 duplicate-commands  duplicate command names within any supported combination
@@ -79,7 +82,7 @@ EMOJI_RE = re.compile(
 FK_LIMITS = {"operational": 9.0, "document": 12.0}
 
 ALLOWED_SKILL_KEYS = {"name", "description", "metadata", "license", "compatibility", "allowed-tools"}
-REQUIRED_SKILL_METADATA = ("register", "connector", "pack", "triggers")
+REQUIRED_SKILL_METADATA = ("register", "connector", "pack")
 
 FORBIDDEN_PLUGIN_PATHS = ("hooks", "agents", "bin", "commands", "monitors", "output-styles",
                           "themes", "workflows", ".lsp.json", "settings.json", "CLAUDE.md")
@@ -172,17 +175,35 @@ def phrases_overlap(a: str, b: str) -> bool:
 
 
 _VOWEL_RUN = re.compile(r"[aeiouy]+")
+# "ia" is two syllables (tri-al, me-di-a, recon-cil-i-a-tion) except after c, g, s or t
+# (spe-cial, ini-tial, A-sia); a silent e after a vowel and a consonant drops before
+# "ment" (state-ment, re-quire-ment).
+_IA_HIATUS = re.compile(r"(?<![cgst])ia")
+_SILENT_E_MENT = re.compile(r"(?<=[aeiouy][^aeiouy])e(?=ments?$)")
+# Silent endings: "-ed" except after t or d (list-ed, record-ed); "-es" except after c, g, s,
+# x or z (phras-es, plac-es) or a consonant and l (ta-bles); a final "e" except after a
+# consonant and l (ta-ble). After a vowel and l the e is silent (file, role, pro-file).
+_SILENT_ENDING = re.compile(
+    r"(?:(?<=[^aeiouytd])ed|(?<=[^aeiouycgsxzl])es|(?<=[aeiouy]l)es|(?<=[^aeiouyl])e|(?<=[aeiouy]l)e)$"
+)
 
 
 def count_syllables(word: str) -> int:
+    """Syllables in one word: a vowel-group heuristic tuned to agree with textstat.
+
+    textstat counts from the CMU pronouncing dictionary. This heuristic is the fallback
+    used when textstat or its dictionary is not available; on the lint's fixtures it gives
+    the same count as textstat (tests/test_lint.py, test_fk_fallback_matches_textstat).
+    """
     word = re.sub(r"[^a-z]", "", word.lower())
     if not word:
-        return 0
+        return 1
     if len(word) <= 3:
         return 1
-    stripped = re.sub(r"(?:[^laeiouy]es|[^laeiouy]ed|[^laeiouy]e)$", "", word)
+    word = _SILENT_E_MENT.sub("", word)
+    stripped = _SILENT_ENDING.sub("", word)
     stripped = re.sub(r"^y", "", stripped)
-    return max(1, len(_VOWEL_RUN.findall(stripped)))
+    return max(1, len(_VOWEL_RUN.findall(stripped)) + len(_IA_HIATUS.findall(stripped)))
 
 
 def prose_for_reading(body: str) -> str:
@@ -196,19 +217,66 @@ def prose_for_reading(body: str) -> str:
         if not stripped or stripped.startswith("|"):
             continue
         stripped = re.sub(r"^(#+|[-*]|\d+\.)\s*", "", stripped)
-        if stripped and stripped[-1] not in ".?:;":
+        if stripped and stripped[-1] not in ".?!":
             stripped += "."
         lines.append(stripped)
     return " ".join(lines)
 
 
-def flesch_kincaid_grade(text: str) -> float:
-    sentences = [s for s in re.split(r"[.?:;]+(?:\s|$)", text) if re.search(r"[A-Za-z]", s)]
-    words = re.findall(r"[A-Za-z][A-Za-z'\-]*", text)
-    if not sentences or not words:
+# Flesch-Kincaid grade (PP4-N2). The standard implementation is textstat's, used when the
+# package and its pronunciation dictionary are both present; the lint never downloads the
+# dictionary. Otherwise the same formula runs with textstat's sentence and word rules and the
+# syllable heuristic above.
+try:  # optional dependency
+    import textstat as _textstat  # type: ignore[import-not-found]
+except ImportError:  # pragma: no cover - depends on the environment
+    _textstat = None
+
+_TS_NON_CONTRACTION_APOSTROPHE = re.compile(r"'(?!(?:[tsd]|ve|ll|re))")
+
+
+def _textstat_ready() -> bool:
+    if _textstat is None:
+        return False
+    try:
+        import nltk  # noqa: PLC0415
+
+        nltk.data.find("corpora/cmudict")
+    except (ImportError, LookupError):
+        return False
+    return True
+
+
+FK_IMPLEMENTATION = "textstat" if _textstat_ready() else "standard formula, fallback syllable count"
+
+
+def fk_words(text: str) -> list[str]:
+    """Words as textstat lists them: punctuation removed, contractions and hyphenations kept whole."""
+    text = _TS_NON_CONTRACTION_APOSTROPHE.sub("", text)
+    return re.sub(r"[^\w\s']", "", text).lower().split()
+
+
+def fk_sentence_count(text: str) -> int:
+    """Sentences as textstat counts them: runs ending at . ? !, ignoring runs of two words or fewer."""
+    if not text:
+        return 0
+    runs = re.findall(r"\b[^.!?]+[.!?]*", text)
+    return max(1, len(runs) - sum(1 for run in runs if len(fk_words(run)) <= 2))
+
+
+def standard_fk_grade(text: str) -> float:
+    """0.39 x words per sentence + 11.8 x syllables per word - 15.59, with textstat's counting rules."""
+    words = fk_words(text)
+    if not words:
         return 0.0
-    syllables = sum(count_syllables(w) for part in words for w in part.split("-"))
-    return 0.39 * (len(words) / len(sentences)) + 11.8 * (syllables / len(words)) - 15.59
+    syllables = sum(count_syllables(w) for w in words)
+    return 0.39 * (len(words) / fk_sentence_count(text)) + 11.8 * (syllables / len(words)) - 15.59
+
+
+def flesch_kincaid_grade(text: str) -> float:
+    if FK_IMPLEMENTATION == "textstat":
+        return float(_textstat.flesch_kincaid_grade(text))
+    return standard_fk_grade(text)
 
 
 def load_json(path: Path) -> tuple[Any, str | None]:
@@ -392,8 +460,13 @@ def rule_skill_frontmatter(ctx: Context) -> list[Finding]:
             findings.append(Finding("L03", rel, "metadata.register differs from the manifest"))
         if meta.get("connector") != command.connector:
             findings.append(Finding("L03", rel, "metadata.connector differs from the manifest"))
-        if list(meta.get("triggers") or []) != list(command.triggers):
-            findings.append(Finding("L03", rel, "metadata.triggers differ from the manifest"))
+        if "triggers" in meta:
+            findings.append(Finding("L03", rel, "metadata.triggers is not read by Claude Code; trigger "
+                                                "phrases belong in the description"))
+        quoted = {normalize_phrase(q) for q in re.findall(r'"([^"]+)"', str(desc or ""))}
+        for trigger in command.triggers:
+            if normalize_phrase(trigger) not in quoted:
+                findings.append(Finding("L03", rel, f"description does not quote trigger phrase '{trigger}'"))
     for plugin_name, name in sorted(set(expected) - found):
         findings.append(Finding("L03", f"{ctx.manifest.plugin_root}/{plugin_name}/skills/{name}/SKILL.md",
                                 "manifest command has no SKILL.md"))
@@ -464,7 +537,23 @@ def rule_reading_level(ctx: Context) -> list[Finding]:
         if grade > limit:
             findings.append(Finding("L06", ctx.rel(path),
                                     f"Flesch-Kincaid grade {grade:.1f} exceeds {limit:.0f} for {register}"))
+        promise = description_promise(str(data.get("description", "")))
+        if promise:
+            grade = flesch_kincaid_grade(promise)
+            if grade > limit:
+                findings.append(Finding("L06", ctx.rel(path),
+                                        f"description Flesch-Kincaid grade {grade:.1f} exceeds {limit:.0f} "
+                                        f"for {register}"))
     return findings
+
+
+TRIGGER_SENTENCE = "Use when a user asks"
+
+
+def description_promise(description: str) -> str:
+    """The description without its trigger sentence: the text staff read in the command menu."""
+    text = " ".join(description.split())
+    return text.split(TRIGGER_SENTENCE, 1)[0].strip()
 
 
 def rule_coverage(ctx: Context) -> list[Finding]:
@@ -923,7 +1012,8 @@ def main(argv: list[str] | None = None) -> int:
         print(finding.render())
     errors = [f for f in findings if f.severity == "error"]
     warnings = [f for f in findings if f.severity == "warning"]
-    print(f"lint: {len(RULES)} rules, {len(errors)} error(s), {len(warnings)} warning(s)")
+    print(f"lint: {len(RULES)} rules, {len(errors)} error(s), {len(warnings)} warning(s); "
+          f"reading grade: {FK_IMPLEMENTATION}")
     return 1 if errors else 0
 
 

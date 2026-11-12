@@ -12,6 +12,7 @@ practice_area: employment_plaintiff
 version: 0.1.0
 release_tier: hidden
 adoption: {adopted_by: null, adopted_on: null, version: 0.1.0}
+phi_default: true
 intake_questions:
 - {id: employment_status, prompt: "Current employment status", answer_type: choice, choices: [employed, terminated, resigned, on leave, other], required: true, sensitive_tag: null}
 - {id: employer_size, prompt: "Approximate number of employees at the employer", answer_type: number, required: false, sensitive_tag: null}
@@ -74,8 +75,8 @@ consent_flags:
 - {id: client_taken_documents_reviewed, label: "Documents the client took from the employer reviewed by the attorney", evidence: [platform_field], verifier_required: true, permitted_channels: [], expiry_days: null, when_unknown: not_permitted}
 - {id: no_case_discussion_by_text_or_social, label: "Client acknowledged that the case is not discussed by text or social media", evidence: [signed_form, engagement_letter_clause], verifier_required: true, permitted_channels: [email, portal, letter], expiry_days: null, when_unknown: not_permitted}
 sensitive_field_tags:
-- {field: intake.protected_activity_or_class, tag: protected_class, excluded_from_scoring: true}
-- {field: intake.pay_hours, tag: financial, excluded_from_scoring: true}
-- {field: record.health_information, tag: health, excluded_from_scoring: true}
+- {field: intake.protected_activity_or_class, tag: protected_class, excluded_from_scoring: true, masked_in_reports: true}
+- {field: intake.pay_hours, tag: financial, excluded_from_scoring: true, masked_in_reports: true}
+- {field: record.health_information, tag: health, excluded_from_scoring: true, masked_in_reports: true}
 brief_views: []
 reports: []
