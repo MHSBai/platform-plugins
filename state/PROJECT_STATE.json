@@ -16,14 +16,14 @@
       "name": "the gate's own tests",
       "command": "tools/release-gate.sh --self-test (python -m pytest -q tests/test_release_gate.py)",
       "status": "pass",
-      "evidence": "6 passed"
+      "evidence": "8 passed (9d9f17a)"
     },
     {
       "id": "G3",
       "name": "release gate output recorded",
-      "command": "tools/release-gate.sh --own-only, run by the firm service gate (item R7) on 35be1e9",
+      "command": "tools/release-gate.sh --own-only, run by the firm service gate (item R7) at e819f14 with this checkout at 9d9f17a",
       "status": "red by design",
-      "evidence": "P0 to P7 and P9 PASS (tests 245 passed, 2 skipped; pack evals 28 of 28; skill evals 144 of 144); P8 FAIL: the model eval record predates the current text (digest 95afc38ec1b4 against fc90eff5f40c), routing 238 of 240, skills 120 of 144, mhsb-firm-core listed at ga although decision D10 holds it at pilot; RELEASE GATE: RED"
+      "evidence": "P0 to P7 and P9 PASS (tests 247 passed, 2 skipped; pack evals 28 of 28; skill evals 144 of 144; license gate 0 failures); P8 FAIL: the model eval record predates the current text (digest 95afc38ec1b4 against fc90eff5f40c), routing 238 of 240, skills 120 of 144, mhsb-firm-core at ga although decision D10 holds it at pilot; RELEASE GATE: RED"
     },
     {
       "id": "G4",
@@ -31,6 +31,13 @@
       "command": "grep -n 'Release gate' docs/release.md",
       "status": "pass",
       "evidence": "section Release gate with the item table and the state on 2026-11-11"
+    },
+    {
+      "id": "G5",
+      "name": "independent review of the gate (rule 9)",
+      "command": "tests/test_release_gate.py (fae056b, failing against its gate) then the fix 9d9f17a",
+      "status": "pass",
+      "evidence": "P10 checks that the service checkout is the firm service and not this checkout; P0 counts untracked files"
     }
   ],
   "provenance_rows_by_license": {

@@ -775,3 +775,9 @@ Recorded output, `tools/release-gate.sh --own-only` on 35be1e9, run by the firm 
 Verdict: RELEASE GATE: RED, on P8 only. P8 is not a hosting item: it clears when the model evals are re-run on a funded key on the current text and every case passes, and D10 is applied (gates G-P211-EVALS and G-P211-D10). `tools/release-gate.sh --self-test`: 6 passed.
 
 CI on 35be1e9: `lint` and `tests` green; `release-gate` red (P8, as above) and `agent-scan` red (`SNYK_TOKEN` absent, decision D8, gate G-P211-SNYK), both by design and both red on `main` at 295c367 as well. The pull request is therefore not merged by this stage.
+
+### P2.11 addendum: the independent review of the gate (2026-11-11)
+
+A fresh reviewer given only the Stage 12 diff, the specification sections and the stage's claims found that P10 accepted any directory whose gate exits 3 (this checkout included) and that P0 ignored untracked files. Tests first (fae056b, which fail against that commit's gate), then the fix (9d9f17a): P10 runs only from a directory carrying the firm service's gate, controls and checks tools that is not this checkout, and P0 counts untracked files outside the ignored ones; the header states that P3 and P9 can reach the network. `tools/release-gate.sh --self-test`: 8 passed.
+
+Recorded output at 9d9f17a (run by the firm service gate at e819f14, its item R7): P0 to P7 and P9 PASS (tests 247 passed, 2 skipped; pack evals 28 of 28; skill evals 144 of 144; license gate 17 ledger entries, 32 PROVENANCE rows, 0 failures); P8 FAIL on the same four model eval problems; RELEASE GATE: RED, on P8 only.
