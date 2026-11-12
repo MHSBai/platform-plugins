@@ -749,3 +749,35 @@ $ python -m pytest -q tests/test_ultrareview_tooling.py tests/test_lint.py tests
 ```
 
 The release gate is red as intended. The digest problem follows from P2 and from `0d39e9b`. The pass-rate problems are those of decision 0005, Section 12. `evals/results/model-evals.json` was not edited and no run was made (no key). Remaining item for Richard Berman: a model evaluation rerun on a funded key to replace the stale record before the 0.2.0 release gate can pass (HANDOFF, PP-8 item 6).
+
+## P2.11, Stage 12: the release gate (2026-11-11)
+
+Run P2.11-20261111-212504 (pp-ops, headless) on pop-os. Branch `pp/p211-release-gate` from `main` at 295c367; draft pull request MHSBai/platform-plugins#5. The companion pull request in the firm service repository carries that repository's gate, the internal security review and the external test packet. Synthetic data only; no model evaluation was run (a charge beyond this stage's zero cap) and no secret was read.
+
+Delivered: `tools/release-gate.sh` (items P0 to P10, `--own-only`, `--self-test`), `tests/test_release_gate.py`, and the "Release gate" section of `docs/release.md`. Each repository's gate runs the other's own items, so one run covers every item of Prompts v2.0 Prompt 12 step 4; a missing sibling checkout is a failure, never a skip.
+
+Recorded output, `tools/release-gate.sh --own-only` on 35be1e9, run by the firm service gate (its item R7) at 2026-11-12T05:18Z (Fact):
+
+| Item | Result |
+|---|---|
+| P0 committed tree | PASS |
+| P1 generated files current | PASS |
+| P2 lint | PASS (17 rules, 0 errors) |
+| P3 release lint | PASS |
+| P4 unit tests | PASS (245 passed, 2 skipped) |
+| P5 pack evals | PASS (28 of 28) |
+| P6 routing suite (deterministic) | PASS |
+| P7 skill evals (reference transcripts) | PASS (24 skills, 144 of 144) |
+| P8 model eval release gate | FAIL: the record's input digest 95afc38ec1b4 does not match the tree fc90eff5f40c; routing 238 of 240; skills 120 of 144; mhsb-firm-core is listed at ga although decision D10 holds it at pilot |
+| P9 PROVENANCE and license gate | PASS (upstream hashes fetched) |
+| P10 firm service items | PARTIAL (not run in `--own-only`) |
+
+Verdict: RELEASE GATE: RED, on P8 only. P8 is not a hosting item: it clears when the model evals are re-run on a funded key on the current text and every case passes, and D10 is applied (gates G-P211-EVALS and G-P211-D10). `tools/release-gate.sh --self-test`: 6 passed.
+
+CI on 35be1e9: `lint` and `tests` green; `release-gate` red (P8, as above) and `agent-scan` red (`SNYK_TOKEN` absent, decision D8, gate G-P211-SNYK), both by design and both red on `main` at 295c367 as well. The pull request is therefore not merged by this stage.
+
+### P2.11 addendum: the independent review of the gate (2026-11-11)
+
+A fresh reviewer given only the Stage 12 diff, the specification sections and the stage's claims found that P10 accepted any directory whose gate exits 3 (this checkout included) and that P0 ignored untracked files. Tests first (fae056b, which fail against that commit's gate), then the fix (9d9f17a): P10 runs only from a directory carrying the firm service's gate, controls and checks tools that is not this checkout, and P0 counts untracked files outside the ignored ones; the header states that P3 and P9 can reach the network. `tools/release-gate.sh --self-test`: 8 passed.
+
+Recorded output at 9d9f17a (run by the firm service gate at e819f14, its item R7): P0 to P7 and P9 PASS (tests 247 passed, 2 skipped; pack evals 28 of 28; skill evals 144 of 144; license gate 17 ledger entries, 32 PROVENANCE rows, 0 failures); P8 FAIL on the same four model eval problems; RELEASE GATE: RED, on P8 only.
