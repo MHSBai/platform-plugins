@@ -1,50 +1,36 @@
 {
   "project": "MHSB Platform Plugins: platform-plugins repository",
-  "stage": "PP-8, Stage 8: skills to final text, routing suite and evals",
-  "branch": "cloud/pp8-skills-evals",
-  "base": "cloud/pp9-pack-fragments at adfce89 (Stages 1, 2 and 9 open, not merged)",
+  "stage": "P2.11, Stage 12: the release gate of this repository",
+  "branch": "pp/p211-release-gate",
+  "base": "main at 295c367 (Stage 8, #4 merged); draft pull request MHSBai/platform-plugins#5",
   "checkpoints": [
     {
-      "id": "C1",
-      "name": "lint green across all skills",
-      "command": "python tools/lint.py && python tools/lint.py --release && python tools/skill_evals.py",
+      "id": "G1",
+      "name": "tools/release-gate.sh covers every item of Prompts v2.0 Prompt 12 step 4, with the firm service gate's own items as P10",
+      "command": "tools/release-gate.sh (P0 to P10); tools/release-gate.sh --own-only",
       "status": "pass",
-      "evidence": "17 rules, 0 errors, 0 warnings (also --release); 24 skills, 144 reference cases, 144 passed; reading grades under textstat: bodies 4.7 to 6.0, description promises 3.2 to 7.0 (FIX2-PP-STACK-A)"
+      "evidence": "items P0 committed tree, P1 generated files, P2 lint, P3 release lint, P4 tests, P5 pack evals, P6 routing, P7 skill evals, P8 model eval release check, P9 license gate with upstream hashes, P10 the service gate --own-only; a missing service checkout fails P10"
     },
     {
-      "id": "C2",
-      "name": "routing deterministic check green",
-      "command": "python tools/routing_check.py",
+      "id": "G2",
+      "name": "the gate's own tests",
+      "command": "tools/release-gate.sh --self-test (python -m pytest -q tests/test_release_gate.py)",
       "status": "pass",
-      "evidence": "60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failures"
+      "evidence": "6 passed"
     },
     {
-      "id": "C3",
-      "name": "model routing and skill evals",
-      "command": "python tools/model_evals.py",
-      "status": "fail",
-      "evidence": "run 2026-11-10T19:53:46Z, input digest 95afc38ec1b4, equal to the tree at the run and stale since 0d39e9b and FIX-ULTRA-PP8 (HANDOFF PP-8 item 6): routing 238 of 240, skills 120 of 144 (mhsb-firm-core 40 of 48; 6 injection cases fail, 2 in mhsb-firm-core); USD 6.36 of a USD 12 cap; --check-release blocks the release; every plugin held at 0.1.0 (decision 0005, Section 12)"
+      "id": "G3",
+      "name": "release gate output recorded",
+      "command": "tools/release-gate.sh --own-only, run by the firm service gate (item R7) on 35be1e9",
+      "status": "red by design",
+      "evidence": "P0 to P7 and P9 PASS (tests 245 passed, 2 skipped; pack evals 28 of 28; skill evals 144 of 144); P8 FAIL: the model eval record predates the current text (digest 95afc38ec1b4 against fc90eff5f40c), routing 238 of 240, skills 120 of 144, mhsb-firm-core listed at ga although decision D10 holds it at pilot; RELEASE GATE: RED"
     },
     {
-      "id": "C4",
-      "name": "counts table unchanged, at most 22",
-      "command": "python tools/gen_manifest.py --check && python tools/gen_manifest.py --counts",
+      "id": "G4",
+      "name": "docs/release.md documents the gate",
+      "command": "grep -n 'Release gate' docs/release.md",
       "status": "pass",
-      "evidence": "895 combinations, maximum 22, combination table identical to adfce89"
-    },
-    {
-      "id": "C5",
-      "name": "CHANGELOG updated",
-      "command": "sed -n '/## Unreleased/,/## Included/p' CHANGELOG.md",
-      "status": "pass",
-      "evidence": "0.2.0 entry for staff, under Unreleased since FIX2-PP-STACK-A; versions held at 0.1.0 in manifest, plugin.json and READMEs until the model evals pass (HANDOFF PP-8 item 1)"
-    },
-    {
-      "id": "C6",
-      "name": "no firm name from the specification",
-      "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
-      "status": "pass",
-      "evidence": "17 identifiers, 0 hits (case-insensitive and short codes case-sensitive)"
+      "evidence": "section Release gate with the item table and the state on 2026-11-11"
     }
   ],
   "provenance_rows_by_license": {
@@ -60,9 +46,30 @@
       "action": "STOP if absent",
       "status": "not triggered",
       "evidence": "firm_profile/schemas/fragment.schema.json on cloud/pp3-firm-profile-v2 at bfcddee"
+    },
+    {
+      "id": "G-P211-EVALS",
+      "name": "re-run the model evals on the current text on a funded key (P8)",
+      "action": "Roo: renew the evals key, then python tools/model_evals.py (cost beyond this stage's zero cap)",
+      "status": "open",
+      "evidence": "tools/model_evals.py --check-release: 4 problems on 35be1e9"
+    },
+    {
+      "id": "G-P211-D10",
+      "name": "apply decision D10 (mhsb-firm-core at pilot until every case passes)",
+      "action": "a later stage changes the tier in catalog/manifest.yaml and regenerates",
+      "status": "open",
+      "evidence": "catalog/manifest.yaml lists mhsb-firm-core at tier ga"
+    },
+    {
+      "id": "G-P211-SNYK",
+      "name": "agent-scan needs SNYK_TOKEN (decision D8)",
+      "action": "Roo: gh secret set SNYK_TOKEN --repo MHSBai/platform-plugins, or decide D8",
+      "status": "open",
+      "evidence": "agent-scan fails on every event without the secret (by design)"
     }
   ],
-  "last_verified": "2026-11-04",
+  "last_verified": "2026-11-11",
   "history": [
     {
       "stage": "PP-9",
@@ -155,6 +162,55 @@
           "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
           "status": "pass",
           "evidence": "15 identifiers, 0 hits"
+        }
+      ]
+    },
+    {
+      "stage": "PP-8, Stage 8: skills to final text, routing suite and evals",
+      "branch": "cloud/pp8-skills-evals",
+      "base": "cloud/pp9-pack-fragments at adfce89 (Stages 1, 2 and 9 open, not merged)",
+      "checkpoints": [
+        {
+          "id": "C1",
+          "name": "lint green across all skills",
+          "command": "python tools/lint.py && python tools/lint.py --release && python tools/skill_evals.py",
+          "status": "pass",
+          "evidence": "17 rules, 0 errors, 0 warnings (also --release); 24 skills, 144 reference cases, 144 passed; reading grades under textstat: bodies 4.7 to 6.0, description promises 3.2 to 7.0 (FIX2-PP-STACK-A)"
+        },
+        {
+          "id": "C2",
+          "name": "routing deterministic check green",
+          "command": "python tools/routing_check.py",
+          "status": "pass",
+          "evidence": "60 phrases, 895 combinations, 4 command sets, 53700 checks, 0 failures"
+        },
+        {
+          "id": "C3",
+          "name": "model routing and skill evals",
+          "command": "python tools/model_evals.py",
+          "status": "fail",
+          "evidence": "run 2026-11-10T19:53:46Z, input digest 95afc38ec1b4, equal to the tree at the run and stale since 0d39e9b and FIX-ULTRA-PP8 (HANDOFF PP-8 item 6): routing 238 of 240, skills 120 of 144 (mhsb-firm-core 40 of 48; 6 injection cases fail, 2 in mhsb-firm-core); USD 6.36 of a USD 12 cap; --check-release blocks the release; every plugin held at 0.1.0 (decision 0005, Section 12)"
+        },
+        {
+          "id": "C4",
+          "name": "counts table unchanged, at most 22",
+          "command": "python tools/gen_manifest.py --check && python tools/gen_manifest.py --counts",
+          "status": "pass",
+          "evidence": "895 combinations, maximum 22, combination table identical to adfce89"
+        },
+        {
+          "id": "C5",
+          "name": "CHANGELOG updated",
+          "command": "sed -n '/## Unreleased/,/## Included/p' CHANGELOG.md",
+          "status": "pass",
+          "evidence": "0.2.0 entry for staff, under Unreleased since FIX2-PP-STACK-A; versions held at 0.1.0 in manifest, plugin.json and READMEs until the model evals pass (HANDOFF PP-8 item 1)"
+        },
+        {
+          "id": "C6",
+          "name": "no firm name from the specification",
+          "command": "grep -rnIiwF -f <private denylist> --exclude-dir=.git --exclude-dir=harvest --exclude-dir=.venv .",
+          "status": "pass",
+          "evidence": "17 identifiers, 0 hits (case-insensitive and short codes case-sensitive)"
         }
       ]
     }
